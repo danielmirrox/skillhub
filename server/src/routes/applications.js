@@ -30,6 +30,20 @@ applicationsRouter.post('/', requireAuth, (req, res, next) => {
 
     return res.status(201).json({ application });
   } catch (error) {
+    if (error.code === 'TEAM_NOT_FOUND') {
+      return res.status(404).json({
+        error: error.code,
+        message: error.message,
+      });
+    }
+
+    if (error.code === 'TEAM_NOT_ACCEPTING_APPLICATIONS' || error.code === 'CANNOT_APPLY_TO_OWN_TEAM') {
+      return res.status(409).json({
+        error: error.code,
+        message: error.message,
+      });
+    }
+
     return next(error);
   }
 });

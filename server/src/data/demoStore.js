@@ -466,6 +466,37 @@ function buildUserSummary(userId, viewer) {
   };
 }
 
+function getRatingHistoryByUserId(userId) {
+  const profile = getProfileByUserId(userId);
+  if (!profile) {
+    return [];
+  }
+
+  return ratings
+    .filter((rating) => rating.profileId === profile.id)
+    .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
+    .map((rating) => clone(rating));
+}
+
+function getScoreJobStatus(jobId, userId) {
+  const profile = getProfileByUserId(userId);
+  if (!profile) {
+    return null;
+  }
+
+  const rating = ratings.find((item) => item.id === jobId && item.profileId === profile.id);
+  if (!rating) {
+    return null;
+  }
+
+  return {
+    jobId,
+    status: 'completed',
+    score: rating.score,
+    createdAt: rating.createdAt,
+  };
+}
+
 function getTeamMembers(teamId) {
   return teamMembers.filter((member) => member.teamId === teamId).map((member) => {
     const user = getUserById(member.userId);
@@ -617,6 +648,28 @@ function listApplicationsForUser(userId) {
 }
 
 function createApplication({ applicantId, teamId, message }) {
+  const team = teams.find((item) => item.id === teamId);
+  if (!team) {
+    const error = new Error('Team not found.');
+    error.statusCode = 404;
+    error.code = 'TEAM_NOT_FOUND';
+    throw error;
+  }
+
+  if (!team.isActive || team.status !== 'active') {
+    const error = new Error('Team is not accepting applications.');
+    error.statusCode = 409;
+    error.code = 'TEAM_NOT_ACCEPTING_APPLICATIONS';
+    throw error;
+  }
+
+  if (team.authorId === applicantId) {
+    const error = new Error('Team author cannot apply to own team.');
+    error.statusCode = 409;
+    error.code = 'CANNOT_APPLY_TO_OWN_TEAM';
+    throw error;
+  }
+
   const existing = applications.find(
     (application) => application.applicantId === applicantId && application.teamId === teamId
   );
@@ -898,6 +951,8 @@ module.exports = {
     buildPublicProfile,
     buildOwnProfile,
     buildUserSummary,
+    getRatingHistoryByUserId,
+    getScoreJobStatus,
     listUsers,
     listTeams,
     getTeamById,
