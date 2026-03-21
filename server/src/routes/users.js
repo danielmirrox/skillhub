@@ -27,4 +27,17 @@ usersRouter.get('/me', requireAuth, (req, res) => {
   return res.json(demoStore.getAuthMe(req.user.id));
 });
 
+usersRouter.get('/:id', requireAuth, (req, res) => {
+  const summary = demoStore.buildUserSummary(req.params.id, req.user);
+
+  if (!summary) {
+    return res.status(404).json({
+      error: 'USER_NOT_FOUND',
+      message: 'User not found.',
+    });
+  }
+
+  return res.json({ user: summary });
+});
+
 module.exports = { usersRouter };

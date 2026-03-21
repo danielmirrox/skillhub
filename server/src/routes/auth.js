@@ -32,10 +32,29 @@ authRouter.get('/github/callback', (_req, res) => {
   });
 });
 
-authRouter.get('/me', requireAuth, (req, res) => {
+authRouter.post('/logout', requireAuth, (_req, res) => {
   return res.json({
-    user: req.user,
-    profile: demoStore.getAuthMe(req.user.id).profile,
+    success: true,
+    message: 'Logged out.',
+  });
+});
+
+authRouter.get('/me', requireAuth, (req, res) => {
+  const me = demoStore.getAuthMe(req.user.id);
+
+  return res.json({
+    user: {
+      id: me.user.id,
+      username: me.user.username,
+      displayName: me.user.displayName,
+      avatarUrl: me.user.avatarUrl,
+      email: me.user.email,
+      isPro: me.user.isPro,
+      proExpiresAt: me.user.proExpiresAt,
+      role: me.user.userRole,
+      userRole: me.user.userRole,
+    },
+    profile: me.profile,
   });
 });
 

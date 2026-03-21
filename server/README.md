@@ -26,9 +26,11 @@ Backend API for the SkillHub hackathon product.
 ## Main routes
 
 - `GET /health`
+- `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
 - `GET /api/v1/profile`
 - `GET /api/v1/users`
+- `GET /api/v1/users/:id`
 - `GET /api/v1/teams`
 - `GET /api/v1/applications`
 

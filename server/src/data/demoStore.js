@@ -444,6 +444,28 @@ function listUsers(query = {}, viewer) {
   };
 }
 
+function buildUserSummary(userId, viewer) {
+  const user = getUserById(userId);
+  if (!user) {
+    return null;
+  }
+
+  const profile = getProfileByUserId(userId);
+  const rating = profile ? getRatingByProfileId(profile.id) : null;
+
+  return {
+    id: user.id,
+    displayName: user.displayName,
+    avatarUrl: user.avatarUrl,
+    role: profile?.role || null,
+    claimedGrade: profile?.claimedGrade || null,
+    primaryStack: profile ? clone(profile.primaryStack) : [],
+    rating: formatRating(rating, viewer),
+    contactVisible: calculateContactVisible(viewer, rating),
+    bio: profile?.bio || '',
+  };
+}
+
 function getTeamMembers(teamId) {
   return teamMembers.filter((member) => member.teamId === teamId).map((member) => {
     const user = getUserById(member.userId);
@@ -875,6 +897,7 @@ module.exports = {
     getRatingByUserId,
     buildPublicProfile,
     buildOwnProfile,
+    buildUserSummary,
     listUsers,
     listTeams,
     getTeamById,
