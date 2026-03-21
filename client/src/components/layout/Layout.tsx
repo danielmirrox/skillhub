@@ -27,7 +27,7 @@ export function Layout() {
             </div>
             <div>
               <h1 className="text-lg font-semibold tracking-wide">SkillHub</h1>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Hackathon matching OS</p>
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Платформа для хакатон-матчинга</p>
             </div>
           </Link>
 
@@ -43,38 +43,44 @@ export function Layout() {
 
           <nav className="hidden items-center justify-end gap-2 text-sm md:flex">
             <NavLink to="/dashboard" className={navLinkClassName}>
-              Dashboard
+              Дашборд
             </NavLink>
             <NavLink to="/search" className={navLinkClassName}>
-              Search
+              Поиск
+            </NavLink>
+            <NavLink to="/teams" className={navLinkClassName}>
+              Команды
             </NavLink>
             <NavLink to="/applications" className={navLinkClassName}>
-              Applications
+              Заявки
             </NavLink>
             <NavLink to="/profile" className={navLinkClassName}>
-              Profile
+              Профиль
             </NavLink>
             <NavLink to="/login" className={navLinkClassName}>
-              Login
+              Вход
             </NavLink>
           </nav>
 
           {mobileMenuOpen ? (
             <nav className="grid w-full gap-2 rounded-[1.5rem] border border-white/10 bg-slate-950/90 p-3 text-sm backdrop-blur-xl md:hidden">
               <NavLink to="/dashboard" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                Dashboard
+                Дашборд
               </NavLink>
               <NavLink to="/search" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                Search
+                Поиск
+              </NavLink>
+              <NavLink to="/teams" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
+                Команды
               </NavLink>
               <NavLink to="/applications" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                Applications
+                Заявки
               </NavLink>
               <NavLink to="/profile" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                Profile
+                Профиль
               </NavLink>
               <NavLink to="/login" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                Login
+                Вход
               </NavLink>
             </nav>
           ) : null}

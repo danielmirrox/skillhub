@@ -11,17 +11,17 @@ const roleOptions: Array<{ label: string; value: UserRole | "" }> = [
   { label: "Frontend", value: "frontend" },
   { label: "Backend", value: "backend" },
   { label: "Fullstack", value: "fullstack" },
-  { label: "Design", value: "design" },
+  { label: "Дизайн", value: "design" },
   { label: "ML", value: "ml" },
   { label: "Mobile", value: "mobile" },
-  { label: "Other", value: "other" },
+  { label: "Другое", value: "other" },
 ];
 
 const gradeOptions: Array<{ label: string; value: ClaimedGrade | "" }> = [
   { label: "Все грейды", value: "" },
-  { label: "Junior", value: "junior" },
-  { label: "Middle", value: "middle" },
-  { label: "Senior", value: "senior" },
+  { label: "Джун", value: "junior" },
+  { label: "Мидл", value: "middle" },
+  { label: "Сеньор", value: "senior" },
 ];
 
 export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps) {
@@ -32,8 +32,8 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Filters</p>
-          <h2 className="mt-2 text-2xl font-semibold">Поиск участников</h2>
-          <p className="mt-2 text-sm text-slate-400">Настрой точность выдачи под команду, а не под шум.</p>
+          <h2 className="mt-2 text-2xl font-semibold">Фильтры поиска участников</h2>
+          <p className="mt-2 text-sm text-slate-400">Настрой выдачу под команду, а не под шум.</p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
             Активных фильтров: {activeFiltersCount}
           </p>
@@ -51,7 +51,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
             onClick={onSubmit}
             className="rounded-full border border-cyan-300/30 bg-cyan-300/15 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/25"
           >
-            Обновить выдачу
+            Обновить результаты
           </button>
         </div>
       </div>

@@ -428,6 +428,7 @@ function buildUserSummary(userId, viewer) {
     primaryStack: profile ? clone(profile.primaryStack) : [],
     rating: formatRating(rating, viewer),
     contactVisible: calculateContactVisible(viewer, rating),
+    telegramUsername: calculateContactVisible(viewer, rating) ? profile?.telegramUsername || null : null,
     bio: profile?.bio || '',
   };
 }
@@ -495,23 +496,44 @@ function listTeams(query = {}) {
       if (query.hackathon && team.hackathonName !== query.hackathon) return false;
       return true;
     })
-    .map((team) => ({
-      id: team.id,
-      name: team.name,
-      description: team.description,
-      hackathonName: team.hackathonName,
-      requiredRoles: clone(team.requiredRoles),
-      stack: clone(team.stack),
-      slotsOpen: team.slotsOpen,
-      author: getUserById(team.authorId)
-        ? {
-            displayName: getUserById(team.authorId).displayName,
-            avatarUrl: getUserById(team.authorId).avatarUrl,
-          }
-        : null,
-      membersCount: getTeamMembers(team.id).length,
-      isActive: team.isActive,
-    }));
+      .map((team) => {
+        const author = getUserById(team.authorId);
+        const membersCount = getTeamMembers(team.id).length;
+
+        return {
+          id: team.id,
+          name: team.name,
+          description: team.description,
+          hackathonName: team.hackathonName,
+          requiredRoles: clone(team.requiredRoles),
+          stack: clone(team.stack),
+          slotsOpen: team.slotsOpen,
+          author: author
+            ? {
+                userId: author.id,
+                displayName: author.displayName,
+                avatarUrl: author.avatarUrl,
+                isPro: Boolean(author.isPro),
+              }
+            : null,
+          membersCount,
+          isActive: team.isActive,
+        };
+      })
+      .sort((left, right) => {
+        const leftBoost = Number(Boolean(left.author?.isPro)) + Number(Boolean(left.isActive));
+        const rightBoost = Number(Boolean(right.author?.isPro)) + Number(Boolean(right.isActive));
+
+        if (rightBoost !== leftBoost) {
+          return rightBoost - leftBoost;
+        }
+
+        if (right.slotsOpen !== left.slotsOpen) {
+          return right.slotsOpen - left.slotsOpen;
+        }
+
+        return right.membersCount - left.membersCount;
+      });
 }
 
 function getTeamById(id) {
@@ -522,12 +544,14 @@ function getTeamById(id) {
 
   return {
     ...clone(team),
-    author: getUserById(team.authorId)
-      ? {
-          displayName: getUserById(team.authorId).displayName,
-          avatarUrl: getUserById(team.authorId).avatarUrl,
-        }
-      : null,
+      author: getUserById(team.authorId)
+        ? {
+            userId: getUserById(team.authorId).id,
+            displayName: getUserById(team.authorId).displayName,
+            avatarUrl: getUserById(team.authorId).avatarUrl,
+            isPro: Boolean(getUserById(team.authorId).isPro),
+          }
+        : null,
     members: getTeamMembers(team.id),
   };
 }

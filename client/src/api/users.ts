@@ -44,6 +44,7 @@ export type UserSummary = {
   rating: UsersListItem["rating"];
   searchMatch?: UsersListItem["searchMatch"];
   contactVisible: boolean;
+  telegramUsername: string | null;
   bio: string;
 };
 

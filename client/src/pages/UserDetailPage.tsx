@@ -2,21 +2,12 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getUserSummary, type UserSummary } from "../api/users";
 import { RatingBadge } from "../components/profile/RatingBadge";
-import { ApplicationModal } from "../components/applications/ApplicationModal";
-import { createApplication } from "../api/applications";
-import { getTeams, type TeamSummary } from "../api/teams";
 
 export function UserDetailPage() {
   const { id } = useParams();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [user, setUser] = React.useState<UserSummary | null>(null);
-  const [teams, setTeams] = React.useState<TeamSummary[]>([]);
-  const [teamsLoading, setTeamsLoading] = React.useState(false);
-  const [teamsError, setTeamsError] = React.useState<string | null>(null);
-  const [applyOpen, setApplyOpen] = React.useState(false);
-  const [applyError, setApplyError] = React.useState<string | null>(null);
-  const [applyStatus, setApplyStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!id) {
@@ -95,41 +86,7 @@ export function UserDetailPage() {
     return <p className="text-red-300">Профиль не найден.</p>;
   }
 
-  const openApply = async () => {
-    setApplyError(null);
-    setApplyStatus(null);
-    setApplyOpen(true);
-
-    if (teams.length > 0 || teamsLoading) {
-      return;
-    }
-
-    setTeamsLoading(true);
-    setTeamsError(null);
-
-    try {
-      const response = await getTeams();
-      setTeams(response.items);
-    } catch {
-      setTeamsError("Не удалось загрузить команды для отклика.");
-    } finally {
-      setTeamsLoading(false);
-    }
-  };
-
-  const submitApplication = async ({ teamId, message }: { teamId: string; message: string }) => {
-    setApplyError(null);
-    setApplyStatus(null);
-
-    try {
-      await createApplication(teamId, message);
-      setApplyStatus("Отклик отправлен.");
-      setApplyOpen(false);
-    } catch (err) {
-      const typed = err as Error & { status?: number };
-      setApplyError(typed.message || "Не удалось отправить отклик.");
-    }
-  };
+  const telegramLink = user.contactVisible && user.telegramUsername ? `https://t.me/${user.telegramUsername.replace(/^@/, "")}` : null;
 
   return (
     <section className="space-y-6">
@@ -201,13 +158,29 @@ export function UserDetailPage() {
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={openApply}
-              className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+            {telegramLink ? (
+              <a
+                href={telegramLink}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+              >
+                Написать
+              </a>
+            ) : (
+              <Link
+                to="/profile"
+                className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+              >
+                Открыть контакты в PRO
+              </Link>
+            )}
+            <Link
+              to="/teams"
+              className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10"
             >
-              Откликнуться
-            </button>
+              Смотреть команды
+            </Link>
             <Link to="/search" className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10">
               Назад к поиску
             </Link>
@@ -215,8 +188,6 @@ export function UserDetailPage() {
               Мой профиль
             </Link>
           </div>
-
-          {applyStatus ? <p className="mt-4 text-sm text-lime-200">{applyStatus}</p> : null}
         </article>
 
         <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
@@ -274,15 +245,6 @@ export function UserDetailPage() {
         </aside>
       </div>
 
-      {applyOpen ? (
-        <ApplicationModal
-          teams={teams}
-          loadingTeams={teamsLoading}
-          error={teamsError || applyError}
-          onSubmit={submitApplication}
-          onClose={() => setApplyOpen(false)}
-        />
-      ) : null}
     </section>
   );
 }

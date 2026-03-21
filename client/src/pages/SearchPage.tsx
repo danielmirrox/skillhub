@@ -64,13 +64,13 @@ export function SearchPage() {
     <div className="space-y-6">
       <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-7 shadow-2xl shadow-slate-950/30 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Search</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Поиск</p>
           <h2 className="mt-3 max-w-2xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
             Ищи участников по роли, грейду и стеку
           </h2>
           <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
-            Живой фронт к API `/api/v1/users`: фильтры по role, grade, minRating и stack работают,
-            а PRO-видимость контактов и рекомендаций подтягивается из бэка.
+            Живой экран поверх API `/api/v1/users`: фильтры по роли, грейду, минимальному рейтингу и стеку работают,
+            а PRO-доступ к контактам и рекомендациям подтягивается из бэка.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export function SearchPage() {
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl sm:col-span-2 lg:col-span-1 xl:col-span-2">
             <p className="text-sm text-slate-400">Фокус</p>
             <p className="mt-2 text-sm leading-7 text-slate-300">
-              PRO-режим открывает рекомендации и контактные данные только там, где это действительно нужно.
+              PRO-режим открывает рекомендации и контактные данные только там, где это действительно полезно.
             </p>
           </article>
         </div>
@@ -154,7 +154,7 @@ export function SearchPage() {
         <div className="space-y-4">
           {appliedFilters.search ? (
             <p className="rounded-2xl border border-cyan-300/15 bg-cyan-300/8 px-4 py-3 text-sm text-cyan-50/90 backdrop-blur-xl">
-              Поиск работает гибридно: сначала учитываются совпадения по имени, стэку, bio, роли и проектам, потом рейтинг.
+              Поиск работает гибридно: сначала учитываются совпадения по имени, стеку, био, роли и проектам, затем рейтинг.
             </p>
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">

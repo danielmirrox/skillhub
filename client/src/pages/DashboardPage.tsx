@@ -19,27 +19,31 @@ export function DashboardPage({ user }: DashboardPageProps) {
               <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
                 {user.displayName ?? user.username}
               </h2>
-              <p className="mt-2 text-slate-400">Авторизован и готов тестировать product flow.</p>
+              <p className="mt-2 text-slate-400">Авторизован и готов проверять продуктовые сценарии.</p>
             </div>
           </div>
 
           <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-            Dashboard теперь работает как навигационный хаб: с него удобно запускать поиск,
-            applications, редактирование профиля и проверку AI-скоринга.
+            Дашборд теперь работает как навигационный хаб: с него удобно запускать поиск,
+            команды, заявки, редактирование профиля и проверку AI-скоринга.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Flow</p>
-              <p className="mt-2 text-2xl font-semibold text-white">Search</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Поиск</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Flow</p>
-              <p className="mt-2 text-2xl font-semibold text-white">Applications</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Команды</p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Flow</p>
-              <p className="mt-2 text-2xl font-semibold text-white">Profile</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Заявки</p>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-sm text-slate-400">Flow</p>
+              <p className="mt-2 text-2xl font-semibold text-white">Профиль</p>
             </div>
           </div>
         </article>
@@ -53,10 +57,16 @@ export function DashboardPage({ user }: DashboardPageProps) {
             Поиск участников
           </Link>
           <Link
+            to="/teams"
+            className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+          >
+            Поиск команд
+          </Link>
+          <Link
             to="/applications"
             className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
-            Applications
+            Заявки
           </Link>
           <Link
             to="/profile"
@@ -77,17 +87,17 @@ export function DashboardPage({ user }: DashboardPageProps) {
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
           <p className="text-sm text-slate-400">Статус</p>
           <p className="mt-2 text-xl font-semibold text-white">Демо-режим готов</p>
-          <p className="mt-2 text-sm text-slate-400">Можно прогонять все экраны без OAuth.</p>
+          <p className="mt-2 text-sm text-slate-400">Можно проверять все экраны без OAuth.</p>
         </article>
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
           <p className="text-sm text-slate-400">UX</p>
-          <p className="mt-2 text-xl font-semibold text-white">Более выразительный UI</p>
+          <p className="mt-2 text-xl font-semibold text-white">Более выразительный интерфейс</p>
           <p className="mt-2 text-sm text-slate-400">Карточки, фон, навигация и hero-блоки уже обновлены.</p>
         </article>
         <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
           <p className="text-sm text-slate-400">Следующий шаг</p>
-          <p className="mt-2 text-xl font-semibold text-white">Подключить прод-данные</p>
-          <p className="mt-2 text-sm text-slate-400">Когда будет нужен real backend, этот UI уже готов к нему.</p>
+          <p className="mt-2 text-xl font-semibold text-white">Подключить боевые данные</p>
+          <p className="mt-2 text-sm text-slate-400">Когда понадобится настоящий backend, этот UI уже готов к нему.</p>
         </article>
       </section>
     </section>
