@@ -34,7 +34,7 @@
 | **0** | Репо GitHub, структура (client/, server/), .gitignore, README | Все вместе | Репо, ветки main/dev |
 | **0–2** | **Даниэл:** Express, структура сервера, env, CORS | Даниэл | `npm run dev` поднимает API |
 | **0–2** | **Денис:** Vite + React + Tailwind, роутинг, base layout | Денис | SPA запускается |
-| **1–3** | **Даниэл:** PostgreSQL — users, profiles, ratings (по spec §3) | Даниэл | Миграции, таблицы |
+| **1–3** | **Даниэл:** PostgreSQL — users(userRole), profiles(specializationRole, claimedGrade), ratings(gradingContext) (по spec §3) | Даниэл | Миграции, таблицы |
 | **2–4** | **Даниэл:** GitHub OAuth (Passport), /auth/github, /auth/github/callback | Даниэл | Вход через GitHub |
 | **2–4** | **Дени:** Настройка env (GITHUB_CLIENT_ID, DATABASE_URL), .env.example | Дени | Env готов |
 | **3–5** | **Денис:** LoginPage, кнопка «Войти через GitHub» | Денис | Редирект на OAuth |
@@ -50,16 +50,16 @@
 | Час | Задача | Кто | Результат |
 |-----|--------|-----|-----------|
 | **6–7** | **Даниэл:** YandexGPT API — тестовый запрос, формат из spec §5 | Даниэл | API отвечает |
-| **6–8** | **Денис:** ProfileEditPage — форма (role, stack, bio, projectLinks, experienceYears, hackathonsCount) | Денис | Форма + локальный state |
+| **6–8** | **Денис:** ProfileEditPage — форма (role, claimedGrade, stack, bio, projectLinks, experienceYears, hackathonsCount) | Денис | Форма + локальный state |
 | **7–8** | **Даниэл:** Промпт-инжиниринг (system + user по spec §5.3), парсинг JSON | Даниэл | Score 0–100 из ответа |
 | **7–9** | **Дени:** Написать 2–3 тестовых профиля (JSON) для проверки AI | Дени | Тест-кейсы |
-| **8–10** | **Даниэл:** PUT /profile, POST /profile/score, сохранение в ratings, лимит 1/7д | Даниэл | Эндпоинты работают |
-| **9–11** | **Денис:** ProfilePage — отображение рейтинга, кнопка «Получить рейтинг», loading, ошибки | Денис | UX скоринга |
-| **10–11** | **Даниэл:** GET /profile (свой), GET /profile/:userId (публичный) | Даниэл | Полная спецификация |
+| **8–10** | **Даниэл:** PUT /profile, POST /profile/score, сохранение в ratings, лимит 1/7д, 429 + nextAllowedAt | Даниэл | Эндпоинты работают |
+| **9–11** | **Денис:** ProfilePage — отображение рейтинга, кнопка «Получить рейтинг», loading, ошибки, блок рекомендаций для PRO | Денис | UX скоринга |
+| **10–11** | **Даниэл:** GET /profile (свой), GET /profile/:userId (публичный), GET /users/:id (summary), PRO-фильтр для strengths/improvements | Даниэл | Полная спецификация |
 | **11–12** | **Денис:** RatingBadge, RatingGauge (цвет по диапазону: 80+ lime, 50–79 amber, 0–49 red) | Денис | Визуал рейтинга |
 | **11–12** | **Дени:** Проверка скоринга на тестовых данных, фикс промпта при необходимости | Дени | AI стабильно пашет |
 
-**Чекпоинт 12ч:** Профиль заполняется, AI выдаёт рейтинг 0–100 с strengths/improvements.
+**Чекпоинт 12ч:** Профиль заполняется, AI выдаёт рейтинг 0–100; strengths/improvements доступны для PRO, лимит и nextAllowedAt работают.
 
 ---
 
@@ -83,9 +83,9 @@
 
 | Час | Задача | Кто | Результат |
 |-----|--------|-----|-----------|
-| **16–17** | **Даниэл:** is_pro в users, логика contactVisible (PRO + rating≥80) | Даниэл | PRO-логика |
-| **16–18** | **Дени:** Таблица applications (applicant_id, recipient_id, message, status) | Дени | Схема + миграция |
-| **17–18** | **Даниэл:** POST /applications, GET /applications, PATCH /applications/:id | Даниэл | API откликов |
+| **16–17** | **Даниэл:** is_pro в users, логика contactVisible (viewer.isPro + target rating≥80) | Даниэл | PRO-логика |
+| **16–18** | **Дени:** Таблицы teams, team_members, applications (team_id, applicant_id, status, timestamps, UNIQUE(team_id,user_id)) | Дени | Схема + миграция |
+| **17–18** | **Даниэл:** POST /applications, GET /applications, PATCH /applications/:id, 404/403 ответы | Даниэл | API откликов |
 | **18–19** | **Денис:** UserDetailPage — профиль, кнопка «Откликнуться», затемнение контакта для Free | Денис | Отклик работает |
 | **18–20** | **Дени:** Заглушка «Стать PRO» (кнопка без оплаты) | Дени | UI для монетизации |
 | **19–20** | **Даниэл:** Эндпоинт «стать PRO» — выставляет is_pro=true (демо) | Даниэл | Можно «включить» PRO |
@@ -100,13 +100,13 @@
 
 | Час | Задача | Кто | Результат |
 |-----|--------|-----|-----------|
-| **21–23** | **Дени:** POST /profile/import-github — вызовы GitHub API (user, repos, languages), сохранение в github_data | Дени | Импорт из GitHub |
+| **21–23** | **Дени:** POST /profile/import-github — вызовы GitHub API (user, repos, languages), сохранение в github_data + suggestedPrimaryStack | Дени | Импорт из GitHub |
 | **22–23** | **Денис:** Кнопка «Импорт из GitHub» на ProfileEditPage | Денис | Юзер может подтянуть данные |
 | **23–24** | **Даниэл:** Деплой backend (Railway/Render/Yandex Cloud) | Даниэл | API в облаке |
 | **23–24** | **Денис:** Деплой frontend (Vercel/Netlify или статика на тот же хост) | Денис | SPA в облаке |
-| **24–25** | **Дени:** CORS, env на проде, проверка OAuth callback URL | Дени | Всё работает по ссылке |
+| **24–25** | **Дени:** CORS, env на проде, проверка OAuth callback URL, GitHub cache fallback | Дени | Всё работает по ссылке |
 | **24–26** | **Дени:** Презентация (Google Slides / Figma) — 8–10 слайдов по spec | Дени | Питч готов |
-| **25–26** | **Денис:** Адаптив, фикс багов, пустые состояния | Денис | Работает на мобилке |
+| **25–26** | **Денис:** Адаптив, 404/error states, пустые состояния | Денис | Работает на мобилке |
 
 **Чекпоинт 26ч:** Деплой, импорт GitHub, презентация.
 
