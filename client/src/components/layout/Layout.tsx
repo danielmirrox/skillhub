@@ -10,6 +10,9 @@ export function Layout() {
             <Link to="/dashboard" className="hover:text-white">
               Dashboard
             </Link>
+            <Link to="/profile" className="hover:text-white">
+              Profile
+            </Link>
             <Link to="/login" className="hover:text-white">
               Login
             </Link>

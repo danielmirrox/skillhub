@@ -2,7 +2,7 @@ import { API_BASE_URL } from "../api/client";
 
 export function LoginPage() {
   const handleLogin = () => {
-    window.location.href = `${API_BASE_URL}/auth/github`;
+    window.location.href = `${API_BASE_URL}/api/v1/auth/github`;
   };
 
   return (

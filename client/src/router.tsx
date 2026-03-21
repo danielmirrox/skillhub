@@ -17,6 +17,14 @@ export const router = createBrowserRouter([
         path: "/dashboard",
         element: <routes.DashboardRoute />,
       },
+      {
+        path: "/profile",
+        element: <routes.ProfileRoute />,
+      },
+      {
+        path: "/profile/edit",
+        element: <routes.ProfileEditRoute />,
+      },
     ],
   },
 ]);

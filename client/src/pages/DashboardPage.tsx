@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import type { AuthUser } from "../api/auth";
 
 type DashboardPageProps = {
@@ -14,6 +15,14 @@ export function DashboardPage({ user }: DashboardPageProps) {
       <p className="mt-4 text-slate-300">
         Dashboard-заглушка готова. Следующий шаг: профиль и AI-скоринг.
       </p>
+      <div className="mt-6 flex gap-3">
+        <Link to="/profile" className="rounded-lg bg-cyan-400 px-4 py-2 font-medium text-slate-950">
+          Мой профиль
+        </Link>
+        <Link to="/profile/edit" className="rounded-lg border border-slate-700 px-4 py-2 text-slate-200">
+          Редактировать профиль
+        </Link>
+      </div>
     </section>
   );
 }

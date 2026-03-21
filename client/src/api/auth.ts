@@ -12,6 +12,6 @@ type AuthMeResponse = {
 };
 
 export async function getCurrentUser(): Promise<AuthUser> {
-  const data = await apiGet<AuthMeResponse>("/auth/me");
+  const data = await apiGet<AuthMeResponse>("/api/v1/auth/me");
   return data.user;
 }
