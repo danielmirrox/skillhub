@@ -29,6 +29,7 @@ const REQUIRED_VARS = [
 
 // Optional variables
 const OPTIONAL_VARS = [
+  'CLIENT_URLS',
   'JWT_SECRET',
   'JWT_EXPIRES_IN',
   'GITHUB_API_TOKEN',

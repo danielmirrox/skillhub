@@ -57,6 +57,7 @@ async function setupEnv() {
     YANDEXGPT_FOLDER_ID: await prompt('YANDEXGPT_FOLDER_ID (Yandex Cloud Folder ID): '),
     JWT_SECRET: await prompt('JWT_SECRET (strong random string) [auto-generate]: '),
     CLIENT_URL: await prompt('CLIENT_URL [http://localhost:5173]: ') || 'http://localhost:5173',
+    CLIENT_URLS: await prompt('CLIENT_URLS (comma-separated extra frontend origins) []: ') || '',
   };
 
   // Generate JWT_SECRET if not provided

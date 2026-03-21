@@ -3,6 +3,7 @@ const { z } = require('zod');
 
 const { requireAuth } = require('../middleware/auth');
 const { demoStore } = require('../data/demoStore');
+const { env } = require('../config/env');
 
 const profileRouter = express.Router();
 
@@ -46,6 +47,86 @@ const githubImportSchema = z.object({
     })
     .optional(),
 });
+
+function extractGithubUsername(githubUrl) {
+  if (!githubUrl) {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(githubUrl);
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    return segments[0] || null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchGitHubJson(url) {
+  const response = await fetch(url, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      ...(env.GITHUB_API_TOKEN ? { Authorization: `Bearer ${env.GITHUB_API_TOKEN}` } : {}),
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'SkillHub-Hackathon-Demo',
+    },
+  });
+
+  if (!response.ok) {
+    const error = new Error(`GitHub API request failed with status ${response.status}`);
+    error.statusCode = 502;
+    error.code = 'GITHUB_IMPORT_FAILED';
+    throw error;
+  }
+
+  return response.json();
+}
+
+async function buildGithubDataFromGitHub(userId) {
+  const profile = demoStore.getProfileByUserId(userId);
+  const githubUsername = extractGithubUsername(profile?.githubUrl);
+
+  if (!githubUsername) {
+    const error = new Error('Provide githubData or set githubUrl before importing.');
+    error.statusCode = 400;
+    error.code = 'GITHUB_DATA_REQUIRED';
+    throw error;
+  }
+
+  const [githubUser, githubRepos] = await Promise.all([
+    fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}`),
+    fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated`),
+  ]);
+
+  const languages = {};
+  for (const repo of githubRepos) {
+    if (!repo.language) continue;
+    languages[repo.language] = (languages[repo.language] || 0) + 1;
+  }
+
+  const topRepos = [...githubRepos]
+    .sort((left, right) => (right.stargazers_count || 0) - (left.stargazers_count || 0))
+    .slice(0, 3)
+    .map((repo) => ({
+      name: repo.name,
+      description: repo.description,
+      stars: repo.stargazers_count || 0,
+      primaryLanguage: repo.language,
+    }));
+
+  const accountAgeYears = githubUser?.created_at
+    ? Math.max(0, Math.floor((Date.now() - new Date(githubUser.created_at).getTime()) / (365.25 * 24 * 60 * 60 * 1000)))
+    : 0;
+
+  return {
+    fetchedAt: new Date().toISOString(),
+    publicRepos: githubUser?.public_repos || 0,
+    followers: githubUser?.followers || 0,
+    accountAgeYears,
+    languages,
+    topRepos,
+  };
+}
 
 profileRouter.get('/', requireAuth, (req, res) => {
   return res.json(demoStore.getAuthMe(req.user.id));
@@ -113,23 +194,46 @@ profileRouter.get('/score/status/:jobId', requireAuth, (req, res) => {
 });
 
 profileRouter.post('/import-github', requireAuth, (req, res) => {
-  const payload = githubImportSchema.parse(req.body || {});
-  const currentProfile = demoStore.getProfileByUserId(req.user.id);
-  const githubData = payload.githubData || currentProfile?.githubData || null;
+  (async () => {
+    const payload = githubImportSchema.parse(req.body || {});
+    const currentProfile = demoStore.getProfileByUserId(req.user.id);
+    const githubData = payload.githubData || currentProfile?.githubData || (await buildGithubDataFromGitHub(req.user.id));
 
-  if (!githubData) {
-    return res.status(400).json({
-      error: 'GITHUB_DATA_REQUIRED',
-      message: 'Provide githubData to import or connect GitHub first.',
+    const result = demoStore.importGithubData(req.user.id, githubData);
+
+    return res.json({
+      suggestedPrimaryStack: result.suggestedPrimaryStack,
+      suggestedProjectLinks: result.suggestedProjectLinks,
+      profile: result.profile,
+    });
+  })().catch((error) => {
+    if (error.statusCode) {
+      return res.status(error.statusCode).json({
+        error: error.code || 'GITHUB_IMPORT_FAILED',
+        message: error.message,
+      });
+    }
+
+    return res.status(500).json({
+      error: 'GITHUB_IMPORT_FAILED',
+      message: error.message || 'Failed to import GitHub data.',
+    });
+  });
+});
+
+profileRouter.post('/pro', requireAuth, (req, res) => {
+  const upgradedUser = demoStore.setUserPro(req.user.id, true);
+
+  if (!upgradedUser) {
+    return res.status(404).json({
+      error: 'USER_NOT_FOUND',
+      message: 'User not found.',
     });
   }
 
-  const result = demoStore.importGithubData(req.user.id, githubData);
-
   return res.json({
-    suggestedPrimaryStack: result.suggestedPrimaryStack,
-    suggestedProjectLinks: result.suggestedProjectLinks,
-    profile: result.profile,
+    user: upgradedUser,
+    success: true,
   });
 });
 

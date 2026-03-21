@@ -8,9 +8,11 @@
 
 ### Уже сделано
 
-- [x] Настроен `.env` и базовые переменные окружения
-- [x] Проверен OAuth callback URL
-- [x] Поднят backend и проверен `/health`
+- [x] Создан `.env.example` с описанием переменных
+- [x] Настроены все переменные окружения в `.env`
+- [x] Локально проверена корректность OAuth callback URL в GitHub App / `.env`
+- [x] Сервер Даниэла (express) стартует на `npm run dev` и отвечает на `/health`
+- [x] Локальный демо-вход позволяет открыть dashboard и profile без GitHub OAuth
 - [x] Добавлен локальный SQL-скрипт инициализации PostgreSQL: `scripts/local-postgres-setup.sql`
 - [x] Подготовлены утилиты: `scripts/setup-env.js`, `scripts/check-env.js`
 - [x] Прогнаны тесты Блока 2 (profile + score + import-github)
@@ -19,6 +21,8 @@
 
 - [x] Переход на Блок 3: seed-данные и проверка ленты поиска
 - [ ] Переход на Блок 4: PRO + Applications end-to-end
+- [ ] БД PostgreSQL подключена и работает
+- [ ] Финальная проверка: PostgreSQL доступен под `DATABASE_URL` и запросы к API проходят стабильно
 
 ---
 
@@ -53,6 +57,8 @@
 ```powershell
 # 1) Проверить env
 node scripts/check-env.js
+
+Если все переменные зелёные (✅), можно двигаться дальше!
 
 # 2) Поднять backend
 cd server
