@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { getApplications, updateApplicationStatus, type ApplicationView } from "../api/applications";
 
 type TabKey = "incoming" | "outgoing";
@@ -13,7 +14,7 @@ function ApplicationCard({
   onDecline?: (id: string) => void;
 }) {
   return (
-    <article className="overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl">
+    <article className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lime-300/60 to-transparent" />
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -145,7 +146,7 @@ export function ApplicationsPage() {
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Статус</p>
-            <p className="mt-2 text-lg font-semibold text-white">{loading ? "Loading" : "Ready"}</p>
+            <p className="mt-2 text-lg font-semibold text-white">{loading ? "Синхронизируем" : "Ready"}</p>
           </article>
         </div>
       </section>
@@ -167,13 +168,47 @@ export function ApplicationsPage() {
         </button>
       </div>
 
-      {loading ? <p className="text-slate-300">Загружаем applications...</p> : null}
+      {loading ? (
+        <div className="grid gap-4">
+          {Array.from({ length: 2 }).map((_, index) => (
+            <article key={index} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-3">
+                  <div className="h-4 w-40 animate-pulse rounded-full bg-white/10" />
+                  <div className="h-3 w-28 animate-pulse rounded-full bg-white/10" />
+                </div>
+                <div className="h-8 w-24 animate-pulse rounded-full bg-white/10" />
+              </div>
+              <div className="mt-4 h-20 animate-pulse rounded-2xl bg-white/5" />
+              <div className="mt-4 h-16 animate-pulse rounded-2xl bg-white/5" />
+            </article>
+          ))}
+        </div>
+      ) : null}
       {error ? <p className="text-red-300">{error}</p> : null}
       {actionError ? <p className="text-red-300">{actionError}</p> : null}
 
       {!loading && !error && activeItems.length === 0 ? (
         <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 text-slate-300 backdrop-blur-xl">
-          Пока пусто. Здесь появятся отклики после работы поиска и modal flow.
+          <p className="text-lg font-semibold text-white">Пока пусто</p>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
+            Здесь появятся отклики после поиска и modal flow. Если ты ждёшь входящие, проверь поиск или открой профиль участника, чтобы отправить первый запрос.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <Link
+              to="/search"
+              className="rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            >
+              Перейти к поиску
+            </Link>
+            <button
+              type="button"
+              onClick={load}
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 font-semibold text-slate-100 hover:bg-white/10"
+            >
+              Обновить список
+            </button>
+          </div>
         </section>
       ) : null}
 

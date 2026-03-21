@@ -55,6 +55,11 @@ export function SearchPage() {
     });
   };
 
+  const handleReset = () => {
+    setFilters(defaultFilters);
+    setAppliedFilters(defaultFilters);
+  };
+
   return (
     <div className="space-y-6">
       <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-7 shadow-2xl shadow-slate-950/30 lg:grid-cols-[1.15fr_0.85fr]">
@@ -93,23 +98,70 @@ export function SearchPage() {
         <p>
           Найдено: <span className="text-slate-100">{total}</span>
         </p>
-        <p>Показаны первые {items.length} карточек</p>
+        <p>{appliedFilters.search ? "Сортировка по релевантности и рейтингу" : "Сортировка по AI-рейтингам"}</p>
       </div>
 
-      {loading ? <p className="text-slate-300">Загружаем участников...</p> : null}
+      {loading ? (
+        <div className="grid gap-4 lg:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <article key={index} className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl">
+              <div className="flex items-start gap-4">
+                <div className="h-16 w-16 animate-pulse rounded-2xl bg-white/10" />
+                <div className="min-w-0 flex-1 space-y-3">
+                  <div className="h-4 w-1/2 animate-pulse rounded-full bg-white/10" />
+                  <div className="h-3 w-2/3 animate-pulse rounded-full bg-white/10" />
+                  <div className="h-3 w-full animate-pulse rounded-full bg-white/10" />
+                  <div className="h-3 w-5/6 animate-pulse rounded-full bg-white/10" />
+                </div>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <div className="h-7 w-20 animate-pulse rounded-full bg-white/10" />
+                <div className="h-7 w-24 animate-pulse rounded-full bg-white/10" />
+                <div className="h-7 w-16 animate-pulse rounded-full bg-white/10" />
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
       {error ? <p className="text-red-300">{error}</p> : null}
 
       {!loading && !error && items.length === 0 ? (
         <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 text-slate-300 backdrop-blur-xl">
-          Ничего не нашлось. Попробуй ослабить фильтры.
+          <p className="text-lg font-semibold text-white">Ничего не нашлось</p>
+          <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
+            Попробуй ослабить фильтры, изменить грейд или убрать лишние ограничения по стеку. Так проще увидеть скрытые совпадения.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            >
+              Сбросить фильтры
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 font-semibold text-slate-100 hover:bg-white/10"
+            >
+              Повторить поиск
+            </button>
+          </div>
         </section>
       ) : null}
 
       {!loading && !error && items.length > 0 ? (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {items.map((user) => (
-            <UserCard key={user.id} user={user} />
-          ))}
+        <div className="space-y-4">
+          {appliedFilters.search ? (
+            <p className="rounded-2xl border border-cyan-300/15 bg-cyan-300/8 px-4 py-3 text-sm text-cyan-50/90 backdrop-blur-xl">
+              Поиск работает гибридно: сначала учитываются совпадения по имени, стэку, bio, роли и проектам, потом рейтинг.
+            </p>
+          ) : null}
+          <div className="grid gap-4 lg:grid-cols-2">
+            {items.map((user) => (
+              <UserCard key={user.id} user={user} />
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

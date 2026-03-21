@@ -17,6 +17,11 @@ export type UsersListItem = {
     strengths?: string[];
     improvements?: string[];
   } | null;
+  searchMatch?: {
+    score: number;
+    reasons: string[];
+    matchedTerms: string[];
+  } | null;
   contactVisible: boolean;
   isPro: boolean;
   bio: string;
@@ -37,6 +42,7 @@ export type UserSummary = {
   claimedGrade: ClaimedGrade | null;
   primaryStack: string[];
   rating: UsersListItem["rating"];
+  searchMatch?: UsersListItem["searchMatch"];
   contactVisible: boolean;
   bio: string;
 };

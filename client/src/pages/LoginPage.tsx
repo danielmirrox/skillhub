@@ -68,8 +68,9 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => handleLogin(false)}
-              className="rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+              className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
             >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/30 text-sm font-black text-slate-950">1</span>
               <span className="block text-sm uppercase tracking-[0.2em] text-slate-800/70">Standard</span>
               <span className="mt-1 block text-lg">Войти как демо-пользователь</span>
             </button>
@@ -77,8 +78,11 @@ export function LoginPage() {
             <button
               type="button"
               onClick={() => handleLogin(true)}
-              className="rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-left font-semibold text-emerald-50 shadow-lg shadow-emerald-950/20"
+              className="inline-flex items-center gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-left font-semibold text-emerald-50 shadow-lg shadow-emerald-950/20 transition hover:translate-y-[-1px]"
             >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-emerald-200/30 bg-emerald-200/15 text-sm font-black text-emerald-50">
+                PRO
+              </span>
               <span className="block text-sm uppercase tracking-[0.2em] text-emerald-200/80">PRO</span>
               <span className="mt-1 block text-lg">Войти как PRO-демо</span>
             </button>
@@ -86,8 +90,9 @@ export function LoginPage() {
             <button
               type="button"
               onClick={handleReset}
-              className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left font-medium text-slate-200 hover:bg-white/10"
+              className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left font-medium text-slate-200 transition hover:bg-white/10"
             >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/10 text-sm font-black text-slate-200">×</span>
               Сбросить демо-вход
             </button>
           </div>

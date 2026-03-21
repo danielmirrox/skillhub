@@ -52,7 +52,39 @@ export function UserDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <p className="text-slate-300">Загружаем профиль участника...</p>;
+    return (
+      <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+          <div className="flex items-start gap-5">
+            <div className="h-24 w-24 animate-pulse rounded-[1.5rem] bg-white/10" />
+            <div className="min-w-0 flex-1 space-y-3">
+              <div className="h-8 w-2/3 animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-1/2 animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-full animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-5/6 animate-pulse rounded-full bg-white/10" />
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+            <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <div className="h-12 w-44 animate-pulse rounded-full bg-white/10" />
+            <div className="h-12 w-44 animate-pulse rounded-full bg-white/10" />
+            <div className="h-12 w-36 animate-pulse rounded-full bg-white/10" />
+          </div>
+        </article>
+
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+          <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
+          <div className="h-40 animate-pulse rounded-[1.5rem] bg-white/5" />
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="h-28 animate-pulse rounded-2xl bg-white/5" />
+            <div className="h-28 animate-pulse rounded-2xl bg-white/5" />
+          </div>
+        </aside>
+      </div>
+    );
   }
 
   if (error) {
@@ -118,6 +150,9 @@ export function UserDetailPage() {
                 {user.role ?? "role not set"} · {user.claimedGrade ?? "grade not set"}
               </p>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">{user.bio || "О себе пока ничего не добавлено."}</p>
+              <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+                {user.contactVisible ? "Контакты открыты" : "Контакты скрыты для PRO"}
+              </div>
             </div>
           </div>
 
@@ -139,11 +174,29 @@ export function UserDetailPage() {
 
             <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Контакт</p>
-              <p className="mt-3 text-slate-200">
-                {user.contactVisible
-                  ? "Контакт открыт: viewer сейчас видит этот профиль как PRO"
-                  : "Контакт скрыт: нужен PRO и рейтинг 80+"}
-              </p>
+              {user.contactVisible ? (
+                <div className="mt-3 space-y-2 text-slate-200">
+                  <p>Контакт открыт для PRO-viewer.</p>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-emerald-300/20 bg-emerald-300/15 px-3 py-1 text-emerald-100">Telegram visible</span>
+                    <span className="rounded-full border border-emerald-300/20 bg-emerald-300/15 px-3 py-1 text-emerald-100">GitHub visible</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  <p className="text-slate-200">Контакт скрыт: нужен PRO и рейтинг 80+</p>
+                  <div className="grid gap-2 text-xs text-slate-300">
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="blur-[2px]">@username</span>
+                      <span className="text-slate-500">Telegram</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="blur-[2px]">github.com/hidden</span>
+                      <span className="text-slate-500">GitHub</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
@@ -182,6 +235,12 @@ export function UserDetailPage() {
                 <p className="mt-4 text-sm text-slate-300">{user.rating.grade}</p>
               </div>
 
+              <div className="rounded-[1.5rem] border border-amber-300/15 bg-amber-300/10 p-4 text-sm text-amber-100">
+                {user.contactVisible
+                  ? "Этот профиль уже открыт для PRO-viewer и выглядит как сильный кандидат для быстрого отклика."
+                  : "Здесь хорошо видно, что именно откроется после PRO: контакты, рекомендации и более тёплый сценарий связи."}
+              </div>
+
               <div className="grid gap-3 md:grid-cols-2">
                 <article className="rounded-2xl border border-white/10 bg-white/5 p-4">
                   <p className="text-sm text-slate-400">Сильные стороны</p>
@@ -209,7 +268,7 @@ export function UserDetailPage() {
           ) : (
             <div className="rounded-[1.5rem] border border-dashed border-white/15 bg-white/5 p-5 text-slate-300">
               <p className="text-lg font-semibold text-white">AI-рейтинг не рассчитан</p>
-              <p className="mt-2 text-sm text-slate-400">После скоринга профиль станет более убедительным для других участников.</p>
+              <p className="mt-2 text-sm text-slate-400">После скоринга профиль станет более убедительным для других участников, а рекомендации появятся прямо здесь.</p>
             </div>
           )}
         </aside>
