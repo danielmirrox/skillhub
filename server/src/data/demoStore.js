@@ -784,7 +784,7 @@ function inferRatingInput(profile, githubData) {
   };
 }
 
-function scoreProfile(userId, overrides = {}) {
+function scoreProfile(userId, overrides = {}, aiResult = null) {
   let profile = getProfileByUserId(userId);
   if (!profile) {
     profile = createOrGetProfileForUser(userId);
@@ -798,7 +798,7 @@ function scoreProfile(userId, overrides = {}) {
     githubData: overrides.githubData || profile.githubData,
   };
 
-  const ratingPayload = inferRatingInput(mergedProfile, overrides.githubData);
+  const ratingPayload = aiResult || inferRatingInput(mergedProfile, overrides.githubData);
   const rating = {
     id: `rating-${randomUUID()}`,
     profileId: profile.id,
@@ -807,7 +807,7 @@ function scoreProfile(userId, overrides = {}) {
     roleLabel: ratingPayload.roleLabel,
     strengths: ratingPayload.strengths,
     improvements: ratingPayload.improvements,
-    rawResponse: ratingPayload.rawResponse,
+    rawResponse: ratingPayload.rawResponse || ratingPayload,
     createdAt: nowIso(),
   };
 
