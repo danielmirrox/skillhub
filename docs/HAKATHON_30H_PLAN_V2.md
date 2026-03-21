@@ -1,5 +1,7 @@
 # SkillHub — План на 30ч для троих (Full Spec)
 
+> Legacy planning material. This file is archived and does not define current product scope.
+
 **Хакатон Viribus · 21–22 марта 2026**  
 **Основа:** PRODUCT_SPEC_FULL.md
 

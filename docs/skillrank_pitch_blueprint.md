@@ -1,5 +1,7 @@
 # SkillHub — структура и наполнение питч-презентации
 
+> Legacy pitch material. This file is archived and does not define current product scope.
+
 **Название проекта: SkillHub**
 **Слоган: "Один профиль — всё IT-сообщество"**
 

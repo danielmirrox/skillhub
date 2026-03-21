@@ -1,5 +1,7 @@
 # SkillHub — План на хакатон (30 часов)
 
+> Legacy planning material. This file is archived and does not define current product scope.
+
 **Хакатон Viribus · 21–22 марта 2026 · T-Space**  
 **Тема:** Технологические решения для развития студенческих IT-сообществ
 
