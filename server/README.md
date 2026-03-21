@@ -39,7 +39,12 @@ Backend API for the SkillHub hackathon product.
 - `GET /api/v1/users`
 - `GET /api/v1/users/:id`
 - `GET /api/v1/teams`
+- `GET /api/v1/teams/:teamId`
+- `POST /api/v1/teams`
+- `PUT /api/v1/teams/:teamId`
 - `GET /api/v1/applications`
+- `POST /api/v1/applications`
+- `PATCH /api/v1/applications/:id`
 
 ## Environment
 

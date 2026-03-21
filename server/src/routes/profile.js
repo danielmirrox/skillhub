@@ -4,6 +4,7 @@ const { z } = require('zod');
 const { requireAuth } = require('../middleware/auth');
 const { demoStore } = require('../data/demoStore');
 const { env } = require('../config/env');
+const { scoreWithYandexGpt } = require('../services/yandexgpt');
 
 const profileRouter = express.Router();
 
@@ -142,35 +143,74 @@ profileRouter.put('/', requireAuth, (req, res) => {
 });
 
 profileRouter.post('/score', requireAuth, (req, res) => {
-  const payload = profileUpdateSchema.partial().parse(req.body || {});
-  const rateLimitStatus = demoStore.getRateLimitStatus(req.user.id);
+  (async () => {
+    const payload = profileUpdateSchema.partial().parse(req.body || {});
+    const rateLimitStatus = demoStore.getRateLimitStatus(req.user.id);
 
-  if (!rateLimitStatus.allowed) {
-    return res.status(429).json({
-      error: 'RATE_LIMITED',
-      message: 'Profile scoring is temporarily limited.',
-      nextAllowedAt: rateLimitStatus.nextAllowedAt,
-    });
-  }
+    if (!rateLimitStatus.allowed) {
+      return res.status(429).json({
+        error: 'RATE_LIMITED',
+        message: 'Profile scoring is temporarily limited.',
+        nextAllowedAt: rateLimitStatus.nextAllowedAt,
+      });
+    }
 
-  if (Object.keys(payload).length > 0) {
-    demoStore.updateProfile(req.user.id, payload);
-  }
+    if (Object.keys(payload).length > 0) {
+      demoStore.updateProfile(req.user.id, payload);
+    }
 
-  const rating = demoStore.scoreProfile(req.user.id, payload);
-  const ownProfile = demoStore.getAuthMe(req.user.id).profile;
+    const currentProfile = demoStore.getProfileByUserId(req.user.id);
+    const mergedProfile = currentProfile
+      ? {
+          ...currentProfile,
+          ...payload,
+          primaryStack: payload.primaryStack || currentProfile.primaryStack,
+          projectLinks: payload.projectLinks || currentProfile.projectLinks,
+          githubData: payload.githubData || currentProfile.githubData,
+        }
+      : payload;
 
-  return res.json({
-    jobId: rating.id,
-    rating: req.user.isPro
-      ? rating
+    let aiResult = null;
+    let aiSource = 'formula';
+
+    try {
+      aiResult = await scoreWithYandexGpt(mergedProfile);
+      if (aiResult) {
+        aiSource = 'yandexgpt';
+      }
+    } catch (aiError) {
+      aiSource = 'formula_fallback';
+    }
+
+    const rating = demoStore.scoreProfile(req.user.id, payload, aiResult);
+    const ownProfile = demoStore.getAuthMe(req.user.id).profile;
+
+    const ratingResponse = req.user.isPro
+      ? { ...rating, source: aiSource }
       : {
           score: rating.score,
           grade: rating.grade,
           roleLabel: rating.roleLabel,
-        },
-    profile: ownProfile,
-    nextAllowedAt: null,
+        };
+
+    return res.json({
+      jobId: rating.id,
+      rating: ratingResponse,
+      profile: ownProfile,
+      nextAllowedAt: null,
+    });
+  })().catch((error) => {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        error: 'VALIDATION_ERROR',
+        message: error.errors.map((issue) => issue.message).join(', '),
+      });
+    }
+
+    return res.status(500).json({
+      error: 'SCORING_FAILED',
+      message: error.message || 'Failed to score profile.',
+    });
   });
 });
 
