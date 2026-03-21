@@ -1,4 +1,4 @@
-# SkillHub — План Дени (актуальный)
+# SkillHub — План Дени (Блок 4)
 
 ## Дата: 21–22 марта 2026
 
@@ -15,42 +15,44 @@
 - [x] Локальный демо-вход позволяет открыть dashboard и profile без GitHub OAuth
 - [x] Добавлен локальный SQL-скрипт инициализации PostgreSQL: `scripts/local-postgres-setup.sql`
 - [x] Подготовлены утилиты: `scripts/setup-env.js`, `scripts/check-env.js`
+- [x] Прогнаны тесты Блока 2 (profile + score + import-github)
 
 ### В работе
 
+- [x] Переход на Блок 3: seed-данные и проверка ленты поиска
+- [ ] Переход на Блок 4: PRO + Applications end-to-end
 - [ ] БД PostgreSQL подключена и работает
 - [ ] Финальная проверка: PostgreSQL доступен под `DATABASE_URL` и запросы к API проходят стабильно
 
 ---
 
-## Следующий этап (Блок 2: Profile + AI)
+## Текущий этап (Блок 4: PRO + Applications)
 
 ### Цель
 
-Проверить, что scoring и импорт GitHub работают на реальных тест-кейсах для демо.
+Проверить, что сценарий отклика и обработки заявок работает end-to-end, и подключить демо-заглушку активации PRO.
 
 ### Что сделать
 
-1. Подготовить 3 тестовых профиля (junior, middle, senior) с разными ролями.
-2. Прогнать сценарий:
-   - `PUT /api/v1/profile`
-   - `POST /api/v1/profile/score`
-   - `POST /api/v1/profile/import-github` (для github-кейса)
-3. Проверить, что в ответе есть `rating.score`, `rating.grade`, `rating.roleLabel`.
-4. Проверить диапазоны score и обновление истории `GET /api/v1/profile/score/history`.
-5. Зафиксировать проблемные кейсы (если есть): невалидный JSON, ошибки 400/500, нестабильные ответы.
+1. Применить SQL-миграцию для `teams`, `team_members`, `applications`.
+2. Проверить `GET /api/v1/teams` и наличие рабочих teamId.
+3. Прогнать сценарий отклика: `POST /api/v1/applications`.
+4. Проверить уведомления/входящие и исходящие: `GET /api/v1/applications`.
+5. Прогнать принятие/отклонение отклика: `PATCH /api/v1/applications/:id`.
+6. Проверить демо-заглушку PRO: `POST /api/v1/auth/pro/upgrade` + `GET /api/v1/auth/me`.
+7. Зафиксировать наблюдения и риски в короткой заметке для команды.
 
 ---
 
 ## Файлы для работы (только scripts)
 
-- `scripts/test-profiles.json` — тестовые payloads
-- `scripts/check-score-cases.md` — runbook прогона
-- `scripts/local-postgres-setup.sql` — локальная инициализация БД
+- `scripts/teams-applications-migration.sql` — SQL для Блока 4
+- `scripts/check-block4-applications.md` — runbook e2e прогона
+- `scripts/BLOCK_3_NOTES.md` — наблюдения и риски с Блока 3
 
 ---
 
-## Быстрый запуск прогона
+## Быстрый запуск для Блока 4
 
 ```powershell
 # 1) Проверить env
@@ -63,163 +65,75 @@ cd server
 npm install
 npm run dev
 
-# 3) В новом терминале вернуться в корень и выполнить тесты по runbook
+# 3) В отдельном терминале вернуться в корень
 cd ..
-# Открыть scripts/check-score-cases.md и прогнать команды
+
+# 4) Применить миграцию Блока 4
+psql "$env:DATABASE_URL" -f scripts/teams-applications-migration.sql
+
+# 5) Прогнать runbook
+# Открыть scripts/check-block4-applications.md и выполнить шаги
 ```
 
-### Если ты уже на этапе `npm run dev`
+---
 
-Отлично. Оставь сервер в этом терминале запущенным и открой второй терминал в корне проекта `skillhub`.
+## Проверки API для Блока 4
 
-#### 1) Проверка, что API живой
+#### 1) Health-check
 
 ```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:5000/health"
 ```
 
-Ожидаемо: ответ со `status: ok`.
-
-#### 2) Тест-кейс 1: junior frontend
+#### 2) Dемо-активация PRO
 
 ```powershell
-$headers1 = @{ "X-Demo-User-Id" = "user-denis" }
-
-$profile1 = @{
-   role = "frontend"
-   claimedGrade = "junior"
-   primaryStack = @("HTML", "CSS", "JavaScript")
-   experienceYears = 0
-   hackathonsCount = 0
-   bio = "Начинающий frontend-разработчик, делаю учебные проекты."
-   projectLinks = @(
-      @{
-         url = "https://github.com/example/junior-frontend-landing"
-         title = "Landing page"
-         description = "Учебный лендинг на чистом JS"
-      }
-   )
-   telegramUsername = "junior_front"
-   githubUrl = "https://github.com/example"
-} | ConvertTo-Json -Depth 6
-
-Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers1 -ContentType "application/json" -Body $profile1
-Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers1 -ContentType "application/json" -Body "{}"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/auth/pro/upgrade" -Headers @{ "X-Demo-User-Id" = "user-denis" } -ContentType "application/json" -Body "{}"
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/auth/me" -Headers @{ "X-Demo-User-Id" = "user-denis" }
 ```
 
-#### 3) Тест-кейс 2: middle backend
+#### 3) Список команд
 
 ```powershell
-$headers2 = @{ "X-Demo-User-Id" = "user-deni" }
-
-$profile2 = @{
-   role = "backend"
-   claimedGrade = "middle"
-   primaryStack = @("Node.js", "PostgreSQL", "Express")
-   experienceYears = 2
-   hackathonsCount = 3
-   bio = "Backend разработчик. Пишу REST API, работаю с PostgreSQL."
-   projectLinks = @(
-      @{
-         url = "https://github.com/example/task-api"
-         title = "Task API"
-         description = "CRUD API с авторизацией"
-      },
-      @{
-         url = "https://github.com/example/queue-worker"
-         title = "Queue Worker"
-         description = "Фоновая обработка задач"
-      }
-   )
-   telegramUsername = "middle_back"
-   githubUrl = "https://github.com/example"
-} | ConvertTo-Json -Depth 6
-
-Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers2 -ContentType "application/json" -Body $profile2
-Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers2 -ContentType "application/json" -Body "{}"
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/teams" -Headers @{ "X-Demo-User-Id" = "user-denis" }
 ```
 
-#### 4) Тест-кейс 3: senior fullstack + github import
+#### 4) Создание отклика
 
 ```powershell
-$headers3 = @{ "X-Demo-User-Id" = "user-captain" }
-
-$profile3 = @{
-   role = "fullstack"
-   claimedGrade = "senior"
-   primaryStack = @("TypeScript", "React", "Node.js", "PostgreSQL")
-   experienceYears = 6
-   hackathonsCount = 9
-   bio = "Fullstack lead. Архитектура, backend и продуктовый frontend."
-   projectLinks = @(
-      @{
-         url = "https://github.com/example/saas-platform"
-         title = "SaaS platform"
-         description = "Многомодульная платформа с RBAC"
-      }
-   )
-   telegramUsername = "senior_full"
-   githubUrl = "https://github.com/example"
-} | ConvertTo-Json -Depth 6
-
-Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers3 -ContentType "application/json" -Body $profile3
-
-$githubData = @{
-   githubData = @{
-      fetchedAt = "2026-03-21T10:00:00Z"
-      publicRepos = 42
-      followers = 120
-      accountAgeYears = 7
-      languages = @{
-         TypeScript = 160000
-         JavaScript = 95000
-         SQL = 34000
-         Python = 27000
-      }
-      topRepos = @(
-         @{
-            name = "platform-core"
-            description = "Core platform services"
-            stars = 320
-            primaryLanguage = "TypeScript"
-         }
-      )
-   }
-} | ConvertTo-Json -Depth 8
-
-Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/import-github" -Headers $headers3 -ContentType "application/json" -Body $githubData
-Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers3 -ContentType "application/json" -Body "{}"
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/applications" -Headers @{ "X-Demo-User-Id" = "user-denis" } -ContentType "application/json" -Body '{"teamId":"team-viribus","message":"Хочу в команду"}'
 ```
 
-#### 5) Проверка истории скоринга
+#### 5) Входящие/исходящие
 
 ```powershell
-Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/profile/score/history" -Headers $headers3
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/applications" -Headers @{ "X-Demo-User-Id" = "user-denis" }
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/applications" -Headers @{ "X-Demo-User-Id" = "user-captain" }
 ```
 
-Ожидаемо: в `items` есть результаты последних запусков.
+#### 6) Принятие/отклонение отклика
 
-#### 6) Что считать успешным прогоном
+```powershell
+Invoke-RestMethod -Method Patch -Uri "http://localhost:5000/api/v1/applications/<APPLICATION_ID>" -Headers @{ "X-Demo-User-Id" = "user-captain" } -ContentType "application/json" -Body '{"status":"accepted"}'
+```
 
-1. Нет ошибок `500` на всех шагах.
-2. В ответе есть `rating.score`, `rating.grade`, `rating.roleLabel`.
-3. История скоринга обновилась.
-4. Если есть ошибка, сохрани текст ошибки и payload в заметку для команды.
+---
 
-### Частая проблема: RATE_LIMITED
+## Что считать успешным прогоном Блока 4
 
-Если получил `RATE_LIMITED`, это нормально для одного и того же пользователя (лимит скоринга).
-
-Что делать:
-
-1. Запускай кейсы с разными заголовками `X-Demo-User-Id` (как в примерах выше).
-2. Для повторного прогона используй другого demo-user: `user-daniel`, `user-denis`, `user-deni`, `user-captain`.
+1. Миграция применяется без ошибок.
+2. PRO-заглушка включает `isPro=true` и выставляет `proExpiresAt`.
+3. Отклик создается со статусом `pending`.
+4. Отклик виден в `outgoing` у аппликанта и в `incoming` у капитана.
+5. `PATCH` меняет статус на `accepted` или `declined`.
+6. Нет ошибок `500` на маршрутах Блока 4.
 
 ---
 
 ## Критерий готовности этапа
 
-- [ ] Все 3 кейса из `scripts/test-profiles.json` проходят без 500
-- [ ] Ответы scoring содержат обязательные поля
-- [ ] История score обновляется после каждого прогона
-- [ ] Есть краткий список наблюдений/рисков для команды
+- [x] Добавлен SQL-файл `scripts/teams-applications-migration.sql`
+- [x] Добавлен runbook `scripts/check-block4-applications.md`
+- [x] Добавлена backend-заглушка `POST /api/v1/auth/pro/upgrade`
+- [x] Прогнан e2e-сценарий отклика и обработки заявки
+- [x] Зафиксированы наблюдения/риски по Блоку 4
