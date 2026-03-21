@@ -1,33 +1,33 @@
-# Block 3 Notes (Deni)
+# Блок 3 — Заметки Дени
 
-## Date
+## Дата
 2026-03-21
 
-## Checks completed
-- Seed dataset connected via scripts/seed.js
-- Base users feed: GET /api/v1/users
-- Filters: role, grade, minRating, stack
-- Pagination: page, limit
+## Что проверено
+- Подключен seed-датасет через scripts/seed.js
+- Базовая выдача пользователей: GET /api/v1/users
+- Фильтры: role, grade, minRating, stack
+- Пагинация: page, limit
 
-## Validation summary
-- total users: 16
-- roles: backend, design, frontend, fullstack, ml, mobile, other
-- rating range: 45-92
-- backend count: 5
-- middle grade count: 8
-- minRating=70 count: 12
-- stack=TypeScript count: 3
-- pagination: page1(limit=5)=5, page2(limit=5)=5
+## Сводка валидации
+- всего пользователей: 16
+- роли: backend, design, frontend, fullstack, ml, mobile, other
+- диапазон рейтинга: 45-92
+- количество backend: 5
+- количество middle: 8
+- количество при minRating=70: 12
+- количество при stack=TypeScript: 3
+- пагинация: page1(limit=5)=5, page2(limit=5)=5
 
-## Observations
-- Feed now has enough diversity for demo cards and filters.
-- Demo user IDs used in previous scripts (user-daniel, user-denis, user-deni, user-captain) are preserved.
-- Seed also includes teams, team members, and sample applications for next steps.
+## Наблюдения
+- В выдаче достаточно разнообразия для карточек и фильтров в демо.
+- Демо user ID из предыдущих шагов сохранены (user-daniel, user-denis, user-deni, user-captain).
+- В seed уже включены teams, team members и примеры applications для следующих этапов.
 
-## Risks
-- Seed is demo/in-memory; data is reset on server restart.
-- Stack filtering is exact-token based; similar labels (TypeScript vs TS) are not matched automatically.
-- Scores are seeded constants; they do not represent live AI scoring outputs.
+## Риски
+- Seed работает в demo/in-memory режиме, данные сбрасываются после перезапуска сервера.
+- Фильтрация по stack основана на точном совпадении, похожие метки (TypeScript vs TS) не объединяются.
+- Значения score заданы константами и не отражают live AI scoring.
 
-## Next step
-- Move to Block 4: validate applications flow end-to-end with incoming/outgoing updates.
+## Следующий шаг
+- Переход к Блоку 4: проверить e2e-поток applications с обновлением incoming/outgoing.

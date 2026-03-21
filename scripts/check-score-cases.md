@@ -1,29 +1,29 @@
-# Score Test Runbook (Deni)
+# Проверка Score-кейсов (Дени)
 
-## Goal
-Validate profile scoring and github import flows before demo.
+## Цель
+Проверить профильный скоринг и поток импорта GitHub перед демо.
 
-## Preconditions
-1. Server is running on http://localhost:5000.
-2. Development mode is enabled (fallback demo user works).
-3. Test payloads are available in scripts/test-profiles.json.
+## Предусловия
+1. Сервер запущен на http://localhost:5000.
+2. Включен development mode (работает fallback demo user).
+3. Тестовые payload доступны в scripts/test-profiles.json.
 
-## API Endpoints
+## API-эндпоинты
 1. PUT /api/v1/profile
 2. POST /api/v1/profile/score
 3. POST /api/v1/profile/import-github
 4. GET /api/v1/profile/score/history
 
-## Manual test sequence per case
-1. Copy profile payload from scripts/test-profiles.json.
-2. Send profile update request.
-3. Send scoring request.
-4. Check score range and required fields.
-5. For github case, send import-github request before scoring and compare result.
+## Ручная последовательность проверки
+1. Скопировать profile payload из scripts/test-profiles.json.
+2. Отправить запрос обновления профиля.
+3. Отправить запрос скоринга.
+4. Проверить диапазон score и обязательные поля.
+5. Для GitHub-кейса отправить import-github перед скорингом и сравнить результат.
 
-## PowerShell examples
+## Примеры PowerShell
 
-### 1) Update profile
+### 1) Обновить профиль
 ```powershell
 $profile = @{
   role = "backend"
@@ -31,7 +31,7 @@ $profile = @{
   primaryStack = @("Node.js", "PostgreSQL", "Express")
   experienceYears = 2
   hackathonsCount = 3
-  bio = "Backend разработчик."
+  bio = "Backend-разработчик."
   projectLinks = @(
     @{
       url = "https://github.com/example/task-api"
@@ -46,12 +46,12 @@ $profile = @{
 Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -ContentType "application/json" -Body $profile
 ```
 
-### 2) Trigger score
+### 2) Запустить скоринг
 ```powershell
 Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -ContentType "application/json" -Body "{}"
 ```
 
-### 3) Import githubData (for senior-fullstack case)
+### 3) Импортировать githubData (для senior-fullstack кейса)
 ```powershell
 $github = @{
   githubData = @{
@@ -79,19 +79,19 @@ $github = @{
 Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/import-github" -ContentType "application/json" -Body $github
 ```
 
-### 4) Score history
+### 4) История скоринга
 ```powershell
 Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/profile/score/history"
 ```
 
-## Pass criteria
-1. Response contains rating.score, rating.grade, rating.roleLabel.
-2. score is in expected range from scripts/test-profiles.json.
-3. No 500 errors.
-4. score history is updated after each run.
+## Критерии успеха
+1. Ответ содержит rating.score, rating.grade, rating.roleLabel.
+2. score находится в ожидаемом диапазоне из scripts/test-profiles.json.
+3. Нет ошибок 500.
+4. История скоринга обновляется после каждого прогона.
 
-## Fail criteria
-1. 400/500 on valid payload.
-2. Missing rating fields.
-3. score outside expected range with same input.
-4. import-github does not affect suggested stack/links.
+## Критерии ошибки
+1. 400/500 на валидном payload.
+2. Отсутствуют поля rating.
+3. score выходит за ожидаемый диапазон при одинаковом входе.
+4. import-github не влияет на suggested stack/links.

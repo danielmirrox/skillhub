@@ -1,29 +1,29 @@
-# Block 4 Notes (Deni)
+# Блок 4 — Заметки Дени
 
-## Date
+## Дата
 2026-03-21
 
-## Implemented
-- Added SQL helper migration: scripts/teams-applications-migration.sql
-- Added E2E runbook: scripts/check-block4-applications.md
-- Added demo PRO endpoint: POST /api/v1/auth/pro/upgrade
+## Что реализовано
+- Добавлен SQL-файл: scripts/teams-applications-migration.sql
+- Добавлен e2e-runbook: scripts/check-block4-applications.md
+- Добавлен demo PRO endpoint: POST /api/v1/auth/pro/upgrade
 
-## E2E verification summary
-- PRO activation: success=true
-- auth/me after upgrade: isPro=true, proExpiresAt is set
-- teams list count: 3
-- applications outgoing (applicant): visible
-- applications incoming (captain): visible
-- PATCH accepted: works, status updated to accepted
+## Сводка e2e-проверки
+- Активация PRO: success=true
+- auth/me после апгрейда: isPro=true, proExpiresAt установлен
+- Количество команд в списке: 3
+- applications outgoing у аппликанта: отображаются
+- applications incoming у капитана: отображаются
+- PATCH accepted: работает, статус меняется на accepted
 
-## Important observation
-- POST /applications returned 409 APPLICATION_ALREADY_EXISTS for repeated create attempt.
-- This is expected behavior because seed already has application for that team/user pair.
+## Важное наблюдение
+- POST /applications возвращает 409 APPLICATION_ALREADY_EXISTS при повторном создании.
+- Это ожидаемо: в seed уже есть заявка для этой пары team/user.
 
-## Risks
-- In-memory demo store resets after server restart.
-- Repeated application creation for the same pair always returns 409 due to UNIQUE behavior.
-- PRO endpoint is a demo stub and does not include payment flow.
+## Риски
+- In-memory demo store сбрасывается после перезапуска сервера.
+- Повторное создание заявки для той же пары всегда вернет 409 из-за UNIQUE-поведения.
+- PRO endpoint — демо-заглушка, без платежного процесса.
 
-## Next step
-- Block 5: GitHub import hardening and deployment checklist.
+## Следующий шаг
+- Блок 5: усиление импорта GitHub и чеклист деплоя.
