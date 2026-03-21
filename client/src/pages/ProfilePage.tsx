@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDemoAuthUser, DEMO_PRO_AUTH_USER, setDemoAuthUser, promoteDemoAuthUserToPro } from "../api/demoAuth";
-import { getOwnProfile, scoreProfile, upgradeToPro } from "../api/profile";
+import { getDemoAuthUser, DEMO_PRO_AUTH_USER, setDemoAuthUser } from "../api/demoAuth";
+import { getOwnProfile, scoreProfile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 
 export function ProfilePage() {
@@ -37,19 +37,6 @@ export function ProfilePage() {
       }
     } finally {
       setScoring(false);
-    }
-  };
-
-  const onUpgradePro = async () => {
-    setError(null);
-    try {
-      await upgradeToPro();
-      promoteDemoAuthUserToPro();
-      const fresh = await getOwnProfile();
-      setProfileData(fresh);
-    } catch (err) {
-      const typed = err as Error;
-      setError(typed.message || "Не удалось включить PRO-режим.");
     }
   };
 
@@ -119,16 +106,15 @@ export function ProfilePage() {
                   PRO-режим
                 </span>
               ) : (
-                <button
-                  type="button"
-                  onClick={onUpgradePro}
+                <Link
+                  to="/paywall"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-950 shadow-lg shadow-emerald-500/20 transition duration-300 ease-out hover:shadow-emerald-500/30"
                 >
                   <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden="true" fill="currentColor">
                     <path d="M5 6V4a3 3 0 1 1 6 0v2h1.5A1.5 1.5 0 0 1 14 7.5v5A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-5A1.5 1.5 0 0 1 3.5 6H5Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
                   </svg>
                   Стать PRO
-                </button>
+                </Link>
               )}
               {!profileData?.user.isPro ? (
                 <button

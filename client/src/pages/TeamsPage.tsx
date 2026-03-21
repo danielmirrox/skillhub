@@ -16,15 +16,24 @@ const ROLE_OPTIONS: Array<{ value: TeamRole | ""; label: string }> = [
 ];
 
 function TeamCard({ team }: { team: TeamSummary }) {
+  const isBoosted = Boolean(team.author?.isPro);
+
   return (
-    <article className="group rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/20 backdrop-blur-xl transition duration-300 ease-out hover:border-cyan-300/20 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-slate-950/35">
+    <article
+      className={[
+        "group rounded-[1.75rem] border p-5 shadow-xl backdrop-blur-xl transition duration-300 ease-out hover:shadow-2xl",
+        isBoosted
+          ? "border-emerald-300/20 bg-gradient-to-br from-emerald-300/10 via-white/5 to-cyan-300/8 shadow-emerald-950/20 hover:border-emerald-300/35 hover:shadow-emerald-950/35"
+          : "border-white/10 bg-white/5 shadow-slate-950/20 hover:border-cyan-300/20 hover:bg-white/[0.07] hover:shadow-slate-950/35",
+      ].join(" ")}
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-cyan-200/80">{team.hackathonName}</p>
+          <p className={`text-xs uppercase tracking-[0.24em] ${isBoosted ? 'text-emerald-100/85' : 'text-cyan-200/80'}`}>{team.hackathonName}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <h3 className="text-2xl font-semibold tracking-tight text-white">{team.name}</h3>
             {team.author?.isPro ? (
-              <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-100">
+              <span className="rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-100">
                 PRO-буст
               </span>
             ) : null}

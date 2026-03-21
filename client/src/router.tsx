@@ -15,6 +15,10 @@ export const router = createBrowserRouter([
         element: <routes.LoginRoute />,
       },
       {
+        path: "/paywall",
+        element: <routes.PaywallRoute />,
+      },
+      {
         path: "/dashboard",
         element: <routes.DashboardRoute />,
       },

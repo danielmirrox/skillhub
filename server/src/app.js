@@ -9,6 +9,7 @@ const { resolveViewer } = require('./middleware/auth');
 const { notFoundHandler } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
 const { pingDatabase } = require('./data/db');
+const { authRouter } = require('./routes/auth');
 const { apiRouter } = require('./routes');
 
 function createApp() {
@@ -66,7 +67,9 @@ function createApp() {
   app.get('/health', async (_req, res) => {
     const database = await pingDatabase();
     const oauthConfigured = Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET && env.GITHUB_CALLBACK_URL);
-    const yandexConfigured = Boolean(env.YANDEXGPT_API_KEY && env.YANDEXGPT_FOLDER_ID);
+    const yandexAuthConfigured = Boolean(env.YANDEXGPT_SA_KEY_PATH || env.YANDEXGPT_IAM_TOKEN || env.YANDEXGPT_API_KEY);
+    const yandexModelConfigured = Boolean(env.YANDEXGPT_MODEL_URI || env.YANDEXGPT_FOLDER_ID || env.YANDEXGPT_MODEL);
+    const yandexConfigured = yandexAuthConfigured && yandexModelConfigured;
     const healthy = database.healthy;
 
     res.status(healthy ? 200 : 503).json({
@@ -85,6 +88,7 @@ function createApp() {
   });
 
   app.use(resolveViewer);
+  app.use('/auth', authRouter);
   app.use('/api/v1', apiRouter);
   app.use(notFoundHandler);
   app.use(errorHandler);

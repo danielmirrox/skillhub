@@ -32,6 +32,7 @@ function resolveViewer(req, _res, next) {
   const demoUserId = req.get('x-demo-user-id');
   const authHeader = req.get('authorization');
   const sessionToken = getCookieValue(req.headers.cookie, 'skillhub.session');
+  const allowDemoAuth = env.NODE_ENV !== 'production';
   let user = null;
 
   if (!user) {
@@ -40,14 +41,18 @@ function resolveViewer(req, _res, next) {
 
   if (!user && authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice('Bearer '.length).trim();
-    if (token === 'demo' || token === 'dev') {
+    if (allowDemoAuth && (token === 'demo' || token === 'dev')) {
       user = demoStore.getDefaultViewer();
     } else {
-      user = resolveUserFromToken(token) || demoStore.getUserById(token);
+      user = resolveUserFromToken(token);
+
+      if (!user && allowDemoAuth) {
+        user = demoStore.getUserById(token);
+      }
     }
   }
 
-  if (!user && demoUserId) {
+  if (!user && allowDemoAuth && demoUserId) {
     user = demoStore.getUserById(demoUserId);
   }
 

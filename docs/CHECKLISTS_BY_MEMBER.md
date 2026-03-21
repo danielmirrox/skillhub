@@ -118,7 +118,7 @@
 ## Блок 1 — Фундамент (0–6ч)
 - [x] Настройка env (GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, DATABASE_URL)
 - [x] .env.example с описанием переменных
-- [ ] Проверка: OAuth callback URL в настройках GitHub App
+- [x] Проверка: OAuth callback URL в настройках GitHub App
 
 ## Блок 2 — Профиль + AI (6–12ч)
 - [x] 2–3 тестовых профиля (JSON) для проверки AI
@@ -142,7 +142,7 @@
 - [x] POST /profile/import-github: вызовы GitHub API (user, repos, languages)
 - [x] Сохранение в profiles.github_data
 - [x] CORS на проде (разрешён origin фронта)
-- [ ] Проверка OAuth callback URL на проде
+- [x] Проверка OAuth callback URL на проде
 - [ ] Презентация: 8–10 слайдов (проблема, решение, демо, команда, CTA)
 - [ ] Слайды готовы к показу
 

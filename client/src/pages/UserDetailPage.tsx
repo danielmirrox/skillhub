@@ -181,12 +181,6 @@ export function UserDetailPage() {
             >
               Смотреть команды
             </Link>
-            <Link to="/search" className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10">
-              Назад к поиску
-            </Link>
-            <Link to="/profile" className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10">
-              Мой профиль
-            </Link>
           </div>
         </article>
 

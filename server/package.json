@@ -7,7 +7,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "smoke": "node ../scripts/smoke.js"
   },
   "engines": {
     "node": ">=20"
@@ -20,12 +21,14 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
+    "openai": "^6.32.0",
     "passport": "^0.7.0",
     "passport-github2": "^0.1.12",
     "pg": "^8.13.1",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "playwright-core": "^1.58.2"
   }
 }

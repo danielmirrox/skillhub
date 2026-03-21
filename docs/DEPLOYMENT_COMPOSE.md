@@ -39,8 +39,16 @@ This note describes the recommended deployment path when the project is hosted o
 ### 2. backend
 
 - build from the `server/` folder
-- pass `DATABASE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, `YANDEXGPT_API_KEY`, `YANDEXGPT_FOLDER_ID`, `JWT_SECRET`, `CLIENT_URL`
+- pass `DATABASE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, `YANDEXGPT_SA_KEY_PATH` or `YANDEXGPT_IAM_TOKEN` or `YANDEXGPT_API_KEY`, `YANDEXGPT_MODEL_URI` or `YANDEXGPT_FOLDER_ID`, `YANDEXGPT_LLM_ENDPOINT`, `JWT_SECRET`, `CLIENT_URL`
 - expose only the internal app port to the compose network
+
+### YandexGPT auth
+
+- preferred path: mount the service-account JSON into the backend container and point `YANDEXGPT_SA_KEY_PATH` to that file
+- optional fallback: use a pre-generated `YANDEXGPT_IAM_TOKEN`
+- legacy fallback: use `YANDEXGPT_API_KEY` only if that is what the current Yandex setup provides
+- set `YANDEXGPT_MODEL_URI` explicitly when possible, for example `gpt://<folder_id>/yandexgpt-4-lite/latest`
+- keep `YANDEXGPT_LLM_ENDPOINT` on the completion endpoint used by the backend
 
 ### 3. frontend
 
@@ -63,8 +71,13 @@ DATABASE_URL=postgresql://skillhub_user:strong_password@postgres:5432/skillhub
 GITHUB_CLIENT_ID=...
 GITHUB_CLIENT_SECRET=...
 GITHUB_CALLBACK_URL=https://api.example.com/api/v1/auth/github/callback
+YANDEXGPT_SA_KEY_PATH=/run/secrets/yandex-service-account.json
+YANDEXGPT_MODEL_URI=gpt://b1gcdrk0le310t723e9o/yandexgpt-4-lite/latest
+YANDEXGPT_LLM_ENDPOINT=https://llm.api.cloud.yandex.net/foundationModels/v1/completion
+# Optional fallback if you already have them:
+YANDEXGPT_IAM_TOKEN=...
 YANDEXGPT_API_KEY=...
-YANDEXGPT_FOLDER_ID=...
+YANDEXGPT_FOLDER_ID=b1gcdrk0le310t723e9o
 JWT_SECRET=long-random-secret
 JWT_EXPIRES_IN=7d
 CLIENT_URL=https://skillhub.example.com
@@ -91,6 +104,9 @@ RATE_LIMIT_MAX_REQUESTS=100
 - `DATABASE_URL` points to the `postgres` service inside Compose.
 - `CLIENT_URL` matches the public frontend origin.
 - `GITHUB_CALLBACK_URL` matches the public backend URL.
+- `YANDEXGPT_SA_KEY_PATH` points to a mounted service-account JSON file, or `YANDEXGPT_IAM_TOKEN` / `YANDEXGPT_API_KEY` are present as fallback.
+- `YANDEXGPT_MODEL_URI` matches the real Yandex model URI, or `YANDEXGPT_FOLDER_ID` plus `YANDEXGPT_MODEL` can build it.
+- `YANDEXGPT_LLM_ENDPOINT` points to the completion endpoint used by the backend.
 - `skillhub.session` cookie is `HttpOnly`.
 - `Secure` cookies are enabled if HTTPS is used.
 - Postgres data is persisted across restarts.

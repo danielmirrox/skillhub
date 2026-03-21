@@ -27,7 +27,7 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
   const [hackathonName, setHackathonName] = React.useState(team?.hackathonName ?? "");
   const [requiredRoles, setRequiredRoles] = React.useState(joinValues(team?.requiredRoles));
   const [stack, setStack] = React.useState(joinValues(team?.stack));
-  const [slotsOpen, setSlotsOpen] = React.useState(String(team?.slotsOpen ?? 1));
+  const [slotsOpen, setSlotsOpen] = React.useState(String(team?.slotsOpen ?? 2));
   const [minRating, setMinRating] = React.useState(team && "minRating" in team && team.minRating !== null ? String(team.minRating) : "");
   const [isActive, setIsActive] = React.useState(team?.isActive ?? true);
   const [status, setStatus] = React.useState<"active" | "paused" | "closed">(
@@ -40,15 +40,21 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
     setHackathonName(team?.hackathonName ?? "");
     setRequiredRoles(joinValues(team?.requiredRoles));
     setStack(joinValues(team?.stack));
-    setSlotsOpen(String(team?.slotsOpen ?? 1));
+    setSlotsOpen(String(team?.slotsOpen ?? 2));
     setMinRating(team && "minRating" in team && team.minRating !== null ? String(team.minRating) : "");
     setIsActive(team?.isActive ?? true);
     setStatus((team && "status" in team ? (team.status as "active" | "paused" | "closed") : "active") ?? "active");
   }, [team]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/75 px-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-2xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-slate-950/95 p-6 shadow-2xl shadow-cyan-950/30">
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/75 px-4 py-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex w-full max-w-2xl max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-slate-950/95 p-6 shadow-2xl shadow-cyan-950/30"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400" />
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -67,17 +73,21 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
         </div>
 
         <form
-          className="mt-5 grid gap-4 md:grid-cols-2"
+          className="mt-5 grid flex-1 min-h-0 gap-4 overflow-y-auto pr-1 md:grid-cols-2"
           onSubmit={(event) => {
             event.preventDefault();
+            const normalizedSlotsOpen = Number(slotsOpen || 0);
+            const normalizedMinRating = minRating ? Number(minRating) : null;
             onSubmit({
               name,
               description,
               hackathonName,
               requiredRoles: toList(requiredRoles) as TeamRole[],
               stack: toList(stack),
-              slotsOpen: Number(slotsOpen || 0),
-              minRating: minRating ? Number(minRating) : null,
+              slotsOpen: Number.isFinite(normalizedSlotsOpen) ? Math.min(20, Math.max(2, normalizedSlotsOpen)) : 2,
+              minRating: Number.isFinite(normalizedMinRating as number)
+                ? Math.min(100, Math.max(0, normalizedMinRating as number))
+                : null,
               isActive,
               status,
             });
@@ -138,7 +148,7 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
             Слоты
             <input
               type="number"
-              min={1}
+              min={2}
               max={20}
               value={slotsOpen}
               onChange={(event) => setSlotsOpen(event.target.value)}

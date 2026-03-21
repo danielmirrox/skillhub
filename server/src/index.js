@@ -2,6 +2,10 @@ const { createApp } = require('./app');
 const { env } = require('./config/env');
 const { demoStore } = require('./data/demoStore');
 
+process.on('unhandledRejection', (error) => {
+  console.error('Unhandled rejection in SkillHub API:', error);
+});
+
 (async () => {
   try {
     const storeMode = await demoStore.initializeStore();

@@ -32,3 +32,11 @@ node seed.js   # проверка и сводка seed-датасета
 ## Файлы Блока 2
 
 - `scripts/BLOCK_2_NOTES.md` — аккуратная сводка по проверке профиля, скоринга и импорта GitHub.
+
+## Smoke-проверка
+
+- `node smoke.js` — полный smoke-контур: seed Postgres, healthcheck API, проверка выборок и headless-открытие UI.
+- Запускать из `server/` через `npm run smoke`.
+- Для PostgreSQL можно явно задать `POSTGRES_BIN_DIR`, либо `POSTGRES_INITDB_PATH` и `POSTGRES_POSTGRES_PATH`, если бинарники не лежат в стандартном месте.
+- Для UI smoke можно задать `SMOKE_BROWSER`, если Chrome/Edge не найдены автоматически.
+- Если заданы `YANDEXGPT_SA_KEY_PATH` или `YANDEXGPT_IAM_TOKEN` или `YANDEXGPT_API_KEY`, а также `YANDEXGPT_MODEL_URI` или `YANDEXGPT_FOLDER_ID`, можно включить live-проверку YandexGPT через `SMOKE_YANDEXGPT=1 node smoke.js`. Тогда smoke дополнительно делает запрос через `/api/v1/profile/score` и проверяет, что ответ пришёл не из fallback.

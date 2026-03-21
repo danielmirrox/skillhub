@@ -19,7 +19,8 @@ Backend API for the SkillHub hackathon product.
 
 ## Defaults for local development
 
-- If no real session is present, the API can still resolve a demo viewer by `X-Demo-User-Id` or the demo buttons in the client.
+- In local development only, if no real session is present, the API can still resolve a demo viewer by `X-Demo-User-Id` or the demo buttons in the client.
+- Demo headers and demo auth helpers are intentionally disabled in production.
 - GitHub OAuth issues a signed `skillhub.session` cookie on callback and validates OAuth `state`.
 - If `DATABASE_URL` is set, the server boots PostgreSQL from `sql/schema.sql` and hydrates the demo store from the database.
 - If the database is unavailable, the server logs a warning and falls back to in-memory demo data instead of crashing.
@@ -55,7 +56,14 @@ Backend API for the SkillHub hackathon product.
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_CALLBACK_URL`
 - `YANDEXGPT_API_KEY`
+- `YANDEXGPT_IAM_TOKEN`
 - `YANDEXGPT_FOLDER_ID`
+- `YANDEXGPT_MODEL_URI`
+- `YANDEXGPT_SA_KEY_PATH`
+- `YANDEXGPT_LLM_ENDPOINT`
+- `YANDEXGPT_MODEL`
+- `YANDEXGPT_BASE_URL`
+- или алиасы `YANDEX_CLOUD_API_KEY`, `YANDEX_CLOUD_FOLDER`, `YANDEX_CLOUD_MODEL`, `YANDEX_CLOUD_BASE_URL`
 - `JWT_SECRET`
 - `JWT_EXPIRES_IN`
 - `CLIENT_URL`

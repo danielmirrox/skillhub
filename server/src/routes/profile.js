@@ -153,8 +153,8 @@ profileRouter.post('/score', requireAuth, (req, res) => {
 
     if (!rateLimitStatus.allowed) {
       return res.status(429).json({
-        error: 'RATE_LIMITED',
-        message: 'Profile scoring is temporarily limited.',
+        error: 'RATING_LIMIT_EXCEEDED',
+        message: `Бесплатный скоринг доступен раз в 7 дней. Следующий: ${rateLimitStatus.nextAllowedAt}`,
         nextAllowedAt: rateLimitStatus.nextAllowedAt,
       });
     }
@@ -178,7 +178,9 @@ profileRouter.post('/score', requireAuth, (req, res) => {
     let aiSource = 'formula';
 
     try {
-      aiResult = await scoreWithYandexGpt(mergedProfile);
+      aiResult = await scoreWithYandexGpt(mergedProfile, {
+        mode: req.user.isPro ? 'pro' : 'free',
+      });
       if (aiResult) {
         aiSource = 'yandexgpt';
       }
@@ -201,7 +203,7 @@ profileRouter.post('/score', requireAuth, (req, res) => {
       jobId: rating.id,
       rating: ratingResponse,
       profile: ownProfile,
-      nextAllowedAt: null,
+      nextAllowedAt: demoStore.getRateLimitStatus(req.user.id).nextAllowedAt,
     });
   })().catch((error) => {
     if (error instanceof z.ZodError) {

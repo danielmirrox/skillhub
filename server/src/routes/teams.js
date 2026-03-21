@@ -13,7 +13,7 @@ const teamSchema = z.object({
   requiredRoles: z.array(z.enum(['frontend', 'backend', 'fullstack', 'design', 'ml', 'mobile', 'other'])).min(1),
   minRating: z.number().int().min(0).max(100).optional().nullable(),
   stack: z.array(z.string().min(1).max(64)).min(1),
-  slotsOpen: z.number().int().min(1).max(20),
+  slotsOpen: z.number().int().min(2).max(20),
   isActive: z.boolean().optional(),
   status: z.enum(['active', 'paused', 'closed']).optional(),
 });

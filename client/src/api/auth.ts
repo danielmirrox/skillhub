@@ -1,4 +1,4 @@
-import { apiGet } from "./client";
+import { API_BASE_URL, apiGet, getApiRequestHeaders } from "./client";
 import { getDemoAuthUser } from "./demoAuth";
 
 export type AuthUser = {
@@ -26,4 +26,12 @@ export async function getCurrentUser(): Promise<AuthUser> {
 
     throw new Error("Not authenticated");
   }
+}
+
+export async function logout() {
+  await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+    headers: getApiRequestHeaders(),
+  }).catch(() => null);
 }

@@ -1,32 +1,21 @@
 import React from "react";
 import { Navigate, Outlet, useLocation, useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
-import { getCurrentUser } from "./api/auth";
+import { getCurrentUser, logout as logoutUser } from "./api/auth";
 import { DEMO_AUTH_CHANGE_EVENT } from "./api/demoAuth";
+import { AuthContext, useAuth, type AuthContextValue } from "./authContext";
 import { Layout } from "./components/layout/Layout";
+import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { ProfileEditPage } from "./pages/ProfileEditPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import { PaywallPage } from "./pages/PaywallPage";
 import { SearchPage } from "./pages/SearchPage";
 import { TeamDetailPage } from "./pages/TeamDetailPage";
 import { TeamsPage } from "./pages/TeamsPage";
 import { UserDetailPage } from "./pages/UserDetailPage";
-import type { AuthUser } from "./api/auth";
-
-type AuthContextValue = {
-  loading: boolean;
-  user: AuthUser | null;
-};
-
-const AuthContext = React.createContext<AuthContextValue>({
-  loading: true,
-  user: null,
-});
-
-function useAuth() {
-  return React.useContext(AuthContext);
-}
+import { clearDemoAuthUser } from "./api/demoAuth";
 
 function AuthStatus() {
   return <p className="text-slate-300">Проверяем авторизацию...</p>;
@@ -80,7 +69,7 @@ function AuthProvider() {
     user: null,
   }));
 
-  React.useEffect(() => {
+  const syncAuth = React.useCallback(() => {
     const requestId = ++requestIdRef.current;
     getCurrentUser()
       .then((user) => {
@@ -93,26 +82,13 @@ function AuthProvider() {
           setState({ loading: false, user: null });
         }
       });
-
-    return undefined;
   }, []);
 
   React.useEffect(() => {
-    const syncAuth = () => {
-      const requestId = ++requestIdRef.current;
-      getCurrentUser()
-        .then((user) => {
-          if (requestIdRef.current === requestId) {
-            setState({ loading: false, user });
-          }
-        })
-        .catch(() => {
-          if (requestIdRef.current === requestId) {
-            setState({ loading: false, user: null });
-          }
-        });
-    };
+    syncAuth();
+  }, [syncAuth]);
 
+  React.useEffect(() => {
     window.addEventListener(DEMO_AUTH_CHANGE_EVENT, syncAuth);
     window.addEventListener("storage", syncAuth);
 
@@ -120,11 +96,22 @@ function AuthProvider() {
       window.removeEventListener(DEMO_AUTH_CHANGE_EVENT, syncAuth);
       window.removeEventListener("storage", syncAuth);
     };
+  }, [syncAuth]);
+
+  const handleLogout = React.useCallback(async () => {
+    try {
+      await logoutUser();
+    } catch {
+      // Ignore logout transport errors and reset the local session state anyway.
+    } finally {
+      clearDemoAuthUser();
+      setState({ loading: false, user: null });
+    }
   }, []);
 
   return (
     <AuthContext.Provider value={state}>
-      <Layout />
+      <Layout user={state.user} loading={state.loading} onLogout={handleLogout} />
     </AuthContext.Provider>
   );
 }
@@ -132,7 +119,7 @@ function AuthProvider() {
 function LoginRoute() {
   const { loading, user } = useAuth();
   if (loading) return <AuthStatus />;
-  if (user) return <Navigate to="/dashboard" replace />;
+  if (user) return <Navigate to="/" replace />;
   return <LoginPage />;
 }
 
@@ -217,9 +204,17 @@ function ApplicationsRoute() {
 }
 
 function RootRoute() {
+  return <HomePage />;
+}
+
+function PaywallRoute() {
   const { loading, user } = useAuth();
+  const location = useLocation();
   if (loading) return <AuthStatus />;
-  return <Navigate to={user ? "/dashboard" : "/login"} replace />;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+  return <PaywallPage />;
 }
 
 export const routes = {
@@ -235,6 +230,7 @@ export const routes = {
   UserDetailRoute,
   ApplicationsRoute,
   RootRoute,
+  PaywallRoute,
   ErrorRoute,
   NotFoundRoute,
 };

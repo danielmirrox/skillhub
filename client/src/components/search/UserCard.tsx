@@ -33,7 +33,14 @@ export function UserCard({ user }: UserCardProps) {
           </p>
           <p className="mt-3 text-sm leading-6 text-slate-300">{user.bio || "Описание пока не заполнено."}</p>
         </div>
-        {user.rating ? <RatingBadge score={user.rating.score} /> : null}
+        {user.rating ? (
+          <div className="flex flex-col items-end gap-2">
+            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100">
+              AI-рейтинг
+            </span>
+            <RatingBadge score={user.rating.score} />
+          </div>
+        ) : null}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">

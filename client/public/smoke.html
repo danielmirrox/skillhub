@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SkillHub smoke helper</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const payload = {
+          id: params.get('userId') || 'user-captain',
+          username: params.get('username') || 'captainpro',
+          displayName: params.get('displayName') || 'Артем Капустин',
+          avatarUrl: params.get('avatarUrl') || 'https://avatars.githubusercontent.com/u/4?v=4',
+          isPro: params.get('isPro') !== 'false',
+          proExpiresAt: params.get('proExpiresAt') || '2026-04-21T08:00:00Z',
+        };
+        const next = params.get('next') || '/dashboard';
+
+        window.localStorage.setItem('skillhub.demoAuthUser', JSON.stringify(payload));
+        window.location.replace(next);
+      })();
+    </script>
+  </body>
+</html>

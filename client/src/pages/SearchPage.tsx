@@ -72,6 +72,12 @@ export function SearchPage() {
             Живой экран поверх API `/api/v1/users`: фильтры по роли, грейду, минимальному рейтингу и стеку работают,
             а PRO-доступ к контактам и рекомендациям подтягивается из бэка.
           </p>
+          <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-50">
+            <span className="rounded-full bg-cyan-300 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.2em] text-slate-950">
+              AI
+            </span>
+            <span className="font-medium">Рейтинг и релевантность подсвечены прямо в карточках</span>
+          </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
@@ -153,9 +159,13 @@ export function SearchPage() {
       {!loading && !error && items.length > 0 ? (
         <div className="space-y-4">
           {appliedFilters.search ? (
-            <p className="rounded-2xl border border-cyan-300/15 bg-cyan-300/8 px-4 py-3 text-sm text-cyan-50/90 backdrop-blur-xl">
-              Поиск работает гибридно: сначала учитываются совпадения по имени, стеку, био, роли и проектам, затем рейтинг.
-            </p>
+            <div className="rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/15 via-slate-950 to-violet-400/10 px-4 py-3 backdrop-blur-xl">
+              <p className="text-xs uppercase tracking-[0.24em] text-cyan-200">AI-рейтинг</p>
+              <p className="mt-2 text-sm text-cyan-50/95">
+                Поиск работает гибридно: сначала учитываются совпадения по имени, стеку, био, роли и проектам,
+                затем рейтинг.
+              </p>
+            </div>
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
             {items.map((user) => (

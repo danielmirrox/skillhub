@@ -35,6 +35,11 @@ function getPool() {
       connectionString: env.DATABASE_URL,
       ssl: useSsl ? { rejectUnauthorized: false } : false,
     });
+
+    pool.on('error', (error) => {
+      databaseReady = false;
+      console.error('PostgreSQL pool error:', error?.message || error);
+    });
   }
 
   return pool;
@@ -48,6 +53,17 @@ async function query(text, params = []) {
   }
 
   return activePool.query(text, params);
+}
+
+async function closePool() {
+  if (!pool) {
+    return;
+  }
+
+  const activePool = pool;
+  pool = null;
+  setDatabaseReady(false);
+  await activePool.end().catch(() => {});
 }
 
 async function pingDatabase() {
@@ -206,7 +222,7 @@ async function bootstrapDatabase() {
 
   try {
     await client.query('BEGIN');
-    const schemaPath = path.join(__dirname, '..', 'sql', 'schema.sql');
+    const schemaPath = path.join(__dirname, '..', '..', 'sql', 'schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
     await client.query(schemaSql);
 
@@ -325,6 +341,7 @@ async function loadSnapshot() {
 
 module.exports = {
   bootstrapDatabase,
+  closePool,
   isDatabaseConfigured,
   isDatabaseReady,
   loadSnapshot,

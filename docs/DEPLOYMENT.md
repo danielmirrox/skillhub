@@ -33,8 +33,8 @@ Compose is helpful for onboarding and demos, but it is not required for the prod
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_CALLBACK_URL`
-- `YANDEXGPT_API_KEY`
-- `YANDEXGPT_FOLDER_ID`
+- `YANDEXGPT_API_KEY` or `YANDEXGPT_IAM_TOKEN` or `YANDEXGPT_SA_KEY_PATH`
+- `YANDEXGPT_FOLDER_ID` or `YANDEXGPT_MODEL_URI`
 - `JWT_SECRET`
 - `CLIENT_URL`
 - `CLIENT_URLS` if there are extra allowed origins
@@ -46,5 +46,5 @@ Compose is helpful for onboarding and demos, but it is not required for the prod
 - Frontend origin is listed in `CLIENT_URL`
 - CORS allowlist includes the frontend domain
 - Database migrations are applied
-- YandexGPT credentials are present
+- YandexGPT credentials are present via API key, IAM token, or service-account JSON
 - Session cookie is `HttpOnly` and `Secure` in production
