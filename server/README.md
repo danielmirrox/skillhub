@@ -29,6 +29,8 @@ Backend API for the SkillHub hackathon product.
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
 - `GET /api/v1/profile`
+- `GET /api/v1/profile/score/history`
+- `GET /api/v1/profile/score/status/:jobId`
 - `GET /api/v1/users`
 - `GET /api/v1/users/:id`
 - `GET /api/v1/teams`

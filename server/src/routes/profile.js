@@ -80,6 +80,7 @@ profileRouter.post('/score', requireAuth, (req, res) => {
   const ownProfile = demoStore.getAuthMe(req.user.id).profile;
 
   return res.json({
+    jobId: rating.id,
     rating: req.user.isPro
       ? rating
       : {
@@ -90,6 +91,25 @@ profileRouter.post('/score', requireAuth, (req, res) => {
     profile: ownProfile,
     nextAllowedAt: null,
   });
+});
+
+profileRouter.get('/score/history', requireAuth, (req, res) => {
+  return res.json({
+    items: demoStore.getRatingHistoryByUserId(req.user.id),
+  });
+});
+
+profileRouter.get('/score/status/:jobId', requireAuth, (req, res) => {
+  const status = demoStore.getScoreJobStatus(req.params.jobId, req.user.id);
+
+  if (!status) {
+    return res.status(404).json({
+      error: 'SCORE_JOB_NOT_FOUND',
+      message: 'Score job not found.',
+    });
+  }
+
+  return res.json(status);
 });
 
 profileRouter.post('/import-github', requireAuth, (req, res) => {

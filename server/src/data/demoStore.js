@@ -466,6 +466,37 @@ function buildUserSummary(userId, viewer) {
   };
 }
 
+function getRatingHistoryByUserId(userId) {
+  const profile = getProfileByUserId(userId);
+  if (!profile) {
+    return [];
+  }
+
+  return ratings
+    .filter((rating) => rating.profileId === profile.id)
+    .sort((left, right) => new Date(right.createdAt) - new Date(left.createdAt))
+    .map((rating) => clone(rating));
+}
+
+function getScoreJobStatus(jobId, userId) {
+  const profile = getProfileByUserId(userId);
+  if (!profile) {
+    return null;
+  }
+
+  const rating = ratings.find((item) => item.id === jobId && item.profileId === profile.id);
+  if (!rating) {
+    return null;
+  }
+
+  return {
+    jobId,
+    status: 'completed',
+    score: rating.score,
+    createdAt: rating.createdAt,
+  };
+}
+
 function getTeamMembers(teamId) {
   return teamMembers.filter((member) => member.teamId === teamId).map((member) => {
     const user = getUserById(member.userId);
@@ -920,6 +951,8 @@ module.exports = {
     buildPublicProfile,
     buildOwnProfile,
     buildUserSummary,
+    getRatingHistoryByUserId,
+    getScoreJobStatus,
     listUsers,
     listTeams,
     getTeamById,
