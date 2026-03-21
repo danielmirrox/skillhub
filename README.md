@@ -2,6 +2,13 @@
 
 Платформа мэтчинга для хакатонов. AI-рейтинг навыков, лента участников, лента команд (party finder). Viribus Hackathon 2026.
 
+## Статус по плану
+
+- ✅ Блок 1 (Frontend, Денис): поднят `client/` на React + Vite + Tailwind
+- ✅ Реализованы маршруты `/`, `/login`, `/dashboard`
+- ✅ Добавлен auth-check через `GET /auth/me` и защита `/dashboard`
+- 🔄 Backend и интеграция продолжаются параллельно
+
 > [!WARNING]
 > **ВАЖНО: как работаем параллельно на одной ветке**
 > - Даниэл — backend и БД, Денис — client и UI, Дени — scripts, seed, презентация, docs.
@@ -22,8 +29,21 @@
 ## Запуск
 
 ```bash
-cd server && npm install && npm run dev
-cd client && npm install && npm run dev
+cd server
+npm install
+npm run dev
+
+cd ../client
+npm install
+npm run dev
+```
+
+## Переменные окружения (frontend)
+
+Создайте `client/.env`, если backend не на `http://localhost:5000`:
+
+```env
+VITE_API_URL=http://localhost:5000
 ```
 
 ## Документация
