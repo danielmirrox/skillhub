@@ -83,7 +83,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
           type="button"
           onClick={onSubmit}
           disabled={Boolean(loading)}
-          className="rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 text-sm font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
         >
           {loading ? "Сохраняем..." : "Сохранить профиль"}
         </button>
@@ -92,11 +92,11 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="space-y-4 rounded-[1.5rem] border border-white/10 bg-slate-950/45 p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Identity</p>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm">
               Специализация
               <select
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 shadow-inner shadow-black/20"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.role}
                 onChange={(event) => setField("role", event.target.value as ProfileRole)}
               >
@@ -113,7 +113,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             <label className="flex flex-col gap-2 text-sm">
               Заявленный грейд
               <select
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 shadow-inner shadow-black/20"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.claimedGrade}
                 onChange={(event) => setField("claimedGrade", event.target.value as ClaimedGrade)}
               >
@@ -129,7 +129,8 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 type="number"
                 min={0}
                 max={50}
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 shadow-inner shadow-black/20"
+                inputMode="numeric"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.experienceYears}
                 onChange={onNumber("experienceYears")}
               />
@@ -141,7 +142,8 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 type="number"
                 min={0}
                 max={100}
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 shadow-inner shadow-black/20"
+                inputMode="numeric"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.hackathonsCount}
                 onChange={onNumber("hackathonsCount")}
               />
@@ -151,41 +153,44 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
           <label className="flex flex-col gap-2 text-sm">
             Основной стек (через запятую)
             <input
-              className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+              className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
               value={values.primaryStackText}
               onChange={(event) => setField("primaryStackText", event.target.value)}
               placeholder="React, TypeScript, Tailwind"
             />
+            <span className="text-xs text-slate-500">Пиши через запятую: это проще читать на мобильном и точнее для поиска.</span>
           </label>
 
           <label className="flex flex-col gap-2 text-sm">
             О себе
             <textarea
               rows={6}
-              className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 shadow-inner shadow-black/20"
+              className="min-h-32 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
               value={values.bio}
               onChange={(event) => setField("bio", event.target.value)}
+              placeholder="Коротко опиши роль, интересы и что ищешь в команде"
             />
           </label>
         </div>
 
         <div className="space-y-4 rounded-[1.5rem] border border-white/10 bg-slate-950/45 p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Reach & work</p>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm">
               Telegram username
               <input
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.telegramUsername}
                 onChange={(event) => setField("telegramUsername", event.target.value)}
                 placeholder="denisui"
               />
+              <span className="text-xs text-slate-500">Показываем только если ты включил public/pro visibility.</span>
             </label>
 
             <label className="flex flex-col gap-2 text-sm">
               GitHub URL
               <input
-                className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.githubUrl}
                 onChange={(event) => setField("githubUrl", event.target.value)}
                 placeholder="https://github.com/username"
@@ -212,8 +217,9 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
               <button
                 type="button"
                 onClick={addProjectLink}
-                className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-300/20"
+                className="inline-flex items-center gap-1 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-2 text-xs font-semibold text-cyan-100 hover:bg-cyan-300/20"
               >
+                <span aria-hidden="true">+</span>
                 + Добавить проект
               </button>
             </div>
@@ -221,15 +227,15 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             <div className="space-y-3">
               {values.projectLinks.map((item, index) => (
                 <div key={`${item.url}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
-                  <div className="grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2">
                     <input
-                      className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                       placeholder="Название проекта"
                       value={item.title}
                       onChange={(event) => updateProjectLink(index, "title", event.target.value)}
                     />
                     <input
-                      className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                       placeholder="https://github.com/user/project"
                       value={item.url}
                       onChange={(event) => updateProjectLink(index, "url", event.target.value)}
@@ -237,7 +243,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                   </div>
                   <textarea
                     rows={2}
-                    className="mt-3 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20"
+                    className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                     placeholder="Короткое описание"
                     value={item.description}
                     onChange={(event) =>
@@ -247,8 +253,9 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                   <button
                     type="button"
                     onClick={() => removeProjectLink(index)}
-                    className="mt-3 text-xs font-semibold text-rose-200 hover:text-rose-100"
+                    className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-rose-200 hover:text-rose-100"
                   >
+                    <span aria-hidden="true">−</span>
                     Удалить проект
                   </button>
                 </div>

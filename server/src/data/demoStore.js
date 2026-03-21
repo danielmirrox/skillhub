@@ -39,6 +39,220 @@ function calculateContactVisible(viewer, targetRating) {
   return Boolean(viewer?.isPro && targetRating?.score >= 80);
 }
 
+const SEARCH_SYNONYM_GROUPS = [
+  ['frontend', 'ui', 'ux', 'interface', 'web', 'client', 'react', 'next', 'vite', 'css', 'html'],
+  ['backend', 'api', 'server', 'service', 'node', 'express', 'postgres', 'database', 'sql', 'redis'],
+  ['design', 'figma', 'mockup', 'prototype', 'system', 'designsystem', 'ui', 'ux'],
+  ['mobile', 'android', 'ios', 'app', 'flutter', 'reactnative'],
+  ['ml', 'ai', 'machine', 'learning', 'machinelearning', 'llm', 'data', 'model', 'nlp'],
+  ['fullstack', 'full', 'stack'],
+  ['junior', 'jr'],
+  ['middle', 'mid'],
+  ['senior', 'sr'],
+];
+
+const SEARCH_SYNONYM_LOOKUP = new Map();
+
+SEARCH_SYNONYM_GROUPS.forEach((group) => {
+  group.forEach((token) => {
+    SEARCH_SYNONYM_LOOKUP.set(token, group);
+  });
+});
+
+function normalizeSearchText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenizeSearchText(value) {
+  const normalized = normalizeSearchText(value);
+  if (!normalized) {
+    return [];
+  }
+
+  return normalized.split(' ').filter(Boolean);
+}
+
+function uniqueTokens(tokens) {
+  return [...new Set(tokens.filter(Boolean))];
+}
+
+function expandSearchToken(token) {
+  return SEARCH_SYNONYM_LOOKUP.get(token) || [token];
+}
+
+function expandSearchTokens(tokens) {
+  const expanded = [];
+
+  tokens.forEach((token) => {
+    expanded.push(...expandSearchToken(token));
+  });
+
+  return uniqueTokens(expanded);
+}
+
+function levenshteinDistance(left, right) {
+  if (left === right) {
+    return 0;
+  }
+
+  if (!left.length) {
+    return right.length;
+  }
+
+  if (!right.length) {
+    return left.length;
+  }
+
+  const previousRow = Array.from({ length: right.length + 1 }, (_, index) => index);
+
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const currentRow = [leftIndex];
+
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      const insertCost = currentRow[rightIndex - 1] + 1;
+      const deleteCost = previousRow[rightIndex] + 1;
+      const substituteCost = previousRow[rightIndex - 1] + (left[leftIndex - 1] === right[rightIndex - 1] ? 0 : 1);
+      currentRow.push(Math.min(insertCost, deleteCost, substituteCost));
+    }
+
+    for (let index = 0; index < previousRow.length; index += 1) {
+      previousRow[index] = currentRow[index];
+    }
+  }
+
+  return previousRow[right.length];
+}
+
+function tokenMatchStrength(queryToken, candidateToken) {
+  if (queryToken === candidateToken) {
+    return 1;
+  }
+
+  if (queryToken.length >= 3 && candidateToken.includes(queryToken)) {
+    return 0.9;
+  }
+
+  if (candidateToken.length >= 3 && queryToken.includes(candidateToken)) {
+    return 0.85;
+  }
+
+  const maxDistance = Math.max(1, Math.floor(Math.min(queryToken.length, candidateToken.length) / 4));
+  const distance = levenshteinDistance(queryToken, candidateToken);
+  if (distance <= maxDistance) {
+    return distance === 1 ? 0.78 : 0.68;
+  }
+
+  return 0;
+}
+
+function buildSearchField(label, value, weight) {
+  const normalizedText = normalizeSearchText(value);
+  const rawTokens = tokenizeSearchText(value);
+  const searchTokens = expandSearchTokens(rawTokens);
+
+  return {
+    label,
+    value: normalizedText,
+    weight,
+    tokens: searchTokens,
+  };
+}
+
+function scoreSearchItem(item, search) {
+  const normalizedQuery = normalizeSearchText(search);
+  if (!normalizedQuery) {
+    return null;
+  }
+
+  const queryTokens = expandSearchTokens(tokenizeSearchText(search));
+  if (!queryTokens.length) {
+    return null;
+  }
+
+  const fields = [
+    buildSearchField('name', item.displayName, 26),
+    buildSearchField('username', item.username || '', 24),
+    buildSearchField('stack', item.primaryStack.join(' '), 22),
+    buildSearchField('bio', item.bio, 16),
+    buildSearchField('role', item.role || '', 18),
+    buildSearchField('grade', item.claimedGrade || '', 14),
+    buildSearchField('projects', (item.projectLinks || []).map((project) => `${project.title} ${project.description}`).join(' '), 18),
+    buildSearchField('rating', item.rating?.grade || '', 10),
+  ];
+
+  let totalScore = 0;
+  const reasonKeys = new Set();
+  const matchedTerms = new Set();
+
+  queryTokens.forEach((queryToken) => {
+    let tokenBestScore = 0;
+    let tokenBestField = null;
+
+    fields.forEach((field) => {
+      if (!field.tokens.length) {
+        return;
+      }
+
+      const fieldMatchScore = field.tokens.reduce((best, candidateToken) => Math.max(best, tokenMatchStrength(queryToken, candidateToken)), 0);
+      if (fieldMatchScore <= 0) {
+        return;
+      }
+
+      const fieldScore = field.weight * fieldMatchScore;
+      if (fieldScore > tokenBestScore) {
+        tokenBestScore = fieldScore;
+        tokenBestField = field.label;
+      }
+    });
+
+    if (tokenBestScore > 0) {
+      totalScore += tokenBestScore;
+      matchedTerms.add(queryToken);
+      if (tokenBestField) {
+        reasonKeys.add(tokenBestField);
+      }
+    }
+  });
+
+  const phraseBoost = fields.reduce((sum, field) => {
+    if (!field.value || !field.value.includes(normalizedQuery)) {
+      return sum;
+    }
+
+    reasonKeys.add(field.label);
+    return sum + field.weight * 0.45;
+  }, 0);
+
+  const ratingBoost = item.rating?.score ? Math.min(item.rating.score / 18, 5) : 0;
+  const finalScore = Math.min(100, Math.round(totalScore + phraseBoost + ratingBoost));
+
+  if (finalScore <= 0) {
+    return null;
+  }
+
+  const reasonLabels = {
+    name: 'совпадение по имени',
+    username: 'совпадение по username',
+    stack: 'совпадение по стеку',
+    bio: 'совпадение по bio',
+    role: 'совпадение по роли',
+    grade: 'совпадение по грейду',
+    projects: 'совпадение по проектам',
+    rating: 'подтягивается AI-рейтинг',
+  };
+
+  return {
+    score: finalScore,
+    reasons: uniqueTokens([...reasonKeys].map((key) => reasonLabels[key]).filter(Boolean)).slice(0, 4),
+    matchedTerms: [...matchedTerms].slice(0, 6),
+  };
+}
+
 function formatRating(rating, viewer) {
   if (!rating) {
     return null;
@@ -127,6 +341,21 @@ function listUsers(query = {}, viewer) {
     .map((user) => {
       const profile = getProfileByUserId(user.id);
       const rating = profile ? getRatingByProfileId(profile.id) : null;
+      const searchMatch = scoreSearchItem(
+        {
+          id: user.id,
+          username: user.username,
+          displayName: user.displayName,
+          primaryStack: profile ? clone(profile.primaryStack) : [],
+          bio: profile?.bio || '',
+          role: profile?.role || null,
+          claimedGrade: profile?.claimedGrade || null,
+          projectLinks: profile ? clone(profile.projectLinks) : [],
+          rating: formatRating(rating, viewer),
+        },
+        query.search || ''
+      );
+
       return {
         id: user.id,
         displayName: user.displayName,
@@ -138,6 +367,7 @@ function listUsers(query = {}, viewer) {
         contactVisible: calculateContactVisible(viewer, rating),
         isPro: user.isPro,
         bio: profile?.bio || '',
+        searchMatch,
       };
     })
     .filter((item) => {
@@ -153,12 +383,20 @@ function listUsers(query = {}, viewer) {
         if (!stackTokens.every((token) => joinedStack.includes(token))) return false;
       }
       if (search) {
-        const searchable = `${item.displayName} ${item.bio} ${getUserById(item.id)?.username || ''}`.toLowerCase();
-        if (!searchable.includes(search)) return false;
+        if (!item.searchMatch || item.searchMatch.score <= 0) return false;
       }
       return true;
     })
-    .sort((left, right) => (right.rating?.score || 0) - (left.rating?.score || 0));
+    .sort((left, right) => {
+      if (search) {
+        const relevanceDelta = (right.searchMatch?.score || 0) - (left.searchMatch?.score || 0);
+        if (relevanceDelta !== 0) {
+          return relevanceDelta;
+        }
+      }
+
+      return (right.rating?.score || 0) - (left.rating?.score || 0);
+    });
 
   const total = items.length;
   const startIndex = (page - 1) * limit;
@@ -190,6 +428,7 @@ function buildUserSummary(userId, viewer) {
     primaryStack: profile ? clone(profile.primaryStack) : [],
     rating: formatRating(rating, viewer),
     contactVisible: calculateContactVisible(viewer, rating),
+    telegramUsername: calculateContactVisible(viewer, rating) ? profile?.telegramUsername || null : null,
     bio: profile?.bio || '',
   };
 }
@@ -257,23 +496,44 @@ function listTeams(query = {}) {
       if (query.hackathon && team.hackathonName !== query.hackathon) return false;
       return true;
     })
-    .map((team) => ({
-      id: team.id,
-      name: team.name,
-      description: team.description,
-      hackathonName: team.hackathonName,
-      requiredRoles: clone(team.requiredRoles),
-      stack: clone(team.stack),
-      slotsOpen: team.slotsOpen,
-      author: getUserById(team.authorId)
-        ? {
-            displayName: getUserById(team.authorId).displayName,
-            avatarUrl: getUserById(team.authorId).avatarUrl,
-          }
-        : null,
-      membersCount: getTeamMembers(team.id).length,
-      isActive: team.isActive,
-    }));
+      .map((team) => {
+        const author = getUserById(team.authorId);
+        const membersCount = getTeamMembers(team.id).length;
+
+        return {
+          id: team.id,
+          name: team.name,
+          description: team.description,
+          hackathonName: team.hackathonName,
+          requiredRoles: clone(team.requiredRoles),
+          stack: clone(team.stack),
+          slotsOpen: team.slotsOpen,
+          author: author
+            ? {
+                userId: author.id,
+                displayName: author.displayName,
+                avatarUrl: author.avatarUrl,
+                isPro: Boolean(author.isPro),
+              }
+            : null,
+          membersCount,
+          isActive: team.isActive,
+        };
+      })
+      .sort((left, right) => {
+        const leftBoost = Number(Boolean(left.author?.isPro)) + Number(Boolean(left.isActive));
+        const rightBoost = Number(Boolean(right.author?.isPro)) + Number(Boolean(right.isActive));
+
+        if (rightBoost !== leftBoost) {
+          return rightBoost - leftBoost;
+        }
+
+        if (right.slotsOpen !== left.slotsOpen) {
+          return right.slotsOpen - left.slotsOpen;
+        }
+
+        return right.membersCount - left.membersCount;
+      });
 }
 
 function getTeamById(id) {
@@ -284,12 +544,14 @@ function getTeamById(id) {
 
   return {
     ...clone(team),
-    author: getUserById(team.authorId)
-      ? {
-          displayName: getUserById(team.authorId).displayName,
-          avatarUrl: getUserById(team.authorId).avatarUrl,
-        }
-      : null,
+      author: getUserById(team.authorId)
+        ? {
+            userId: getUserById(team.authorId).id,
+            displayName: getUserById(team.authorId).displayName,
+            avatarUrl: getUserById(team.authorId).avatarUrl,
+            isPro: Boolean(getUserById(team.authorId).isPro),
+          }
+        : null,
     members: getTeamMembers(team.id),
   };
 }
@@ -522,7 +784,7 @@ function inferRatingInput(profile, githubData) {
   };
 }
 
-function scoreProfile(userId, overrides = {}) {
+function scoreProfile(userId, overrides = {}, aiResult = null) {
   let profile = getProfileByUserId(userId);
   if (!profile) {
     profile = createOrGetProfileForUser(userId);
@@ -536,7 +798,7 @@ function scoreProfile(userId, overrides = {}) {
     githubData: overrides.githubData || profile.githubData,
   };
 
-  const ratingPayload = inferRatingInput(mergedProfile, overrides.githubData);
+  const ratingPayload = aiResult || inferRatingInput(mergedProfile, overrides.githubData);
   const rating = {
     id: `rating-${randomUUID()}`,
     profileId: profile.id,
@@ -545,7 +807,7 @@ function scoreProfile(userId, overrides = {}) {
     roleLabel: ratingPayload.roleLabel,
     strengths: ratingPayload.strengths,
     improvements: ratingPayload.improvements,
-    rawResponse: ratingPayload.rawResponse,
+    rawResponse: ratingPayload.rawResponse || ratingPayload,
     createdAt: nowIso(),
   };
 

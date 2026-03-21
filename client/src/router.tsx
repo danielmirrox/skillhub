@@ -23,6 +23,14 @@ export const router = createBrowserRouter([
         element: <routes.SearchRoute />,
       },
       {
+        path: "/teams",
+        element: <routes.TeamsRoute />,
+      },
+      {
+        path: "/teams/:id",
+        element: <routes.TeamDetailRoute />,
+      },
+      {
         path: "/profile",
         element: <routes.ProfileRoute />,
       },

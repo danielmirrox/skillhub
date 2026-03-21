@@ -2,21 +2,12 @@ import React from "react";
 import { Link, useParams } from "react-router-dom";
 import { getUserSummary, type UserSummary } from "../api/users";
 import { RatingBadge } from "../components/profile/RatingBadge";
-import { ApplicationModal } from "../components/applications/ApplicationModal";
-import { createApplication } from "../api/applications";
-import { getTeams, type TeamSummary } from "../api/teams";
 
 export function UserDetailPage() {
   const { id } = useParams();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [user, setUser] = React.useState<UserSummary | null>(null);
-  const [teams, setTeams] = React.useState<TeamSummary[]>([]);
-  const [teamsLoading, setTeamsLoading] = React.useState(false);
-  const [teamsError, setTeamsError] = React.useState<string | null>(null);
-  const [applyOpen, setApplyOpen] = React.useState(false);
-  const [applyError, setApplyError] = React.useState<string | null>(null);
-  const [applyStatus, setApplyStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     if (!id) {
@@ -52,7 +43,39 @@ export function UserDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <p className="text-slate-300">Загружаем профиль участника...</p>;
+    return (
+      <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+          <div className="flex items-start gap-5">
+            <div className="h-24 w-24 animate-pulse rounded-[1.5rem] bg-white/10" />
+            <div className="min-w-0 flex-1 space-y-3">
+              <div className="h-8 w-2/3 animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-1/2 animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-full animate-pulse rounded-full bg-white/10" />
+              <div className="h-4 w-5/6 animate-pulse rounded-full bg-white/10" />
+            </div>
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+            <div className="h-32 animate-pulse rounded-2xl bg-white/5" />
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <div className="h-12 w-44 animate-pulse rounded-full bg-white/10" />
+            <div className="h-12 w-44 animate-pulse rounded-full bg-white/10" />
+            <div className="h-12 w-36 animate-pulse rounded-full bg-white/10" />
+          </div>
+        </article>
+
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+          <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
+          <div className="h-40 animate-pulse rounded-[1.5rem] bg-white/5" />
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="h-28 animate-pulse rounded-2xl bg-white/5" />
+            <div className="h-28 animate-pulse rounded-2xl bg-white/5" />
+          </div>
+        </aside>
+      </div>
+    );
   }
 
   if (error) {
@@ -63,41 +86,7 @@ export function UserDetailPage() {
     return <p className="text-red-300">Профиль не найден.</p>;
   }
 
-  const openApply = async () => {
-    setApplyError(null);
-    setApplyStatus(null);
-    setApplyOpen(true);
-
-    if (teams.length > 0 || teamsLoading) {
-      return;
-    }
-
-    setTeamsLoading(true);
-    setTeamsError(null);
-
-    try {
-      const response = await getTeams();
-      setTeams(response.items);
-    } catch {
-      setTeamsError("Не удалось загрузить команды для отклика.");
-    } finally {
-      setTeamsLoading(false);
-    }
-  };
-
-  const submitApplication = async ({ teamId, message }: { teamId: string; message: string }) => {
-    setApplyError(null);
-    setApplyStatus(null);
-
-    try {
-      await createApplication(teamId, message);
-      setApplyStatus("Отклик отправлен.");
-      setApplyOpen(false);
-    } catch (err) {
-      const typed = err as Error & { status?: number };
-      setApplyError(typed.message || "Не удалось отправить отклик.");
-    }
-  };
+  const telegramLink = user.contactVisible && user.telegramUsername ? `https://t.me/${user.telegramUsername.replace(/^@/, "")}` : null;
 
   return (
     <section className="space-y-6">
@@ -118,6 +107,9 @@ export function UserDetailPage() {
                 {user.role ?? "role not set"} · {user.claimedGrade ?? "grade not set"}
               </p>
               <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">{user.bio || "О себе пока ничего не добавлено."}</p>
+              <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+                {user.contactVisible ? "Контакты открыты" : "Контакты скрыты для PRO"}
+              </div>
             </div>
           </div>
 
@@ -139,22 +131,56 @@ export function UserDetailPage() {
 
             <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Контакт</p>
-              <p className="mt-3 text-slate-200">
-                {user.contactVisible
-                  ? "Контакт открыт: viewer сейчас видит этот профиль как PRO"
-                  : "Контакт скрыт: нужен PRO и рейтинг 80+"}
-              </p>
+              {user.contactVisible ? (
+                <div className="mt-3 space-y-2 text-slate-200">
+                  <p>Контакт открыт для PRO-viewer.</p>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-emerald-300/20 bg-emerald-300/15 px-3 py-1 text-emerald-100">Telegram visible</span>
+                    <span className="rounded-full border border-emerald-300/20 bg-emerald-300/15 px-3 py-1 text-emerald-100">GitHub visible</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 space-y-3">
+                  <p className="text-slate-200">Контакт скрыт: нужен PRO и рейтинг 80+</p>
+                  <div className="grid gap-2 text-xs text-slate-300">
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="blur-[2px]">@username</span>
+                      <span className="text-slate-500">Telegram</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                      <span className="blur-[2px]">github.com/hidden</span>
+                      <span className="text-slate-500">GitHub</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <button
-              type="button"
-              onClick={openApply}
-              className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+            {telegramLink ? (
+              <a
+                href={telegramLink}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+              >
+                Написать
+              </a>
+            ) : (
+              <Link
+                to="/profile"
+                className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+              >
+                Открыть контакты в PRO
+              </Link>
+            )}
+            <Link
+              to="/teams"
+              className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10"
             >
-              Откликнуться
-            </button>
+              Смотреть команды
+            </Link>
             <Link to="/search" className="rounded-full border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10">
               Назад к поиску
             </Link>
@@ -162,8 +188,6 @@ export function UserDetailPage() {
               Мой профиль
             </Link>
           </div>
-
-          {applyStatus ? <p className="mt-4 text-sm text-lime-200">{applyStatus}</p> : null}
         </article>
 
         <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
@@ -180,6 +204,12 @@ export function UserDetailPage() {
                   <RatingBadge score={user.rating.score} />
                 </div>
                 <p className="mt-4 text-sm text-slate-300">{user.rating.grade}</p>
+              </div>
+
+              <div className="rounded-[1.5rem] border border-amber-300/15 bg-amber-300/10 p-4 text-sm text-amber-100">
+                {user.contactVisible
+                  ? "Этот профиль уже открыт для PRO-viewer и выглядит как сильный кандидат для быстрого отклика."
+                  : "Здесь хорошо видно, что именно откроется после PRO: контакты, рекомендации и более тёплый сценарий связи."}
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
@@ -209,21 +239,12 @@ export function UserDetailPage() {
           ) : (
             <div className="rounded-[1.5rem] border border-dashed border-white/15 bg-white/5 p-5 text-slate-300">
               <p className="text-lg font-semibold text-white">AI-рейтинг не рассчитан</p>
-              <p className="mt-2 text-sm text-slate-400">После скоринга профиль станет более убедительным для других участников.</p>
+              <p className="mt-2 text-sm text-slate-400">После скоринга профиль станет более убедительным для других участников, а рекомендации появятся прямо здесь.</p>
             </div>
           )}
         </aside>
       </div>
 
-      {applyOpen ? (
-        <ApplicationModal
-          teams={teams}
-          loadingTeams={teamsLoading}
-          error={teamsError || applyError}
-          onSubmit={submitApplication}
-          onClose={() => setApplyOpen(false)}
-        />
-      ) : null}
     </section>
   );
 }

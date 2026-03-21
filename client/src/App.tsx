@@ -9,6 +9,8 @@ import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { ProfileEditPage } from "./pages/ProfileEditPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { SearchPage } from "./pages/SearchPage";
+import { TeamDetailPage } from "./pages/TeamDetailPage";
+import { TeamsPage } from "./pages/TeamsPage";
 import { UserDetailPage } from "./pages/UserDetailPage";
 import type { AuthUser } from "./api/auth";
 
@@ -171,6 +173,26 @@ function SearchRoute() {
   return <SearchPage />;
 }
 
+function TeamsRoute() {
+  const { loading, user } = useAuth();
+  const location = useLocation();
+  if (loading) return <AuthStatus />;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+  return <TeamsPage />;
+}
+
+function TeamDetailRoute() {
+  const { loading, user } = useAuth();
+  const location = useLocation();
+  if (loading) return <AuthStatus />;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+  return <TeamDetailPage />;
+}
+
 function UserDetailRoute() {
   const { loading, user } = useAuth();
   const location = useLocation();
@@ -205,6 +227,8 @@ export const routes = {
   ProfileRoute,
   ProfileEditRoute,
   SearchRoute,
+  TeamsRoute,
+  TeamDetailRoute,
   UserDetailRoute,
   ApplicationsRoute,
   RootRoute,

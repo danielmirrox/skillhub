@@ -25,15 +25,18 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 
 ## Implemented in Block 1
 
-- Router with `/`, `/login`, `/dashboard`, `/search`, `/users/:id`, `/applications`
+- Router with `/`, `/login`, `/dashboard`, `/search`, `/teams`, `/teams/:id`, `/users/:id`, `/applications`
 - Protected `/dashboard` route
 - Auth check via `GET /api/v1/auth/me` with cookies (`credentials: include`)
 - Login button currently uses a demo stub so the rest of the UI can be tested without GitHub OAuth
 - Demo auth persists in localStorage and pushes the app into `/dashboard`
 - Search page uses `GET /api/v1/users` with filters for role, grade, minRating and stack
+- Teams page uses `GET /api/v1/teams` with filters for hackathon, role and stack
+- Team detail page uses `GET /api/v1/teams/:id` and offers a team join flow
+- PRO captains get a visible boost in the teams feed; there is no separate paid teams-only paywall
 - Public user detail page uses `GET /api/v1/users/:id` and respects PRO visibility
 - Applications page uses `GET /api/v1/applications` and allows accept/decline for incoming items
-- User detail page can send an application with a team picker modal
+- Applications now strictly mean joining a team
 - Profile page can promote the current demo user to PRO via `POST /api/v1/profile/pro`
 - Profile edit page supports GitHub import preview and can post `githubData` to `POST /api/v1/profile/import-github`
 - Basic app layout and dashboard placeholder
