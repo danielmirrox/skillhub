@@ -80,7 +80,6 @@ async function setupEnv() {
   rl.close();
 }
 
-// Run setup
 setupEnv().catch(err => {
   console.error('❌ Error:', err);
   rl.close();

@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "project": "SkillHub",
+    "purpose": "Manual test payloads for /api/v1/profile and /api/v1/profile/score",
+    "updatedAt": "2026-03-21"
+  },
+  "cases": [
+    {
+      "id": "case-junior-frontend",
+      "title": "Junior Frontend without githubData",
+      "expected": {
+        "scoreRange": [45, 65],
+        "mustHave": ["rating.score", "rating.grade", "rating.roleLabel"],
+        "notes": "Should include growth-oriented improvements."
+      },
+      "profile": {
+        "role": "frontend",
+        "claimedGrade": "junior",
+        "primaryStack": ["HTML", "CSS", "JavaScript"],
+        "experienceYears": 0,
+        "hackathonsCount": 0,
+        "bio": "Начинающий frontend-разработчик, делаю учебные проекты.",
+        "projectLinks": [
+          {
+            "url": "https://github.com/example/junior-frontend-landing",
+            "title": "Landing page",
+            "description": "Учебный лендинг на чистом JS"
+          }
+        ],
+        "telegramUsername": "junior_front",
+        "githubUrl": "https://github.com/example"
+      }
+    },
+    {
+      "id": "case-middle-backend",
+      "title": "Middle Backend with balanced profile",
+      "expected": {
+        "scoreRange": [70, 88],
+        "mustHave": ["rating.score", "rating.grade", "rating.roleLabel"],
+        "notes": "Should produce stable mid/high score with clear strengths."
+      },
+      "profile": {
+        "role": "backend",
+        "claimedGrade": "middle",
+        "primaryStack": ["Node.js", "PostgreSQL", "Express"],
+        "experienceYears": 2,
+        "hackathonsCount": 3,
+        "bio": "Backend разработчик. Пишу REST API, работаю с PostgreSQL.",
+        "projectLinks": [
+          {
+            "url": "https://github.com/example/task-api",
+            "title": "Task API",
+            "description": "CRUD API с авторизацией"
+          },
+          {
+            "url": "https://github.com/example/queue-worker",
+            "title": "Queue Worker",
+            "description": "Фоновая обработка задач"
+          }
+        ],
+        "telegramUsername": "middle_back",
+        "githubUrl": "https://github.com/example"
+      }
+    },
+    {
+      "id": "case-senior-fullstack-github",
+      "title": "Senior Fullstack with githubData",
+      "expected": {
+        "scoreRange": [85, 97],
+        "mustHave": ["rating.score", "rating.grade", "rating.roleLabel"],
+        "notes": "Should rank highest due to experience and GitHub data."
+      },
+      "profile": {
+        "role": "fullstack",
+        "claimedGrade": "senior",
+        "primaryStack": ["TypeScript", "React", "Node.js", "PostgreSQL"],
+        "experienceYears": 6,
+        "hackathonsCount": 9,
+        "bio": "Fullstack lead. Архитектура, backend и продуктовый frontend.",
+        "projectLinks": [
+          {
+            "url": "https://github.com/example/saas-platform",
+            "title": "SaaS platform",
+            "description": "Многомодульная платформа с RBAC"
+          },
+          {
+            "url": "https://github.com/example/analytics-dashboard",
+            "title": "Analytics dashboard",
+            "description": "BI дашборд с real-time метриками"
+          },
+          {
+            "url": "https://github.com/example/devops-kit",
+            "title": "DevOps kit",
+            "description": "CI/CD и инфраструктурные шаблоны"
+          }
+        ],
+        "telegramUsername": "senior_full",
+        "githubUrl": "https://github.com/example"
+      },
+      "githubData": {
+        "fetchedAt": "2026-03-21T10:00:00Z",
+        "publicRepos": 42,
+        "followers": 120,
+        "accountAgeYears": 7,
+        "languages": {
+          "TypeScript": 160000,
+          "JavaScript": 95000,
+          "SQL": 34000,
+          "Python": 27000
+        },
+        "topRepos": [
+          {
+            "name": "platform-core",
+            "description": "Core platform services",
+            "stars": 320,
+            "primaryLanguage": "TypeScript"
+          },
+          {
+            "name": "data-pipeline",
+            "description": "Stream processing pipeline",
+            "stars": 180,
+            "primaryLanguage": "Python"
+          }
+        ]
+      }
+    }
+  ]
+}
