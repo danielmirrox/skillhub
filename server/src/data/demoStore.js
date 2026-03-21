@@ -888,6 +888,20 @@ function updateProfile(userId, payload) {
   return clone(profile);
 }
 
+function setUserPro(userId, isPro, proExpiresAt = null) {
+  const user = getUserById(userId);
+
+  if (!user) {
+    return null;
+  }
+
+  user.isPro = Boolean(isPro);
+  user.proExpiresAt = user.isPro ? proExpiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null;
+  user.updatedAt = nowIso();
+
+  return clone(user);
+}
+
 function importGithubData(userId, githubData) {
   const profile = createOrGetProfileForUser(userId);
   profile.githubData = githubData;
@@ -963,6 +977,7 @@ module.exports = {
     updateApplicationStatus,
     scoreProfile,
     updateProfile,
+    setUserPro,
     importGithubData,
     createOrGetProfileForUser,
     getRateLimitStatus,

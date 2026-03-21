@@ -6,6 +6,8 @@ export type AuthUser = {
   username: string;
   displayName?: string;
   avatarUrl?: string;
+  isPro?: boolean;
+  proExpiresAt?: string | null;
 };
 
 type AuthMeResponse = {

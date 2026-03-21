@@ -34,4 +34,6 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 - Public user detail page uses `GET /api/v1/users/:id` and respects PRO visibility
 - Applications page uses `GET /api/v1/applications` and allows accept/decline for incoming items
 - User detail page can send an application with a team picker modal
+- Profile page can promote the current demo user to PRO via `POST /api/v1/profile/pro`
+- Profile edit page supports GitHub import preview and can post `githubData` to `POST /api/v1/profile/import-github`
 - Basic app layout and dashboard placeholder

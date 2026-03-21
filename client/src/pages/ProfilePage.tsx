@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDemoAuthUser, DEMO_PRO_AUTH_USER, setDemoAuthUser } from "../api/demoAuth";
-import { getOwnProfile, scoreProfile } from "../api/profile";
+import { getDemoAuthUser, DEMO_PRO_AUTH_USER, setDemoAuthUser, promoteDemoAuthUserToPro } from "../api/demoAuth";
+import { getOwnProfile, scoreProfile, upgradeToPro } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 
 export function ProfilePage() {
@@ -37,6 +37,19 @@ export function ProfilePage() {
       }
     } finally {
       setScoring(false);
+    }
+  };
+
+  const onUpgradePro = async () => {
+    setError(null);
+    try {
+      await upgradeToPro();
+      promoteDemoAuthUserToPro();
+      const fresh = await getOwnProfile();
+      setProfileData(fresh);
+    } catch (err) {
+      const typed = err as Error;
+      setError(typed.message || "Не удалось включить PRO-режим.");
     }
   };
 
@@ -88,15 +101,24 @@ export function ProfilePage() {
               ) : (
                 <button
                   type="button"
+                  onClick={onUpgradePro}
+                  className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100"
+                >
+                  Стать PRO
+                </button>
+              )}
+              {!profileData?.user.isPro ? (
+                <button
+                  type="button"
                   onClick={() => {
                     setDemoAuthUser(DEMO_PRO_AUTH_USER);
                     window.location.reload();
                   }}
-                  className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100"
+                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"
                 >
                   Включить PRO-демо
                 </button>
-              )}
+              ) : null}
               <Link
                 to="/profile/edit"
                 className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"

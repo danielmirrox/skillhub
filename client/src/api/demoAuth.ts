@@ -3,6 +3,8 @@ export type DemoAuthUser = {
   username: string;
   displayName?: string;
   avatarUrl?: string;
+  isPro?: boolean;
+  proExpiresAt?: string | null;
 };
 
 export const DEMO_AUTH_STORAGE_KEY = "skillhub.demoAuthUser";
@@ -51,6 +53,20 @@ export function setDemoAuthUser(user: DemoAuthUser) {
 
   window.localStorage.setItem(DEMO_AUTH_STORAGE_KEY, JSON.stringify(user));
   window.dispatchEvent(new Event(DEMO_AUTH_CHANGE_EVENT));
+}
+
+export function promoteDemoAuthUserToPro() {
+  const currentUser = getDemoAuthUser();
+
+  if (!currentUser) {
+    return;
+  }
+
+  setDemoAuthUser({
+    ...currentUser,
+    isPro: true,
+    proExpiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+  });
 }
 
 export function clearDemoAuthUser() {

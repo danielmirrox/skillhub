@@ -39,7 +39,7 @@
 - [x] GET /applications (входящие + исходящие)
 - [x] PATCH /applications/:id (принять/отклонить)
 - [x] teams/team_members/applications схемы с timestamps и UNIQUE(team_id, user_id)
-- [ ] Эндпоинт «стать PRO» (заглушка для демо)
+- [x] Эндпоинт «стать PRO» (заглушка для демо)
 
 ## Блок 5 — Деплой (21–26ч)
 - [ ] Деплой backend (Railway / Render / Yandex Cloud)
@@ -137,8 +137,8 @@
 
 ## Блок 5 — GitHub Import + Деплой (21–26ч)
 - [x] Черновик UI для GitHub import в редактировании профиля
-- [ ] POST /profile/import-github: вызовы GitHub API (user, repos, languages)
-- [ ] Сохранение в profiles.github_data
+- [x] POST /profile/import-github: вызовы GitHub API (user, repos, languages)
+- [x] Сохранение в profiles.github_data
 - [x] CORS на проде (разрешён origin фронта)
 - [ ] Проверка OAuth callback URL на проде
 - [ ] Презентация: 8–10 слайдов (проблема, решение, демо, команда, CTA)

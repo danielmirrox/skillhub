@@ -65,6 +65,11 @@ export type UpdateProfilePayload = Partial<{
   isPublic: boolean;
 }>;
 
+export type UpgradeProResponse = {
+  user: OwnProfileResponse['user'];
+  success: boolean;
+};
+
 export type GithubImportData = {
   fetchedAt?: string;
   publicRepos?: number;
@@ -180,4 +185,31 @@ export async function importGithubProfile(githubData: GithubImportData) {
   }
 
   return body as GithubImportResponse;
+}
+
+export async function upgradeToPro() {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/profile/pro`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: getApiRequestHeaders({
+        "Content-Type": "application/json",
+      }),
+    },
+  );
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      typeof body.message === "string"
+        ? body.message
+        : `Request failed with status ${response.status}`,
+    );
+    (error as Error & { status?: number }).status = response.status;
+    throw error;
+  }
+
+  return body as UpgradeProResponse;
 }

@@ -32,6 +32,8 @@ Backend API for the SkillHub hackathon product.
 - `GET /api/v1/auth/me`
 - `GET /api/v1/auth/github` and `GET /api/v1/auth/github/callback` are demo placeholders for the OAuth flow
 - `GET /api/v1/profile`
+- `POST /api/v1/profile/pro`
+- `POST /api/v1/profile/import-github`
 - `GET /api/v1/profile/score/history`
 - `GET /api/v1/profile/score/status/:jobId`
 - `GET /api/v1/users`
