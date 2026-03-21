@@ -1,5 +1,6 @@
 const { randomUUID } = require('crypto');
 const { seedData } = require('../../../scripts/seed');
+const { isDatabaseConfigured, isDatabaseReady, query, bootstrapDatabase, loadSnapshot, setDatabaseReady } = require('./db');
 
 const nowIso = () => new Date().toISOString();
 const clone = (value) => JSON.parse(JSON.stringify(value));
@@ -11,6 +12,251 @@ const ratings = clone(seedData.ratings);
 const teams = clone(seedData.teams);
 const teamMembers = clone(seedData.teamMembers);
 const applications = clone(seedData.applications);
+
+function replaceCollection(target, source) {
+  target.splice(0, target.length, ...clone(source));
+}
+
+function hydrateFromSnapshot(snapshot) {
+  if (!snapshot) {
+    return;
+  }
+
+  replaceCollection(users, snapshot.users || []);
+  replaceCollection(profiles, snapshot.profiles || []);
+  replaceCollection(ratings, snapshot.ratings || []);
+  replaceCollection(teams, snapshot.teams || []);
+  replaceCollection(teamMembers, snapshot.teamMembers || []);
+  replaceCollection(applications, snapshot.applications || []);
+}
+
+async function initializeStore() {
+  if (!isDatabaseConfigured()) {
+    return {
+      enabled: false,
+      seeded: false,
+    };
+  }
+
+  try {
+    const bootstrapResult = await bootstrapDatabase();
+    const snapshot = await loadSnapshot();
+    hydrateFromSnapshot(snapshot);
+
+    return {
+      enabled: true,
+      seeded: Boolean(bootstrapResult.seeded),
+    };
+  } catch (error) {
+    setDatabaseReady(false);
+    console.warn('PostgreSQL bootstrap failed, falling back to in-memory demo store.');
+    console.warn(error?.message || error);
+
+    return {
+      enabled: false,
+      seeded: false,
+      fallback: true,
+    };
+  }
+}
+
+function toDatabaseJson(value) {
+  return value == null ? null : JSON.stringify(value);
+}
+
+async function persistUser(user) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO users (id, github_id, telegram_id, email, username, avatar_url, display_name, is_pro, pro_expires_at, user_role, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+     ON CONFLICT (id) DO UPDATE SET
+       github_id = EXCLUDED.github_id,
+       telegram_id = EXCLUDED.telegram_id,
+       email = EXCLUDED.email,
+       username = EXCLUDED.username,
+       avatar_url = EXCLUDED.avatar_url,
+       display_name = EXCLUDED.display_name,
+       is_pro = EXCLUDED.is_pro,
+       pro_expires_at = EXCLUDED.pro_expires_at,
+       user_role = EXCLUDED.user_role,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      user.id,
+      user.githubId ?? null,
+      user.telegramId ?? null,
+      user.email ?? null,
+      user.username ?? null,
+      user.avatarUrl ?? null,
+      user.displayName ?? null,
+      Boolean(user.isPro),
+      user.proExpiresAt ?? null,
+      user.userRole ?? 'participant',
+      user.createdAt ?? nowIso(),
+      user.updatedAt ?? nowIso(),
+    ],
+  );
+}
+
+async function persistProfile(profile) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO profiles (id, user_id, role, claimed_grade, primary_stack, experience_years, hackathons_count, bio, project_links, telegram_username, github_url, github_data, is_public, last_scored_at, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7, $8, $9::jsonb, $10, $11, $12::jsonb, $13, $14, $15, $16)
+     ON CONFLICT (id) DO UPDATE SET
+       user_id = EXCLUDED.user_id,
+       role = EXCLUDED.role,
+       claimed_grade = EXCLUDED.claimed_grade,
+       primary_stack = EXCLUDED.primary_stack,
+       experience_years = EXCLUDED.experience_years,
+       hackathons_count = EXCLUDED.hackathons_count,
+       bio = EXCLUDED.bio,
+       project_links = EXCLUDED.project_links,
+       telegram_username = EXCLUDED.telegram_username,
+       github_url = EXCLUDED.github_url,
+       github_data = EXCLUDED.github_data,
+       is_public = EXCLUDED.is_public,
+       last_scored_at = EXCLUDED.last_scored_at,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      profile.id,
+      profile.userId,
+      profile.role,
+      profile.claimedGrade,
+      toDatabaseJson(profile.primaryStack || []),
+      profile.experienceYears ?? 0,
+      profile.hackathonsCount ?? 0,
+      profile.bio ?? '',
+      toDatabaseJson(profile.projectLinks || []),
+      profile.telegramUsername ?? null,
+      profile.githubUrl ?? null,
+      toDatabaseJson(profile.githubData ?? null),
+      Boolean(profile.isPublic),
+      profile.lastScoredAt ?? null,
+      profile.createdAt ?? nowIso(),
+      profile.updatedAt ?? nowIso(),
+    ],
+  );
+}
+
+async function persistRating(rating) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO ratings (id, profile_id, score, grade, role_label, strengths, improvements, raw_response, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7::jsonb, $8::jsonb, $9)
+     ON CONFLICT (id) DO NOTHING`,
+    [
+      rating.id,
+      rating.profileId,
+      rating.score,
+      rating.grade,
+      rating.roleLabel,
+      toDatabaseJson(rating.strengths || []),
+      toDatabaseJson(rating.improvements || []),
+      toDatabaseJson(rating.rawResponse || {}),
+      rating.createdAt ?? nowIso(),
+    ],
+  );
+}
+
+async function persistTeam(team) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO teams (id, author_id, name, description, hackathon_name, required_roles, min_rating, stack, slots_open, is_active, status, updated_at, deleted_at, created_at)
+     VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8::jsonb, $9, $10, $11, $12, $13, $14)
+     ON CONFLICT (id) DO UPDATE SET
+       author_id = EXCLUDED.author_id,
+       name = EXCLUDED.name,
+       description = EXCLUDED.description,
+       hackathon_name = EXCLUDED.hackathon_name,
+       required_roles = EXCLUDED.required_roles,
+       min_rating = EXCLUDED.min_rating,
+       stack = EXCLUDED.stack,
+       slots_open = EXCLUDED.slots_open,
+       is_active = EXCLUDED.is_active,
+       status = EXCLUDED.status,
+       updated_at = EXCLUDED.updated_at,
+       deleted_at = EXCLUDED.deleted_at`,
+    [
+      team.id,
+      team.authorId,
+      team.name,
+      team.description,
+      team.hackathonName,
+      toDatabaseJson(team.requiredRoles || []),
+      team.minRating ?? null,
+      toDatabaseJson(team.stack || []),
+      team.slotsOpen ?? 1,
+      Boolean(team.isActive),
+      team.status || 'active',
+      team.updatedAt ?? nowIso(),
+      team.deletedAt ?? null,
+      team.createdAt ?? nowIso(),
+    ],
+  );
+}
+
+async function persistTeamMember(teamMember) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO team_members (id, team_id, user_id, role, joined_at)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (id) DO UPDATE SET
+       team_id = EXCLUDED.team_id,
+       user_id = EXCLUDED.user_id,
+       role = EXCLUDED.role,
+       joined_at = EXCLUDED.joined_at`,
+    [
+      teamMember.id,
+      teamMember.teamId,
+      teamMember.userId,
+      teamMember.role,
+      teamMember.joinedAt ?? nowIso(),
+    ],
+  );
+}
+
+async function persistApplication(application) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO applications (id, applicant_id, team_id, message, status, viewed_at, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+     ON CONFLICT (id) DO UPDATE SET
+       applicant_id = EXCLUDED.applicant_id,
+       team_id = EXCLUDED.team_id,
+       message = EXCLUDED.message,
+       status = EXCLUDED.status,
+       viewed_at = EXCLUDED.viewed_at,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      application.id,
+      application.applicantId,
+      application.teamId,
+      application.message || '',
+      application.status || 'pending',
+      application.viewedAt ?? null,
+      application.createdAt ?? nowIso(),
+      application.updatedAt ?? nowIso(),
+    ],
+  );
+}
 
 function getUserById(id) {
   return users.find((user) => user.id === id) || null;
@@ -556,7 +802,7 @@ function getTeamById(id) {
   };
 }
 
-function createTeam(authorId, payload) {
+async function createTeam(authorId, payload) {
   const team = {
     id: `team-${randomUUID()}`,
     authorId,
@@ -575,10 +821,11 @@ function createTeam(authorId, payload) {
   };
 
   teams.push(team);
+  await persistTeam(team);
   return clone(team);
 }
 
-function updateTeam(teamId, payload) {
+async function updateTeam(teamId, payload) {
   const team = teams.find((item) => item.id === teamId);
   if (!team) {
     return null;
@@ -589,6 +836,7 @@ function updateTeam(teamId, payload) {
     updatedAt: nowIso(),
   });
 
+  await persistTeam(team);
   return clone(team);
 }
 
@@ -637,7 +885,7 @@ function listApplicationsForUser(userId) {
   };
 }
 
-function createApplication({ applicantId, teamId, message }) {
+async function createApplication({ applicantId, teamId, message }) {
   const team = teams.find((item) => item.id === teamId);
   if (!team) {
     const error = new Error('Team not found.');
@@ -683,10 +931,11 @@ function createApplication({ applicantId, teamId, message }) {
   };
 
   applications.push(application);
+  await persistApplication(application);
   return getApplicationView(application);
 }
 
-function updateApplicationStatus(applicationId, userId, status) {
+async function updateApplicationStatus(applicationId, userId, status) {
   const application = applications.find((item) => item.id === applicationId);
   if (!application) {
     return { error: 'not_found' };
@@ -707,16 +956,20 @@ function updateApplicationStatus(applicationId, userId, status) {
     );
 
     if (!memberExists) {
-      teamMembers.push({
+      const teamMember = {
         id: `member-${randomUUID()}`,
         teamId: application.teamId,
         userId: application.applicantId,
         role: getProfileByUserId(application.applicantId)?.role || 'participant',
         joinedAt: nowIso(),
-      });
+      };
+
+      teamMembers.push(teamMember);
+      await persistTeamMember(teamMember);
     }
   }
 
+  await persistApplication(application);
   return getApplicationView(application);
 }
 
@@ -784,10 +1037,10 @@ function inferRatingInput(profile, githubData) {
   };
 }
 
-function scoreProfile(userId, overrides = {}, aiResult = null) {
+async function scoreProfile(userId, overrides = {}, aiResult = null) {
   let profile = getProfileByUserId(userId);
   if (!profile) {
-    profile = createOrGetProfileForUser(userId);
+    profile = await createOrGetProfileForUser(userId);
   }
 
   const mergedProfile = {
@@ -817,10 +1070,12 @@ function scoreProfile(userId, overrides = {}, aiResult = null) {
   storedProfile.lastScoredAt = rating.createdAt;
   storedProfile.updatedAt = rating.createdAt;
 
+  await persistRating(rating);
+  await persistProfile(storedProfile);
   return clone(rating);
 }
 
-function createOrGetProfileForUser(userId) {
+async function createOrGetProfileForUser(userId) {
   const existing = getProfileByUserId(userId);
   if (existing) {
     return existing;
@@ -829,7 +1084,7 @@ function createOrGetProfileForUser(userId) {
   const profile = {
     id: `profile-${randomUUID()}`,
     userId,
-    role: 'backend',
+    role: 'other',
     claimedGrade: 'junior',
     primaryStack: [],
     experienceYears: 0,
@@ -846,15 +1101,16 @@ function createOrGetProfileForUser(userId) {
   };
 
   profiles.push(profile);
+  await persistProfile(profile);
   return profile;
 }
 
-function updateProfile(userId, payload) {
+async function updateProfile(userId, payload) {
   const user = getUserById(userId);
   let profile = getProfileByUserId(userId);
 
   if (!profile) {
-    profile = createOrGetProfileForUser(userId);
+    profile = await createOrGetProfileForUser(userId);
   }
 
   Object.assign(profile, {
@@ -873,12 +1129,14 @@ function updateProfile(userId, payload) {
 
   if (user && payload.role) {
     user.updatedAt = nowIso();
+    await persistUser(user);
   }
 
+  await persistProfile(profile);
   return clone(profile);
 }
 
-function setUserPro(userId, isPro, proExpiresAt = null) {
+async function setUserPro(userId, isPro, proExpiresAt = null) {
   const user = getUserById(userId);
 
   if (!user) {
@@ -889,11 +1147,68 @@ function setUserPro(userId, isPro, proExpiresAt = null) {
   user.proExpiresAt = user.isPro ? proExpiresAt ?? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null;
   user.updatedAt = nowIso();
 
+  await persistUser(user);
   return clone(user);
 }
 
-function importGithubData(userId, githubData) {
-  const profile = createOrGetProfileForUser(userId);
+async function upsertOAuthUser({
+  githubId,
+  username,
+  displayName,
+  avatarUrl,
+  email,
+}) {
+  const normalizedGithubId = githubId ? Number(githubId) : null;
+  let user = null;
+
+  if (normalizedGithubId) {
+    user = users.find((item) => Number(item.githubId) === normalizedGithubId) || null;
+  }
+
+  if (!user && username) {
+    user = users.find((item) => item.username === username) || null;
+  }
+
+  if (!user && email) {
+    user = users.find((item) => item.email === email) || null;
+  }
+
+  const now = nowIso();
+
+  if (!user) {
+    user = {
+      id: `user-${normalizedGithubId || randomUUID()}`,
+      githubId: normalizedGithubId,
+      telegramId: null,
+      email: email || `${username || 'user'}@skillhub.dev`,
+      username: username || `user-${normalizedGithubId || 'guest'}`,
+      avatarUrl: avatarUrl || 'https://avatars.githubusercontent.com/u/1?v=4',
+      displayName: displayName || username || 'GitHub User',
+      isPro: false,
+      proExpiresAt: null,
+      userRole: 'participant',
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    users.push(user);
+  } else {
+    user.githubId = normalizedGithubId ?? user.githubId;
+    user.email = email || user.email;
+    user.username = username || user.username;
+    user.avatarUrl = avatarUrl || user.avatarUrl;
+    user.displayName = displayName || user.displayName;
+    user.updatedAt = now;
+  }
+
+  await persistUser(user);
+  await createOrGetProfileForUser(user.id);
+
+  return clone(user);
+}
+
+async function importGithubData(userId, githubData) {
+  const profile = await createOrGetProfileForUser(userId);
   profile.githubData = githubData;
   profile.updatedAt = nowIso();
 
@@ -908,6 +1223,7 @@ function importGithubData(userId, githubData) {
     description: repo.description || repo.primaryLanguage || 'GitHub repository',
   }));
 
+  await persistProfile(profile);
   return {
     suggestedPrimaryStack,
     suggestedProjectLinks,
@@ -945,7 +1261,7 @@ function getAuthMe(userId) {
   return buildOwnProfile(userId, getUserById(userId));
 }
 
-function upgradeUserToPro(userId, days = 30) {
+async function upgradeUserToPro(userId, days = 30) {
   const user = getUserById(userId);
   if (!user) {
     return null;
@@ -956,6 +1272,7 @@ function upgradeUserToPro(userId, days = 30) {
   user.proExpiresAt = expiresAt;
   user.updatedAt = nowIso();
 
+  await persistUser(user);
   return {
     id: user.id,
     isPro: user.isPro,
@@ -965,6 +1282,7 @@ function upgradeUserToPro(userId, days = 30) {
 
 module.exports = {
   demoStore: {
+    initializeStore,
     getUserById,
     getDefaultViewer,
     getProfileByUserId,
@@ -986,6 +1304,7 @@ module.exports = {
     scoreProfile,
     updateProfile,
     setUserPro,
+    upsertOAuthUser,
     importGithubData,
     createOrGetProfileForUser,
     getRateLimitStatus,

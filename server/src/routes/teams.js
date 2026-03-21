@@ -43,34 +43,42 @@ teamsRouter.get('/:teamId', requireAuth, (req, res) => {
   return res.json({ team });
 });
 
-teamsRouter.post('/', requireAuth, (req, res) => {
-  const payload = teamSchema.parse(req.body || {});
-  const team = demoStore.createTeam(req.user.id, payload);
+teamsRouter.post('/', requireAuth, async (req, res, next) => {
+  try {
+    const payload = teamSchema.parse(req.body || {});
+    const team = await demoStore.createTeam(req.user.id, payload);
 
-  return res.status(201).json({ team });
+    return res.status(201).json({ team });
+  } catch (error) {
+    return next(error);
+  }
 });
 
-teamsRouter.put('/:teamId', requireAuth, (req, res) => {
-  const team = demoStore.getTeamById(req.params.teamId);
+teamsRouter.put('/:teamId', requireAuth, async (req, res, next) => {
+  try {
+    const team = demoStore.getTeamById(req.params.teamId);
 
-  if (!team) {
-    return res.status(404).json({
-      error: 'TEAM_NOT_FOUND',
-      message: 'Team not found.',
-    });
+    if (!team) {
+      return res.status(404).json({
+        error: 'TEAM_NOT_FOUND',
+        message: 'Team not found.',
+      });
+    }
+
+    if (team.authorId !== req.user.id) {
+      return res.status(403).json({
+        error: 'FORBIDDEN',
+        message: 'Only the team author can edit the team.',
+      });
+    }
+
+    const payload = teamSchema.partial().parse(req.body || {});
+    const updatedTeam = await demoStore.updateTeam(req.params.teamId, payload);
+
+    return res.json({ team: updatedTeam });
+  } catch (error) {
+    return next(error);
   }
-
-  if (team.authorId !== req.user.id) {
-    return res.status(403).json({
-      error: 'FORBIDDEN',
-      message: 'Only the team author can edit the team.',
-    });
-  }
-
-  const payload = teamSchema.partial().parse(req.body || {});
-  const updatedTeam = demoStore.updateTeam(req.params.teamId, payload);
-
-  return res.json({ team: updatedTeam });
 });
 
 module.exports = { teamsRouter };

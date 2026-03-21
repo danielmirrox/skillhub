@@ -2,8 +2,8 @@
 -- Scope: teams, team_members, applications
 
 CREATE TABLE IF NOT EXISTS teams (
-  id UUID PRIMARY KEY,
-  author_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY,
+  author_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
   hackathon_name TEXT NOT NULL,
@@ -19,18 +19,18 @@ CREATE TABLE IF NOT EXISTS teams (
 );
 
 CREATE TABLE IF NOT EXISTS team_members (
-  id UUID PRIMARY KEY,
-  team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY,
+  team_id TEXT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role TEXT NOT NULL,
   joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (team_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS applications (
-  id UUID PRIMARY KEY,
-  applicant_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  team_id UUID NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  id TEXT PRIMARY KEY,
+  applicant_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  team_id TEXT NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
   message TEXT NOT NULL DEFAULT '',
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'declined', 'withdrawn')),
   viewed_at TIMESTAMPTZ,

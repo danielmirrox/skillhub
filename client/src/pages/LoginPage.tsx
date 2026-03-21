@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../api/client";
 import { clearDemoAuthUser, setDemoAuthUser, DEMO_AUTH_USER, DEMO_PRO_AUTH_USER } from "../api/demoAuth";
 
 export function LoginPage() {
@@ -15,18 +16,21 @@ export function LoginPage() {
     navigate("/login", { replace: true });
   };
 
+  const handleGithubLogin = () => {
+    window.location.assign(`${API_BASE_URL}/api/v1/auth/github`);
+  };
+
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
       <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
         <div className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100">
-          Демо-вход
+          GitHub OAuth
         </div>
         <h2 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
           SkillHub делает поиск людей и команд быстрым и понятным.
         </h2>
         <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
-          GitHub OAuth временно заменён демо-входом, чтобы можно было безопасно проверять поиск,
-          PRO-доступ, заявки и редактирование профиля без лишних барьеров.
+          Вход через GitHub подключён к серверу, а демо-режим оставлен для локальной проверки UI и сценариев без OAuth.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -67,6 +71,18 @@ export function LoginPage() {
           <div className="mt-6 grid gap-3">
             <button
               type="button"
+              onClick={handleGithubLogin}
+              className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-100 via-cyan-200 to-sky-300 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-950/10 text-sm font-black text-slate-950">
+                GH
+              </span>
+              <span className="block text-sm uppercase tracking-[0.2em] text-slate-700/70">GitHub</span>
+              <span className="mt-1 block text-lg">Войти через GitHub</span>
+            </button>
+
+            <button
+              type="button"
               onClick={() => handleLogin(false)}
               className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
             >
@@ -98,7 +114,7 @@ export function LoginPage() {
           </div>
 
           <p className="mt-5 text-sm text-slate-400">
-            Кнопка GitHub вернётся позже, когда подключим настоящий OAuth-флоу.
+            Кнопка GitHub открывает серверный OAuth-флоу. Демо-кнопки оставлены для локальных тестов.
           </p>
         </div>
       </aside>

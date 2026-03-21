@@ -28,7 +28,7 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 - Router with `/`, `/login`, `/dashboard`, `/search`, `/teams`, `/teams/:id`, `/users/:id`, `/applications`
 - Protected `/dashboard` route
 - Auth check via `GET /api/v1/auth/me` with cookies (`credentials: include`)
-- Login button currently uses a demo stub so the rest of the UI can be tested without GitHub OAuth
+- Login screen offers real GitHub OAuth plus demo buttons for local testing
 - Demo auth persists in localStorage and pushes the app into `/dashboard`
 - Search page uses `GET /api/v1/users` with filters for role, grade, minRating and stack
 - Teams page uses `GET /api/v1/teams` with filters for hackathon, role and stack

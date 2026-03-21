@@ -133,13 +133,17 @@ profileRouter.get('/', requireAuth, (req, res) => {
   return res.json(demoStore.getAuthMe(req.user.id));
 });
 
-profileRouter.put('/', requireAuth, (req, res) => {
-  const payload = profileUpdateSchema.parse(req.body || {});
-  const profile = demoStore.updateProfile(req.user.id, payload);
+profileRouter.put('/', requireAuth, async (req, res, next) => {
+  try {
+    const payload = profileUpdateSchema.parse(req.body || {});
+    const profile = await demoStore.updateProfile(req.user.id, payload);
 
-  return res.json({
-    profile,
-  });
+    return res.json({
+      profile,
+    });
+  } catch (error) {
+    return next(error);
+  }
 });
 
 profileRouter.post('/score', requireAuth, (req, res) => {
@@ -156,7 +160,7 @@ profileRouter.post('/score', requireAuth, (req, res) => {
     }
 
     if (Object.keys(payload).length > 0) {
-      demoStore.updateProfile(req.user.id, payload);
+      await demoStore.updateProfile(req.user.id, payload);
     }
 
     const currentProfile = demoStore.getProfileByUserId(req.user.id);
@@ -182,7 +186,7 @@ profileRouter.post('/score', requireAuth, (req, res) => {
       aiSource = 'formula_fallback';
     }
 
-    const rating = demoStore.scoreProfile(req.user.id, payload, aiResult);
+    const rating = await demoStore.scoreProfile(req.user.id, payload, aiResult);
     const ownProfile = demoStore.getAuthMe(req.user.id).profile;
 
     const ratingResponse = req.user.isPro
@@ -239,7 +243,7 @@ profileRouter.post('/import-github', requireAuth, (req, res) => {
     const currentProfile = demoStore.getProfileByUserId(req.user.id);
     const githubData = payload.githubData || currentProfile?.githubData || (await buildGithubDataFromGitHub(req.user.id));
 
-    const result = demoStore.importGithubData(req.user.id, githubData);
+    const result = await demoStore.importGithubData(req.user.id, githubData);
 
     return res.json({
       suggestedPrimaryStack: result.suggestedPrimaryStack,
@@ -261,20 +265,22 @@ profileRouter.post('/import-github', requireAuth, (req, res) => {
   });
 });
 
-profileRouter.post('/pro', requireAuth, (req, res) => {
-  const upgradedUser = demoStore.setUserPro(req.user.id, true);
+profileRouter.post('/pro', requireAuth, (req, res, next) => {
+  (async () => {
+    const upgradedUser = await demoStore.setUserPro(req.user.id, true);
 
-  if (!upgradedUser) {
-    return res.status(404).json({
-      error: 'USER_NOT_FOUND',
-      message: 'User not found.',
+    if (!upgradedUser) {
+      return res.status(404).json({
+        error: 'USER_NOT_FOUND',
+        message: 'User not found.',
+      });
+    }
+
+    return res.json({
+      user: upgradedUser,
+      success: true,
     });
-  }
-
-  return res.json({
-    user: upgradedUser,
-    success: true,
-  });
+  })().catch(next);
 });
 
 profileRouter.get('/:userId', requireAuth, (req, res) => {

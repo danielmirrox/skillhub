@@ -15,11 +15,15 @@ type AuthMeResponse = {
 };
 
 export async function getCurrentUser(): Promise<AuthUser> {
-  const demoUser = getDemoAuthUser();
-  if (demoUser) {
-    return demoUser;
-  }
+  try {
+    const data = await apiGet<AuthMeResponse>("/api/v1/auth/me", { useDemoAuth: false });
+    return data.user;
+  } catch {
+    const demoUser = getDemoAuthUser();
+    if (demoUser) {
+      return demoUser;
+    }
 
-  const data = await apiGet<AuthMeResponse>("/api/v1/auth/me");
-  return data.user;
+    throw new Error("Not authenticated");
+  }
 }

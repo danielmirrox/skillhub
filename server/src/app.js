@@ -8,6 +8,7 @@ const { env } = require('./config/env');
 const { resolveViewer } = require('./middleware/auth');
 const { notFoundHandler } = require('./middleware/notFound');
 const { errorHandler } = require('./middleware/errorHandler');
+const { pingDatabase } = require('./data/db');
 const { apiRouter } = require('./routes');
 
 function createApp() {
@@ -62,13 +63,24 @@ function createApp() {
     })
   );
 
-  app.get('/health', (_req, res) => {
-    res.json({
-      status: 'ok',
+  app.get('/health', async (_req, res) => {
+    const database = await pingDatabase();
+    const oauthConfigured = Boolean(env.GITHUB_CLIENT_ID && env.GITHUB_CLIENT_SECRET && env.GITHUB_CALLBACK_URL);
+    const yandexConfigured = Boolean(env.YANDEXGPT_API_KEY && env.YANDEXGPT_FOLDER_ID);
+    const healthy = database.healthy;
+
+    res.status(healthy ? 200 : 503).json({
+      status: healthy ? 'ok' : 'degraded',
       service: 'skillhub-server',
       environment: env.NODE_ENV,
       timestamp: new Date().toISOString(),
-      databaseConfigured: Boolean(env.DATABASE_URL),
+      database,
+      oauth: {
+        githubConfigured: oauthConfigured,
+      },
+      yandexgpt: {
+        configured: yandexConfigured,
+      },
     });
   });
 

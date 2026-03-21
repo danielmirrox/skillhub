@@ -1,7 +1,7 @@
 import React from "react";
 import { Navigate, Outlet, useLocation, useRouteError, isRouteErrorResponse, Link } from "react-router-dom";
 import { getCurrentUser } from "./api/auth";
-import { DEMO_AUTH_CHANGE_EVENT, getDemoAuthUser } from "./api/demoAuth";
+import { DEMO_AUTH_CHANGE_EVENT } from "./api/demoAuth";
 import { Layout } from "./components/layout/Layout";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
@@ -76,27 +76,20 @@ function NotFoundRoute() {
 function AuthProvider() {
   const requestIdRef = React.useRef(0);
   const [state, setState] = React.useState<AuthContextValue>(() => ({
-    loading: !getDemoAuthUser(),
-    user: getDemoAuthUser(),
+    loading: true,
+    user: null,
   }));
 
   React.useEffect(() => {
-    const demoUser = getDemoAuthUser();
-
-    if (demoUser) {
-      setState({ loading: false, user: demoUser });
-      return;
-    }
-
     const requestId = ++requestIdRef.current;
     getCurrentUser()
       .then((user) => {
-        if (requestIdRef.current === requestId && !getDemoAuthUser()) {
+        if (requestIdRef.current === requestId) {
           setState({ loading: false, user });
         }
       })
       .catch(() => {
-        if (requestIdRef.current === requestId && !getDemoAuthUser()) {
+        if (requestIdRef.current === requestId) {
           setState({ loading: false, user: null });
         }
       });
@@ -105,17 +98,27 @@ function AuthProvider() {
   }, []);
 
   React.useEffect(() => {
-    const syncDemoAuth = () => {
-      const user = getDemoAuthUser();
-      setState({ loading: false, user });
+    const syncAuth = () => {
+      const requestId = ++requestIdRef.current;
+      getCurrentUser()
+        .then((user) => {
+          if (requestIdRef.current === requestId) {
+            setState({ loading: false, user });
+          }
+        })
+        .catch(() => {
+          if (requestIdRef.current === requestId) {
+            setState({ loading: false, user: null });
+          }
+        });
     };
 
-    window.addEventListener(DEMO_AUTH_CHANGE_EVENT, syncDemoAuth);
-    window.addEventListener("storage", syncDemoAuth);
+    window.addEventListener(DEMO_AUTH_CHANGE_EVENT, syncAuth);
+    window.addEventListener("storage", syncAuth);
 
     return () => {
-      window.removeEventListener(DEMO_AUTH_CHANGE_EVENT, syncDemoAuth);
-      window.removeEventListener("storage", syncDemoAuth);
+      window.removeEventListener(DEMO_AUTH_CHANGE_EVENT, syncAuth);
+      window.removeEventListener("storage", syncAuth);
     };
   }, []);
 

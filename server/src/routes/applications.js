@@ -19,10 +19,10 @@ applicationsRouter.get('/', requireAuth, (req, res) => {
   return res.json(demoStore.listApplicationsForUser(req.user.id));
 });
 
-applicationsRouter.post('/', requireAuth, (req, res, next) => {
+applicationsRouter.post('/', requireAuth, async (req, res, next) => {
   try {
     const payload = createApplicationSchema.parse(req.body || {});
-    const application = demoStore.createApplication({
+    const application = await demoStore.createApplication({
       applicantId: req.user.id,
       teamId: payload.teamId,
       message: payload.message || '',
@@ -48,25 +48,29 @@ applicationsRouter.post('/', requireAuth, (req, res, next) => {
   }
 });
 
-applicationsRouter.patch('/:applicationId', requireAuth, (req, res) => {
-  const payload = updateStatusSchema.parse(req.body || {});
-  const application = demoStore.updateApplicationStatus(req.params.applicationId, req.user.id, payload.status);
+applicationsRouter.patch('/:applicationId', requireAuth, async (req, res, next) => {
+  try {
+    const payload = updateStatusSchema.parse(req.body || {});
+    const application = await demoStore.updateApplicationStatus(req.params.applicationId, req.user.id, payload.status);
 
-  if (application.error === 'not_found') {
-    return res.status(404).json({
-      error: 'APPLICATION_NOT_FOUND',
-      message: 'Application not found.',
-    });
+    if (application.error === 'not_found') {
+      return res.status(404).json({
+        error: 'APPLICATION_NOT_FOUND',
+        message: 'Application not found.',
+      });
+    }
+
+    if (application.error === 'forbidden') {
+      return res.status(403).json({
+        error: 'FORBIDDEN',
+        message: 'Only the team author can update applications for this team.',
+      });
+    }
+
+    return res.json({ application });
+  } catch (error) {
+    return next(error);
   }
-
-  if (application.error === 'forbidden') {
-    return res.status(403).json({
-      error: 'FORBIDDEN',
-      message: 'Only the team author can update applications for this team.',
-    });
-  }
-
-  return res.json({ application });
 });
 
 module.exports = { applicationsRouter };
