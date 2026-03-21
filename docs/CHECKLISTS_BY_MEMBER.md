@@ -7,24 +7,24 @@
 ## Блок 1 — Фундамент (0–6ч)
 - [x] Express-сервер, структура папок
 - [x] Env-конфиг, CORS
-- [ ] PostgreSQL: таблицы users(userRole), profiles(specializationRole, claimedGrade), ratings(gradingContext)
-- [ ] Миграции (или SQL-скрипт)
-- [ ] GitHub OAuth (Passport): /auth/github, /auth/github/callback
-- [ ] OAuth scopes: public_repo + user:email
+- [x] PostgreSQL: таблицы users(userRole), profiles(specializationRole, claimedGrade), ratings(gradingContext)
+- [x] Миграции (или SQL-скрипт)
+- [x] GitHub OAuth (Passport): /auth/github, /auth/github/callback
+- [x] OAuth scopes: read:user + user:email
 - [x] GET /auth/me
 - [x] Middleware авторизации
 - [x] `npm run dev` поднимает API
 
 ## Блок 2 — Профиль + AI (6–12ч)
-- [ ] Интеграция YandexGPT API (тестовый запрос)
-- [ ] Промпт system + user (по PRODUCT_SPEC_FULL §5.3)
-- [ ] Парсинг JSON-ответа → score, strengths, improvements
+- [x] Интеграция YandexGPT API (тестовый запрос)
+- [x] Промпт system + user (по PRODUCT_SPEC_FULL §5.3)
+- [x] Парсинг JSON-ответа → score, strengths, improvements
 - [x] PUT /profile (создание/обновление профиля, claimedGrade)
 - [x] POST /profile/score (лимит 1 раз в 7 дней, 429 + nextAllowedAt)
 - [x] GET /profile (свой профиль)
 - [x] GET /profile/:userId (публичный профиль)
 - [x] GET /users/:id (summary)
-- [ ] Сохранение рейтинга в ratings
+- [x] Сохранение рейтинга в ratings
 
 ## Блок 3 — Поиск (12–15ч)
 - [x] GET /users с фильтрами: role, minRating, stack, page, limit
@@ -44,12 +44,12 @@
 ## Блок 5 — Деплой (21–26ч)
 - [ ] Деплой backend (Railway / Render / Yandex Cloud)
 - [ ] Публичный URL API
-- [ ] 404/403/429/503 error responses оформлены
+- [x] 404/403/429/503 error responses оформлены
 
 ## Блок 6 — Финал (26–30ч)
-- [ ] README с инструкцией запуска
+- [x] README с инструкцией запуска
 - [ ] MIT-лицензия
-- [ ] .env.example с перечнем переменных
+- [x] .env.example с перечнем переменных
 - [ ] Репозиторий соответствует требованиям хакатона
 
 ---
@@ -59,7 +59,7 @@
 ## Блок 1 — Фундамент (0–6ч)
 - [x] Vite + React + Tailwind
 - [x] React Router, base layout
-- [x] LoginPage с кнопкой демо-входа вместо GitHub OAuth
+- [x] LoginPage с демо-входом и реальным GitHub OAuth
 - [x] API client (fetch/axios), base URL
 - [x] Вызов /auth/me после загрузки
 - [x] Редирект: гость → /login, авторизован → /dashboard
@@ -100,12 +100,12 @@
 - [x] TeamsPage: создание/редактирование команд и PRO-boost в ленте
 
 ## Блок 5 — Деплой (21–26ч)
-- [ ] Кнопка «Импорт из GitHub» на ProfileEditPage
-- [ ] Preview suggestedPrimaryStack / suggestedProjectLinks
+- [x] Кнопка «Импорт из GitHub» на ProfileEditPage
+- [x] Preview suggestedPrimaryStack / suggestedProjectLinks
 - [ ] Деплой frontend (Vercel / Netlify / статика)
 - [ ] Публичный URL SPA
 - [ ] Адаптив (работа на мобилке)
-- [ ] Пустые состояния (нет данных, нет рейтинга)
+- [x] Пустые состояния (нет данных, нет рейтинга)
 
 ## Блок 6 — Финал (26–30ч)
 - [ ] Фикс критичных багов после прогона
@@ -116,24 +116,24 @@
 # Чеклист: Дени (Integration & Demo)
 
 ## Блок 1 — Фундамент (0–6ч)
-- [ ] Настройка env (GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, DATABASE_URL)
-- [ ] .env.example с описанием переменных
+- [x] Настройка env (GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, DATABASE_URL)
+- [x] .env.example с описанием переменных
 - [ ] Проверка: OAuth callback URL в настройках GitHub App
 
 ## Блок 2 — Профиль + AI (6–12ч)
-- [ ] 2–3 тестовых профиля (JSON) для проверки AI
-- [ ] Прогон скоринга на тестовых данных
-- [ ] Фикс промпта при некорректных ответах (если нужно)
+- [x] 2–3 тестовых профиля (JSON) для проверки AI
+- [x] Прогон скоринга на тестовых данных
+- [x] Фикс промпта при некорректных ответах (если нужно)
 
 ## Блок 3 — Поиск (12–15ч)
-- [ ] Seed-скрипт: 15–20 юзеров с профилями и рейтингами
-- [ ] Разные роли: frontend, backend, fullstack, design
-- [ ] Разброс рейтингов: от 45 до 92
-- [ ] Проверка: лента показывает разнообразные карточки
+- [x] Seed-скрипт: 15–20 юзеров с профилями и рейтингами
+- [x] Разные роли: frontend, backend, fullstack, design
+- [x] Разброс рейтингов: от 45 до 92
+- [x] Проверка: лента показывает разнообразные карточки
 
 ## Блок 4 — PRO + Applications (16–21ч)
-- [ ] Миграция: tables teams/team_members/applications (team_id, applicant_id, message, status, timestamps)
-- [ ] Заглушка «Стать PRO» (UI-кнопка, передаёт на бэк)
+- [x] Миграция: tables teams/team_members/applications (team_id, applicant_id, message, status, timestamps)
+- [x] Заглушка «Стать PRO» (UI-кнопка, передаёт на бэк)
 - [x] Прогон полного флоу: отклик → уведомление → принятие/отклонение
 - [x] Проверка: сценарий работает end-to-end
 
