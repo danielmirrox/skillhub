@@ -39,6 +39,25 @@ authRouter.post('/logout', requireAuth, (_req, res) => {
   });
 });
 
+authRouter.post('/pro/upgrade', requireAuth, (req, res) => {
+  const days = Number.isInteger(req.body?.days) ? req.body.days : 30;
+  const normalizedDays = Math.min(365, Math.max(1, days));
+  const result = demoStore.upgradeUserToPro(req.user.id, normalizedDays);
+
+  if (!result) {
+    return res.status(404).json({
+      error: 'USER_NOT_FOUND',
+      message: 'User not found.',
+    });
+  }
+
+  return res.json({
+    success: true,
+    message: 'PRO status activated for demo.',
+    user: result,
+  });
+});
+
 authRouter.get('/me', requireAuth, (req, res) => {
   const me = demoStore.getAuthMe(req.user.id);
 

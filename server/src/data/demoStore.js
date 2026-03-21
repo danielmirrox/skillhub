@@ -1,288 +1,16 @@
 const { randomUUID } = require('crypto');
+const { seedData } = require('../../../scripts/seed');
 
 const nowIso = () => new Date().toISOString();
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const capitalize = (value) => value.charAt(0).toUpperCase() + value.slice(1);
 
-const users = [
-  {
-    id: 'user-daniel',
-    githubId: 1111,
-    telegramId: null,
-    email: 'daniel@skillhub.dev',
-    username: 'danieltgrm',
-    avatarUrl: 'https://avatars.githubusercontent.com/u/1?v=4',
-    displayName: 'Даниэл Петров',
-    isPro: false,
-    proExpiresAt: null,
-    userRole: 'participant',
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'user-denis',
-    githubId: 2222,
-    telegramId: null,
-    email: 'denis@skillhub.dev',
-    username: 'denisui',
-    avatarUrl: 'https://avatars.githubusercontent.com/u/2?v=4',
-    displayName: 'Денис Соколов',
-    isPro: false,
-    proExpiresAt: null,
-    userRole: 'participant',
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'user-deni',
-    githubId: 3333,
-    telegramId: null,
-    email: 'deni@skillhub.dev',
-    username: 'deniops',
-    avatarUrl: 'https://avatars.githubusercontent.com/u/3?v=4',
-    displayName: 'Дени Алиев',
-    isPro: false,
-    proExpiresAt: null,
-    userRole: 'participant',
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'user-captain',
-    githubId: 4444,
-    telegramId: null,
-    email: 'captain@skillhub.dev',
-    username: 'captainpro',
-    avatarUrl: 'https://avatars.githubusercontent.com/u/4?v=4',
-    displayName: 'Артём Капустин',
-    isPro: true,
-    proExpiresAt: '2026-04-21T08:00:00Z',
-    userRole: 'captain',
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-];
-
-const profiles = [
-  {
-    id: 'profile-daniel',
-    userId: 'user-daniel',
-    role: 'backend',
-    claimedGrade: 'middle',
-    primaryStack: ['Node.js', 'PostgreSQL', 'Express'],
-    experienceYears: 2,
-    hackathonsCount: 3,
-    bio: 'Backend-разработчик, люблю API и структуру.',
-    projectLinks: [
-      {
-        url: 'https://github.com/daniel/project',
-        title: 'Hackathon API',
-        description: 'Demo REST API for team matching.',
-      },
-    ],
-    telegramUsername: 'danieltgrm',
-    githubUrl: 'https://github.com/daniel',
-    githubData: {
-      fetchedAt: '2026-03-21T08:00:00Z',
-      publicRepos: 8,
-      followers: 3,
-      accountAgeYears: 3,
-      languages: { JavaScript: 32000, TypeScript: 12000, SQL: 4000 },
-      topRepos: [
-        {
-          name: 'hackathon-api',
-          description: 'Hackathon backend starter',
-          stars: 1,
-          primaryLanguage: 'TypeScript',
-        },
-      ],
-    },
-    isPublic: true,
-    lastScoredAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'profile-denis',
-    userId: 'user-denis',
-    role: 'frontend',
-    claimedGrade: 'middle',
-    primaryStack: ['React', 'Vite', 'Tailwind'],
-    experienceYears: 2,
-    hackathonsCount: 2,
-    bio: 'Frontend и продуктовые интерфейсы.',
-    projectLinks: [],
-    telegramUsername: 'denisui',
-    githubUrl: 'https://github.com/denis',
-    githubData: {
-      fetchedAt: '2026-03-21T08:00:00Z',
-      publicRepos: 6,
-      followers: 4,
-      accountAgeYears: 2,
-      languages: { TypeScript: 28000, JavaScript: 18000, CSS: 8000 },
-      topRepos: [],
-    },
-    isPublic: true,
-    lastScoredAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'profile-deni',
-    userId: 'user-deni',
-    role: 'design',
-    claimedGrade: 'junior',
-    primaryStack: ['Figma', 'Design Systems'],
-    experienceYears: 1,
-    hackathonsCount: 1,
-    bio: 'Делаю интерфейсы и презентации.',
-    projectLinks: [],
-    telegramUsername: 'deniops',
-    githubUrl: 'https://github.com/deni',
-    githubData: null,
-    isPublic: true,
-    lastScoredAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'profile-captain',
-    userId: 'user-captain',
-    role: 'backend',
-    claimedGrade: 'senior',
-    primaryStack: ['Node.js', 'PostgreSQL', 'Redis'],
-    experienceYears: 5,
-    hackathonsCount: 7,
-    bio: 'Капитан и backend lead.',
-    projectLinks: [],
-    telegramUsername: 'captainpro',
-    githubUrl: 'https://github.com/captain',
-    githubData: {
-      fetchedAt: '2026-03-21T08:00:00Z',
-      publicRepos: 22,
-      followers: 18,
-      accountAgeYears: 6,
-      languages: { TypeScript: 54000, JavaScript: 24000, SQL: 8000 },
-      topRepos: [],
-    },
-    isPublic: true,
-    lastScoredAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-    updatedAt: '2026-03-21T08:00:00Z',
-  },
-];
-
-const ratings = [
-  {
-    id: 'rating-daniel',
-    profileId: 'profile-daniel',
-    score: 82,
-    grade: 'Middle Backend',
-    roleLabel: 'Backend',
-    strengths: ['Сильный backend-стек', 'Есть опыт с PostgreSQL'],
-    improvements: ['Добавить тесты', 'Подтянуть docker'],
-    rawResponse: { source: 'demo' },
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'rating-denis',
-    profileId: 'profile-denis',
-    score: 76,
-    grade: 'Middle Frontend',
-    roleLabel: 'Frontend',
-    strengths: ['Современный frontend stack', 'Хороший UI вкус'],
-    improvements: ['Добавить больше сложных кейсов', 'Усилить системный дизайн'],
-    rawResponse: { source: 'demo' },
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'rating-deni',
-    profileId: 'profile-deni',
-    score: 64,
-    grade: 'Junior Design',
-    roleLabel: 'Design',
-    strengths: ['Понимает визуальную композицию'],
-    improvements: ['Больше практики в продуктовых сценариях'],
-    rawResponse: { source: 'demo' },
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'rating-captain',
-    profileId: 'profile-captain',
-    score: 91,
-    grade: 'Senior Backend',
-    roleLabel: 'Backend',
-    strengths: ['Сильная архитектура', 'Много практики'],
-    improvements: ['Слегка упростить реализацию для MVP'],
-    rawResponse: { source: 'demo' },
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-];
-
-const teams = [
-  {
-    id: 'team-viribus',
-    authorId: 'user-captain',
-    name: 'Viribus Matchers',
-    description: 'Ищем backend и дизайнера для хакатона.',
-    hackathonName: 'Viribus Hackathon',
-    requiredRoles: ['backend', 'design'],
-    minRating: 70,
-    stack: ['Node.js', 'React'],
-    slotsOpen: 2,
-    isActive: true,
-    status: 'active',
-    updatedAt: '2026-03-21T08:00:00Z',
-    deletedAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'team-ai-hub',
-    authorId: 'user-daniel',
-    name: 'AI Hub',
-    description: 'Собираем команду вокруг AI-демо.',
-    hackathonName: 'Viribus Hackathon',
-    requiredRoles: ['frontend', 'backend'],
-    minRating: 60,
-    stack: ['TypeScript', 'React'],
-    slotsOpen: 1,
-    isActive: true,
-    status: 'active',
-    updatedAt: '2026-03-21T08:00:00Z',
-    deletedAt: null,
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-];
-
-const teamMembers = [
-  {
-    id: 'member-captain',
-    teamId: 'team-viribus',
-    userId: 'user-captain',
-    role: 'backend',
-    joinedAt: '2026-03-21T08:00:00Z',
-  },
-  {
-    id: 'member-daniel',
-    teamId: 'team-ai-hub',
-    userId: 'user-daniel',
-    role: 'backend',
-    joinedAt: '2026-03-21T08:00:00Z',
-  },
-];
-
-const applications = [
-  {
-    id: 'app-denis-viribus',
-    applicantId: 'user-denis',
-    teamId: 'team-viribus',
-    message: 'Хочу сделать фронтенд и забрать UX.',
-    status: 'pending',
-    viewedAt: null,
-    updatedAt: '2026-03-21T08:00:00Z',
-    createdAt: '2026-03-21T08:00:00Z',
-  },
-];
+const users = clone(seedData.users);
+const profiles = clone(seedData.profiles);
+const ratings = clone(seedData.ratings);
+const teams = clone(seedData.teams);
+const teamMembers = clone(seedData.teamMembers);
+const applications = clone(seedData.applications);
 
 function getUserById(id) {
   return users.find((user) => user.id === id) || null;
@@ -941,6 +669,24 @@ function getAuthMe(userId) {
   return buildOwnProfile(userId, getUserById(userId));
 }
 
+function upgradeUserToPro(userId, days = 30) {
+  const user = getUserById(userId);
+  if (!user) {
+    return null;
+  }
+
+  const expiresAt = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toISOString();
+  user.isPro = true;
+  user.proExpiresAt = expiresAt;
+  user.updatedAt = nowIso();
+
+  return {
+    id: user.id,
+    isPro: user.isPro,
+    proExpiresAt: user.proExpiresAt,
+  };
+}
+
 module.exports = {
   demoStore: {
     getUserById,
@@ -967,5 +713,6 @@ module.exports = {
     createOrGetProfileForUser,
     getRateLimitStatus,
     getAuthMe,
+    upgradeUserToPro,
   },
 };
