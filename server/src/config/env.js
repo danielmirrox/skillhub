@@ -22,6 +22,16 @@ const envSchema = z.object({
   JWT_SECRET: z.string().optional().default('dev-secret'),
   JWT_EXPIRES_IN: z.string().optional().default('7d'),
   CLIENT_URL: z.string().optional().default('http://localhost:5173'),
+  CLIENT_URLS: z
+    .string()
+    .optional()
+    .default('')
+    .transform((value) =>
+      value
+        .split(',')
+        .map((item) => item.trim())
+        .filter(Boolean),
+    ),
   GITHUB_API_TOKEN: z.string().optional().default(''),
   DEBUG: z.string().optional().default('skillhub:*'),
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),

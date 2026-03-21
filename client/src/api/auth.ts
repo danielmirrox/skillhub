@@ -1,4 +1,5 @@
 import { apiGet } from "./client";
+import { getDemoAuthUser } from "./demoAuth";
 
 export type AuthUser = {
   id: string;
@@ -12,6 +13,11 @@ type AuthMeResponse = {
 };
 
 export async function getCurrentUser(): Promise<AuthUser> {
+  const demoUser = getDemoAuthUser();
+  if (demoUser) {
+    return demoUser;
+  }
+
   const data = await apiGet<AuthMeResponse>("/api/v1/auth/me");
   return data.user;
 }

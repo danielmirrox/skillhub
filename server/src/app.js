@@ -12,10 +12,44 @@ const { apiRouter } = require('./routes');
 
 function createApp() {
   const app = express();
+  const allowedClientOrigins = new Set(
+    [env.CLIENT_URL, ...(env.CLIENT_URLS || [])]
+      .filter(Boolean)
+      .map((value) => {
+        try {
+          return new URL(value).origin;
+        } catch {
+          return value;
+        }
+      }),
+  );
+
+  const isAllowedOrigin = (origin) => {
+    if (!origin) {
+      return true;
+    }
+
+    if (allowedClientOrigins.has(origin)) {
+      return true;
+    }
+
+    return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  };
 
   app.disable('x-powered-by');
   app.use(helmet());
-  app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (isAllowedOrigin(origin)) {
+          return callback(null, true);
+        }
+
+        return callback(null, false);
+      },
+      credentials: true,
+    })
+  );
   app.use(express.json({ limit: '1mb' }));
   app.use(express.urlencoded({ extended: true }));
   app.use(morgan(env.LOG_LEVEL === 'debug' ? 'dev' : 'combined'));

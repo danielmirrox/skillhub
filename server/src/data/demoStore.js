@@ -425,7 +425,7 @@ function listUsers(query = {}, viewer) {
         if (!stackTokens.every((token) => joinedStack.includes(token))) return false;
       }
       if (search) {
-        const searchable = `${item.displayName} ${item.bio}`.toLowerCase();
+        const searchable = `${item.displayName} ${item.bio} ${getUserById(item.id)?.username || ''}`.toLowerCase();
         if (!searchable.includes(search)) return false;
       }
       return true;

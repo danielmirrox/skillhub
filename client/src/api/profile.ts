@@ -1,4 +1,4 @@
-import { API_BASE_URL, apiGet } from "./client";
+import { API_BASE_URL, apiGet, getApiRequestHeaders } from "./client";
 
 export type ProfileRole =
   | "frontend"
@@ -65,6 +65,26 @@ export type UpdateProfilePayload = Partial<{
   isPublic: boolean;
 }>;
 
+export type GithubImportData = {
+  fetchedAt?: string;
+  publicRepos?: number;
+  followers?: number;
+  accountAgeYears?: number;
+  languages?: Record<string, number>;
+  topRepos?: Array<{
+    name: string;
+    description?: string | null;
+    stars?: number;
+    primaryLanguage?: string | null;
+  }>;
+};
+
+export type GithubImportResponse = {
+  suggestedPrimaryStack: string[];
+  suggestedProjectLinks: ProjectLink[];
+  profile: Profile;
+};
+
 export type ScoreProfileResponse = {
   rating: {
     score: number;
@@ -87,9 +107,9 @@ export async function updateOwnProfile(payload: UpdateProfilePayload) {
     {
       method: "PUT",
       credentials: "include",
-      headers: {
+      headers: getApiRequestHeaders({
         "Content-Type": "application/json",
-      },
+      }),
       body: JSON.stringify(payload),
     },
   );
@@ -109,9 +129,9 @@ export async function scoreProfile(payload: UpdateProfilePayload = {}) {
     {
       method: "POST",
       credentials: "include",
-      headers: {
+      headers: getApiRequestHeaders({
         "Content-Type": "application/json",
-      },
+      }),
       body: JSON.stringify(payload),
     },
   );
@@ -132,4 +152,32 @@ export async function scoreProfile(payload: UpdateProfilePayload = {}) {
   }
 
   return body as ScoreProfileResponse;
+}
+
+export async function importGithubProfile(githubData: GithubImportData) {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/profile/import-github`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: getApiRequestHeaders({
+        "Content-Type": "application/json",
+      }),
+      body: JSON.stringify({ githubData }),
+    },
+  );
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      typeof body.message === "string"
+        ? body.message
+        : `Request failed with status ${response.status}`,
+    );
+    (error as Error & { status?: number }).status = response.status;
+    throw error;
+  }
+
+  return body as GithubImportResponse;
 }

@@ -10,6 +10,7 @@
 - [x] Настроены все переменные окружения в `.env`
 - [x] Локально проверена корректность OAuth callback URL в GitHub App / `.env`
 - [x] Сервер Даниэла (express) стартует на `npm run dev` и отвечает на `/health`
+- [x] Локальный демо-вход позволяет открыть dashboard и profile без GitHub OAuth
 - [ ] БД PostgreSQL подключена и работает
 
 ---
@@ -114,6 +115,7 @@ node scripts/check-env.js
 ✅ `.env.example` создан с описанием  
 ✅ `.env` заполнен корректными значениями  
 ✅ `npm run dev` в `server/` поднимает API  
+✅ Демо-вход в клиенте работает и открывает другие экраны без GitHub  
 ✅ БД подключена (можно проверить подключением через psql)  
 ✅ OAuth callback URL в GitHub App совпадает с `GITHUB_CALLBACK_URL` в `.env`
 
@@ -141,6 +143,7 @@ YANDEXGPT_API_KEY=AQVNz1234567890abcdef
 YANDEXGPT_FOLDER_ID=b1a234567890abcdef
 JWT_SECRET=generated_auto_or_your_random_string
 CLIENT_URL=http://localhost:5173
+CLIENT_URLS=
 ```
 
 ---
