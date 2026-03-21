@@ -32,6 +32,8 @@ Backend API for the SkillHub hackathon product.
 
 ## Main routes
 
+### Public user-facing routes
+
 - `GET /health`
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
@@ -39,8 +41,6 @@ Backend API for the SkillHub hackathon product.
 - `GET /api/v1/profile`
 - `POST /api/v1/profile/pro`
 - `POST /api/v1/profile/import-github`
-- `GET /api/v1/profile/score/history`
-- `GET /api/v1/profile/score/status/:jobId`
 - `GET /api/v1/users`
 - `GET /api/v1/users/:id`
 - `GET /api/v1/teams`
@@ -50,6 +50,13 @@ Backend API for the SkillHub hackathon product.
 - `GET /api/v1/applications`
 - `POST /api/v1/applications`
 - `PATCH /api/v1/applications/:id`
+
+### Support and internal routes
+
+- `GET /api/v1/profile/score/history`
+- `GET /api/v1/profile/score/status/:jobId`
+
+These support routes are kept for diagnostics and future UI hooks. They are not part of the main product surface today.
 
 ## Environment
 
