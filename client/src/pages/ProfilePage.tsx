@@ -54,7 +54,7 @@ export function ProfilePage() {
   if (loading) {
     return (
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
           <div className="mt-4 h-12 w-2/3 animate-pulse rounded-full bg-white/10" />
           <div className="mt-5 h-4 w-full animate-pulse rounded-full bg-white/10" />
@@ -129,8 +129,8 @@ export function ProfilePage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
-              <h2 className="mt-3 text-4xl font-semibold tracking-tight text-white">{profileData?.user.displayName ?? profileData?.user.username}</h2>
-              <p className="mt-3 max-w-2xl text-lg leading-8 text-slate-300">
+              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">{profileData?.user.displayName ?? profileData?.user.username}</h2>
+              <p className="mt-3 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
                 Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и посмотреть,
                 как тебя видят другие участники.
               </p>
@@ -277,7 +277,7 @@ export function ProfilePage() {
           </div>
         </article>
 
-        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
           <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-slate-400">
             <SparklesIcon className="h-4 w-4" />
             AI-рейтинг

@@ -19,15 +19,15 @@ export function HomePage() {
       <div className="absolute -left-24 top-0 h-72 w-72 rounded-full bg-cyan-400/15 blur-3xl" />
       <div className="absolute right-0 top-20 h-80 w-80 rounded-full bg-violet-400/10 blur-3xl" />
       <div className="relative grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100">
             <SparklesIcon className="mr-2 h-3.5 w-3.5" />
             SkillHub
           </div>
-          <h2 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+          <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
             Одна и та же главная страница до входа и после него.
           </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
             Здесь видно, что делает платформа: поиск людей, команды, AI-рейтинг, заявки и будущий PRO-доступ.
             После входа меняются только действия и навигация, а не сама точка входа.
           </p>
@@ -70,10 +70,10 @@ export function HomePage() {
           </div>
         </article>
 
-        <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
-          <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-6">
-            <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Главное действие</p>
-            <h3 className="mt-3 text-2xl font-semibold text-white">{user ? "Продолжить работу" : "Войти и открыть продукт"}</h3>
+        <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
+          <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-5 sm:p-6">
+            <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Главное действие</p>
+            <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">{user ? "Продолжить работу" : "Войти и открыть продукт"}</h3>
             <p className="mt-3 text-sm leading-7 text-slate-300">
               Главная не пересобирается под авторизацию. После GitHub входа ты остаёшься в той же логике страницы,
               просто открываются внутренние разделы.
@@ -123,8 +123,8 @@ export function HomePage() {
             <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
               <p className="font-semibold text-white">Проверка на защите</p>
               <p className="mt-2 leading-7">
-                Для демо важно только, что всё стартует предсказуемо: GitHub вход, Postgres, YandexGPT и
-                смоук-тест на тестовых данных.
+                Для показа важно только, что всё стартует предсказуемо: GitHub вход, Postgres, YandexGPT и
+                проверка на тестовых данных.
               </p>
             </div>
           </div>

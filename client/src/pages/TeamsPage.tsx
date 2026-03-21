@@ -191,12 +191,12 @@ export function TeamsPage() {
 
   return (
     <section className="space-y-6">
-      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Команды</p>
-            <h2 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Лента команд для хакатона</h2>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Лента команд для хакатона</h2>
+            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
               Здесь видно, кто ищет людей, какие роли нужны и насколько команда уже собрана.
               PRO-капитаны получают более заметную подачу, а страница команды даёт контекст и кнопку вступления.
             </p>

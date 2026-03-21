@@ -44,7 +44,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
   return (
     <section className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-cyan-300">
             <SparklesIcon className="h-4 w-4" />
             Дашборд
@@ -157,7 +157,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
           )}
         </article>
 
-        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Быстрые действия</p>
           <Link
             to="/search"

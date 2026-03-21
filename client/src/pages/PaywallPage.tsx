@@ -28,15 +28,15 @@ export function PaywallPage() {
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-100">
           <LockIcon className="mr-2 h-3.5 w-3.5" />
           PRO paywall
         </div>
-        <h2 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+        <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
           Экран оплаты уже на месте и готов к подключению YuMoney.
         </h2>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
           Здесь позже подключится YuMoney. Для защиты достаточно показать сам экран, сценарий переключения
           и то, что он переводит пользователя в PRO-режим.
         </p>
@@ -66,13 +66,13 @@ export function PaywallPage() {
         </div>
       </article>
 
-      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
-        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-emerald-300/15 via-slate-950 to-cyan-300/10 p-6">
-          <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-emerald-300">
+      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
+        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-emerald-300/15 via-slate-950 to-cyan-300/10 p-5 sm:p-6">
+          <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-emerald-300 sm:text-sm sm:tracking-[0.24em]">
             <SparklesIcon className="h-4 w-4" />
             Платёж позже
           </p>
-          <h3 className="mt-3 text-2xl font-semibold text-white">Оплата PRO</h3>
+          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Оплата PRO</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
             Эта страница уже отделяет покупку от профиля. Когда подключите платёжку, достаточно заменить кнопку
             подтверждения на реальный checkout.

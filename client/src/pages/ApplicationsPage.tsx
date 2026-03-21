@@ -126,11 +126,11 @@ export function ApplicationsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 rounded-[2rem] border border-lime-300/20 bg-gradient-to-br from-lime-300/10 via-slate-950 to-cyan-400/10 p-7 shadow-2xl shadow-slate-950/30 lg:grid-cols-[1.1fr_0.9fr]">
+      <section className="grid gap-4 rounded-[2rem] border border-lime-300/20 bg-gradient-to-br from-lime-300/10 via-slate-950 to-cyan-400/10 p-6 shadow-2xl shadow-slate-950/30 sm:p-7 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-lime-300">Заявки</p>
-          <h2 className="mt-3 text-4xl font-semibold tracking-tight text-white">Заявки и управление откликами</h2>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+          <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Заявки и управление откликами</h2>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
             Здесь видны входящие и исходящие заявки, а также можно принять или отклонить отклик без ручного API.
           </p>
         </div>

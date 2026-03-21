@@ -46,7 +46,7 @@ export function UserDetailPage() {
   if (loading) {
     return (
       <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="flex items-start gap-5">
             <div className="h-24 w-24 animate-pulse rounded-[1.5rem] bg-white/10" />
             <div className="min-w-0 flex-1 space-y-3">
@@ -67,7 +67,7 @@ export function UserDetailPage() {
           </div>
         </article>
 
-        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
           <div className="h-4 w-32 animate-pulse rounded-full bg-white/10" />
           <div className="h-40 animate-pulse rounded-[1.5rem] bg-white/5" />
           <div className="grid gap-3 md:grid-cols-2">
@@ -92,7 +92,7 @@ export function UserDetailPage() {
   return (
     <section className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="flex flex-wrap items-start gap-5">
             <img
               src={user.avatarUrl}
@@ -107,7 +107,7 @@ export function UserDetailPage() {
               <p className="mt-2 text-slate-400">
                 {user.role ?? "роль не указана"} · {user.claimedGrade ?? "грейд не указан"}
               </p>
-              <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">{user.bio || "О себе пока ничего не добавлено."}</p>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">{user.bio || "О себе пока ничего не добавлено."}</p>
               <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
                 {user.contactVisible ? (
                   <span className="inline-flex items-center gap-2">
@@ -204,7 +204,7 @@ export function UserDetailPage() {
           </div>
         </article>
 
-        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
+        <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
           <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-slate-400">
             <SparklesIcon className="h-4 w-4" />
             AI-рейтинг
@@ -216,7 +216,7 @@ export function UserDetailPage() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm text-slate-400">Рейтинг</p>
-                    <p className="mt-2 text-5xl font-semibold tracking-tight text-white">{user.rating.score}</p>
+                    <p className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{user.rating.score}</p>
                   </div>
                   <RatingBadge score={user.rating.score} />
                 </div>

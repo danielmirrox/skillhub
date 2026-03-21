@@ -80,9 +80,14 @@ function createApp() {
       database,
       oauth: {
         githubConfigured: oauthConfigured,
+        callbackUrl: env.GITHUB_CALLBACK_URL || null,
+        clientUrl: env.CLIENT_URL || null,
+        cookieSecure: env.COOKIE_SECURE,
       },
       yandexgpt: {
         configured: yandexConfigured,
+        authConfigured: yandexAuthConfigured,
+        modelConfigured: yandexModelConfigured,
       },
     });
   });

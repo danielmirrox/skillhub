@@ -63,13 +63,13 @@ export function SearchPage() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-7 shadow-2xl shadow-slate-950/30 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-6 shadow-2xl shadow-slate-950/30 sm:p-7 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Поиск</p>
-          <h2 className="mt-3 max-w-2xl text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
             Ищи участников по роли, грейду и стеку
           </h2>
-          <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
             Живой экран поверх API `/api/v1/users`. Фильтры по роли, грейду, минимальному рейтингу и стеку
             работают, а AI-релевантность и PRO-доступ к контактам подтягиваются из бэка.
           </p>

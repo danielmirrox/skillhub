@@ -30,17 +30,17 @@ export function LoginPage() {
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+      <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100">
           <GithubIcon className="mr-2 h-3.5 w-3.5" />
           GitHub OAuth
         </div>
-        <h2 className="mt-5 max-w-2xl text-4xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+        <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
           SkillHub делает поиск людей и команд быстрым и понятным.
         </h2>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-slate-300">
-          Основной путь входа подключён к серверу через GitHub OAuth. Локальный демо-режим
-          доступен только в среде разработки для проверки сценариев без внешней авторизации.
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+          Основной путь входа подключён к серверу через GitHub OAuth. В локальной среде доступны дополнительные
+          сценарии проверки без внешней авторизации.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -69,10 +69,10 @@ export function LoginPage() {
         </div>
       </div>
 
-      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
-        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-6">
-          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Панель входа</p>
-          <h3 className="mt-3 text-2xl font-semibold text-white">Войти</h3>
+      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
+        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-5 sm:p-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Панель входа</p>
+          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
             Нажми кнопку GitHub, чтобы перейти в настоящий флоу авторизации и открыть рабочие разделы продукта.
           </p>
