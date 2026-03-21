@@ -1,183 +1,220 @@
-# SkillHub — Блок 1. Фундамент (0–6ч)
+# SkillHub — План Дени (актуальный)
 
 ## Дата: 21–22 марта 2026
 
 ---
 
-## 📋 Чек-лист Дени на Блок 1
+## Статус на сейчас
 
-- [x] Создан `.env.example` с описанием переменных
-- [ ] Настроены все переменные окружения в `.env`
-- [ ] Проверена корректность OAuth callback URL в GitHub App
-- [ ] Сервер Даниэла (express) стартует на `npm run dev`
-- [ ] БД PostgreSQL подключена и работает
+### Уже сделано
+
+- [x] Настроен `.env` и базовые переменные окружения
+- [x] Проверен OAuth callback URL
+- [x] Поднят backend и проверен `/health`
+- [x] Добавлен локальный SQL-скрипт инициализации PostgreSQL: `scripts/local-postgres-setup.sql`
+- [x] Подготовлены утилиты: `scripts/setup-env.js`, `scripts/check-env.js`
+
+### В работе
+
+- [ ] Финальная проверка: PostgreSQL доступен под `DATABASE_URL` и запросы к API проходят стабильно
 
 ---
 
-## 🚀 Инструкция по настройке окружения
+## Следующий этап (Блок 2: Profile + AI)
 
-### Шаг 1: Получить GitHub OAuth Credentials
+### Цель
 
-1. Перейди на https://github.com/settings/developers
-2. Нажми **OAuth Apps** → **New OAuth Application**
-3. Заполни форму:
-   - **Application name:** `SkillHub MVP` (или другое)
-   - **Homepage URL:** `http://localhost:5173` (frontend URL)
-   - **Authorization callback URL:** `http://localhost:5000/auth/github/callback` (server callback)
-4. Скопируй:
-   - **Client ID** → `GITHUB_CLIENT_ID`
-   - **Client Secret** → `GITHUB_CLIENT_SECRET`
+Проверить, что scoring и импорт GitHub работают на реальных тест-кейсах для демо.
 
-### Шаг 2: Получить Yandex Cloud Credentials
+### Что сделать
 
-1. Перейди на https://console.yandex.cloud
-2. Создай или выбери проект
-3. Перейди в **API Gateways** или **YandexGPT API**
-4. Создай API ключ → скопируй в `YANDEXGPT_API_KEY`
-5. Найди ID папки (Folder ID) → скопируй в `YANDEXGPT_FOLDER_ID`
+1. Подготовить 3 тестовых профиля (junior, middle, senior) с разными ролями.
+2. Прогнать сценарий:
+   - `PUT /api/v1/profile`
+   - `POST /api/v1/profile/score`
+   - `POST /api/v1/profile/import-github` (для github-кейса)
+3. Проверить, что в ответе есть `rating.score`, `rating.grade`, `rating.roleLabel`.
+4. Проверить диапазоны score и обновление истории `GET /api/v1/profile/score/history`.
+5. Зафиксировать проблемные кейсы (если есть): невалидный JSON, ошибки 400/500, нестабильные ответы.
 
-### Шаг 3: PostgreSQL (локально, Windows)
+---
 
-#### 3.1 Установи PostgreSQL
+## Файлы для работы (только scripts)
 
-1. Скачай инсталлятор с https://www.postgresql.org/download/windows/
-2. Во время установки запомни:
-   - пароль пользователя `postgres`
-   - порт (обычно `5432`)
-3. Проверь, что служба запущена:
-   - `Win + R` → `services.msc`
-   - служба `postgresql-x64-XX` должна быть в статусе `Running`
+- `scripts/test-profiles.json` — тестовые payloads
+- `scripts/check-score-cases.md` — runbook прогона
+- `scripts/local-postgres-setup.sql` — локальная инициализация БД
 
-#### 3.2 Создай БД и пользователя
+---
 
-Вариант A (через psql):
+## Быстрый запуск прогона
 
 ```powershell
-psql -U postgres -h localhost -p 5432
-```
-
-Внутри `psql` выполни:
-
-```sql
-CREATE DATABASE skillhub;
-CREATE USER skillhub_user WITH PASSWORD 'password123';
-GRANT ALL PRIVILEGES ON DATABASE skillhub TO skillhub_user;
-```
-
-Вариант B (одной командой из PowerShell):
-
-```powershell
-psql -U postgres -h localhost -p 5432 -f scripts/local-postgres-setup.sql
-```
-
-#### 3.3 Проверь подключение от нового пользователя
-
-```powershell
-psql "postgresql://skillhub_user:password123@localhost:5432/skillhub" -c "SELECT current_database(), current_user;"
-```
-
-Если получил строку с `skillhub` и `skillhub_user`, всё ок.
-
-#### 3.4 Пропиши DATABASE_URL
-
-В `server/.env`:
-
-```env
-DATABASE_URL=postgresql://skillhub_user:password123@localhost:5432/skillhub
-```
-
-### Шаг 4: Создать .env файл
-
-**Вариант 1: Интерактивная настройка (рекомендуется)**
-```bash
-node scripts/setup-env.js
-```
-
-**Вариант 2: Ручная копия**
-```bash
-cp server/.env.example server/.env
-# Потом отредактируй server/.env в текстовом редакторе
-```
-
-### Шаг 5: Проверить окружение
-
-```bash
+# 1) Проверить env
 node scripts/check-env.js
-```
 
-Если все переменные зелёные (✅), можно двигаться дальше!
-
----
-
-## 📌 Что должно быть к концу Блока 1
-
-✅ `.env.example` создан с описанием  
-✅ `.env` заполнен корректными значениями  
-✅ `npm run dev` в `server/` поднимает API  
-✅ БД подключена (можно проверить подключением через psql)  
-✅ OAuth callback URL в GitHub App совпадает с `GITHUB_CALLBACK_URL` в `.env`
-
----
-
-## 🔧 В каких файлах это использует
-
-- **server/.env** — все переменные для Express + API
-- **scripts/setup-env.js** — помощь при настройке (ты)
-- **scripts/check-env.js** — проверка (ты)
-- **Даниэл:** будет читать переменные из `.env` в своих скриптах
-
----
-
-## ✏️ Примеры значений
-
-```
-NODE_ENV=development
-PORT=5000
-DATABASE_URL=postgresql://skillhub_user:password123@localhost:5432/skillhub
-GITHUB_CLIENT_ID=Ive123456abcdef789012
-GITHUB_CLIENT_SECRET=your_secret_key_123456789
-GITHUB_CALLBACK_URL=http://localhost:5000/auth/github/callback
-YANDEXGPT_API_KEY=AQVNz1234567890abcdef
-YANDEXGPT_FOLDER_ID=b1a234567890abcdef
-JWT_SECRET=generated_auto_or_your_random_string
-CLIENT_URL=http://localhost:5173
-```
-
----
-
-## 📞 Вопросы/проблемы?
-
-- **OAuth не работает?** Проверь точное совпадение `GITHUB_CALLBACK_URL` в `.env` и в GitHub App settings
-- **БД не подключается?** Проверь `DATABASE_URL` — правильно ли значение user:password@host:port/dbname
-- **YandexGPT ошибка?** Убедись, что API ключ и Folder ID из одного проекта Yandex Cloud
-
----
-
-## 🎯 Контрольная точка 6ч
-
-Когда будет готово всё что выше, переходи на **Блок 2 — Профиль + AI (6–12ч)**
-
----
-
-## ▶️ Дальнейшие шаги после локального PostgreSQL
-
-1. Проверь env:
-
-```powershell
-node scripts/check-env.js
-```
-
-2. Подними сервер:
-
-```powershell
+# 2) Поднять backend
 cd server
 npm install
 npm run dev
+
+# 3) В новом терминале вернуться в корень и выполнить тесты по runbook
+cd ..
+# Открыть scripts/check-score-cases.md и прогнать команды
 ```
 
-3. Проверь, что API живой (минимум `/auth/me` должен отвечать 401/200, но не 500).
+### Если ты уже на этапе `npm run dev`
 
-4. Как только сервер стабильно стартует, переходи на Блок 2 по твоей зоне:
-   - подготовить 2–3 тестовых профиля (JSON)
-   - прогнать AI-скоринг на них
-   - зафиксировать кейсы, где ответ AI ломает JSON
+Отлично. Оставь сервер в этом терминале запущенным и открой второй терминал в корне проекта `skillhub`.
+
+#### 1) Проверка, что API живой
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/health"
+```
+
+Ожидаемо: ответ со `status: ok`.
+
+#### 2) Тест-кейс 1: junior frontend
+
+```powershell
+$headers1 = @{ "X-Demo-User-Id" = "user-denis" }
+
+$profile1 = @{
+   role = "frontend"
+   claimedGrade = "junior"
+   primaryStack = @("HTML", "CSS", "JavaScript")
+   experienceYears = 0
+   hackathonsCount = 0
+   bio = "Начинающий frontend-разработчик, делаю учебные проекты."
+   projectLinks = @(
+      @{
+         url = "https://github.com/example/junior-frontend-landing"
+         title = "Landing page"
+         description = "Учебный лендинг на чистом JS"
+      }
+   )
+   telegramUsername = "junior_front"
+   githubUrl = "https://github.com/example"
+} | ConvertTo-Json -Depth 6
+
+Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers1 -ContentType "application/json" -Body $profile1
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers1 -ContentType "application/json" -Body "{}"
+```
+
+#### 3) Тест-кейс 2: middle backend
+
+```powershell
+$headers2 = @{ "X-Demo-User-Id" = "user-deni" }
+
+$profile2 = @{
+   role = "backend"
+   claimedGrade = "middle"
+   primaryStack = @("Node.js", "PostgreSQL", "Express")
+   experienceYears = 2
+   hackathonsCount = 3
+   bio = "Backend разработчик. Пишу REST API, работаю с PostgreSQL."
+   projectLinks = @(
+      @{
+         url = "https://github.com/example/task-api"
+         title = "Task API"
+         description = "CRUD API с авторизацией"
+      },
+      @{
+         url = "https://github.com/example/queue-worker"
+         title = "Queue Worker"
+         description = "Фоновая обработка задач"
+      }
+   )
+   telegramUsername = "middle_back"
+   githubUrl = "https://github.com/example"
+} | ConvertTo-Json -Depth 6
+
+Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers2 -ContentType "application/json" -Body $profile2
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers2 -ContentType "application/json" -Body "{}"
+```
+
+#### 4) Тест-кейс 3: senior fullstack + github import
+
+```powershell
+$headers3 = @{ "X-Demo-User-Id" = "user-captain" }
+
+$profile3 = @{
+   role = "fullstack"
+   claimedGrade = "senior"
+   primaryStack = @("TypeScript", "React", "Node.js", "PostgreSQL")
+   experienceYears = 6
+   hackathonsCount = 9
+   bio = "Fullstack lead. Архитектура, backend и продуктовый frontend."
+   projectLinks = @(
+      @{
+         url = "https://github.com/example/saas-platform"
+         title = "SaaS platform"
+         description = "Многомодульная платформа с RBAC"
+      }
+   )
+   telegramUsername = "senior_full"
+   githubUrl = "https://github.com/example"
+} | ConvertTo-Json -Depth 6
+
+Invoke-RestMethod -Method Put -Uri "http://localhost:5000/api/v1/profile" -Headers $headers3 -ContentType "application/json" -Body $profile3
+
+$githubData = @{
+   githubData = @{
+      fetchedAt = "2026-03-21T10:00:00Z"
+      publicRepos = 42
+      followers = 120
+      accountAgeYears = 7
+      languages = @{
+         TypeScript = 160000
+         JavaScript = 95000
+         SQL = 34000
+         Python = 27000
+      }
+      topRepos = @(
+         @{
+            name = "platform-core"
+            description = "Core platform services"
+            stars = 320
+            primaryLanguage = "TypeScript"
+         }
+      )
+   }
+} | ConvertTo-Json -Depth 8
+
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/import-github" -Headers $headers3 -ContentType "application/json" -Body $githubData
+Invoke-RestMethod -Method Post -Uri "http://localhost:5000/api/v1/profile/score" -Headers $headers3 -ContentType "application/json" -Body "{}"
+```
+
+#### 5) Проверка истории скоринга
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://localhost:5000/api/v1/profile/score/history" -Headers $headers3
+```
+
+Ожидаемо: в `items` есть результаты последних запусков.
+
+#### 6) Что считать успешным прогоном
+
+1. Нет ошибок `500` на всех шагах.
+2. В ответе есть `rating.score`, `rating.grade`, `rating.roleLabel`.
+3. История скоринга обновилась.
+4. Если есть ошибка, сохрани текст ошибки и payload в заметку для команды.
+
+### Частая проблема: RATE_LIMITED
+
+Если получил `RATE_LIMITED`, это нормально для одного и того же пользователя (лимит скоринга).
+
+Что делать:
+
+1. Запускай кейсы с разными заголовками `X-Demo-User-Id` (как в примерах выше).
+2. Для повторного прогона используй другого demo-user: `user-daniel`, `user-denis`, `user-deni`, `user-captain`.
+
+---
+
+## Критерий готовности этапа
+
+- [ ] Все 3 кейса из `scripts/test-profiles.json` проходят без 500
+- [ ] Ответы scoring содержат обязательные поля
+- [ ] История score обновляется после каждого прогона
+- [ ] Есть краткий список наблюдений/рисков для команды

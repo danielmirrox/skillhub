@@ -1,0 +1,41 @@
+const fs = require('fs');
+const path = require('path');
+const dotenv = require('dotenv');
+const { z } = require('zod');
+
+const envPath = path.join(__dirname, '..', '..', '.env');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+} else {
+  dotenv.config();
+}
+
+const envSchema = z.object({
+  NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  PORT: z.coerce.number().int().positive().default(5000),
+  DATABASE_URL: z.string().optional().default(''),
+  GITHUB_CLIENT_ID: z.string().optional().default(''),
+  GITHUB_CLIENT_SECRET: z.string().optional().default(''),
+  GITHUB_CALLBACK_URL: z.string().optional().default('http://localhost:5000/auth/github/callback'),
+  YANDEXGPT_API_KEY: z.string().optional().default(''),
+  YANDEXGPT_FOLDER_ID: z.string().optional().default(''),
+  JWT_SECRET: z.string().optional().default('dev-secret'),
+  JWT_EXPIRES_IN: z.string().optional().default('7d'),
+  CLIENT_URL: z.string().optional().default('http://localhost:5173'),
+  GITHUB_API_TOKEN: z.string().optional().default(''),
+  DEBUG: z.string().optional().default('skillhub:*'),
+  LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
+  RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(900000),
+  RATE_LIMIT_MAX_REQUESTS: z.coerce.number().int().positive().default(100),
+});
+
+const parsed = envSchema.safeParse(process.env);
+
+if (!parsed.success) {
+  const messages = parsed.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`);
+  throw new Error(`Invalid environment configuration:\n${messages.join('\n')}`);
+}
+
+const env = parsed.data;
+
+module.exports = { env };
