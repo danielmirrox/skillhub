@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { RatingBadge } from "../profile/RatingBadge";
 import type { UsersListItem } from "../../api/users";
+import { ArrowRightIcon, GithubIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../ui/Icons";
 
 type UserCardProps = {
   user: UsersListItem;
@@ -23,7 +24,8 @@ export function UserCard({ user }: UserCardProps) {
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-lg font-semibold tracking-tight text-white">{user.displayName}</h3>
             {user.isPro ? (
-              <span className="rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                <ShieldCheckIcon className="h-3.5 w-3.5" />
                 PRO
               </span>
             ) : null}
@@ -35,7 +37,8 @@ export function UserCard({ user }: UserCardProps) {
         </div>
         {user.rating ? (
           <div className="flex flex-col items-end gap-2">
-            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100">
+            <span className="inline-flex items-center gap-1 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100">
+              <SparklesIcon className="h-3.5 w-3.5" />
               AI-рейтинг
             </span>
             <RatingBadge score={user.rating.score} />
@@ -102,16 +105,12 @@ export function UserCard({ user }: UserCardProps) {
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Контакты</p>
           {user.contactVisible ? (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/20 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100">
-              <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true" fill="currentColor">
-                <path d="M6.5 8.75 4.75 7l-1 1 2.75 2.75 6-6-1-1z" />
-              </svg>
-              PRO unlocked
+              <ShieldCheckIcon className="h-3 w-3" />
+              PRO открыт
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100">
-              <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true" fill="currentColor">
-                <path d="M5 6V4a3 3 0 1 1 6 0v2h1.5A1.5 1.5 0 0 1 14 7.5v5A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-5A1.5 1.5 0 0 1 3.5 6H5Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
-              </svg>
+              <LockIcon className="h-3 w-3" />
               Только предпросмотр
             </span>
           )}
@@ -127,18 +126,14 @@ export function UserCard({ user }: UserCardProps) {
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition duration-300 ease-out group-hover:border-amber-300/20 group-hover:bg-amber-300/10">
               <span className="blur-[2px]">@username</span>
               <span className="inline-flex items-center gap-1 text-slate-500">
-                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true" fill="currentColor">
-                  <path d="M5 6V4a3 3 0 1 1 6 0v2h1.5A1.5 1.5 0 0 1 14 7.5v5A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-5A1.5 1.5 0 0 1 3.5 6H5Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
-                </svg>
+                <LockIcon className="h-3 w-3" />
                 Telegram
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition duration-300 ease-out group-hover:border-amber-300/20 group-hover:bg-amber-300/10">
               <span className="blur-[2px]">github.com/hidden</span>
               <span className="inline-flex items-center gap-1 text-slate-500">
-                <svg viewBox="0 0 16 16" className="h-3 w-3" aria-hidden="true" fill="currentColor">
-                  <path d="M8 .75a7.25 7.25 0 0 0-2.29 14.12c.36.07.49-.15.49-.34v-1.2c-2.01.44-2.43-.86-2.43-.86-.33-.85-.82-1.08-.82-1.08-.67-.46.05-.45.05-.45.75.05 1.14.78 1.14.78.66 1.14 1.73.81 2.15.62.07-.48.26-.81.46-.99-1.61-.18-3.3-.8-3.3-3.57 0-.79.28-1.44.74-1.95-.08-.18-.32-.93.07-1.94 0 0 .6-.19 1.96.74a6.77 6.77 0 0 1 1.78-.24c.6 0 1.2.08 1.78.24 1.36-.93 1.96-.74 1.96-.74.39 1.01.15 1.76.07 1.94.46.51.74 1.16.74 1.95 0 2.78-1.69 3.39-3.3 3.57.27.23.5.68.5 1.38v2.04c0 .19.13.41.5.34A7.25 7.25 0 0 0 8 .75Z" />
-                </svg>
+                <GithubIcon className="h-3 w-3" />
                 GitHub
               </span>
             </div>
@@ -152,8 +147,9 @@ export function UserCard({ user }: UserCardProps) {
         </p>
         <Link
           to={`/users/${user.id}`}
-          className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition duration-300 ease-out hover:bg-cyan-300/20 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition duration-300 ease-out hover:bg-cyan-300/20 hover:text-white"
         >
+          <ArrowRightIcon className="h-4 w-4" />
           Открыть профиль
         </Link>
       </div>

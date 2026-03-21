@@ -80,7 +80,7 @@ export function TeamDetailPage() {
 
     try {
       await createApplication(teamId, message);
-      setApplyStatus("Заявка отправлена в applications.");
+      setApplyStatus("Заявка отправлена в раздел заявок.");
       setApplyOpen(false);
     } catch (err) {
       const typed = err as Error & { status?: number };
@@ -158,10 +158,17 @@ export function TeamDetailPage() {
           <div className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
             <p className="text-sm text-slate-400">Капитан</p>
             <div className="mt-3 flex items-center gap-3">
-              <img src={team.author?.avatarUrl ?? ""} alt={team.author?.displayName ?? "Author"} className="h-12 w-12 rounded-xl object-cover" />
+              <img
+                src={team.author?.avatarUrl ?? ""}
+                alt={team.author?.displayName ?? "Капитан"}
+                className="h-12 w-12 rounded-xl object-cover"
+              />
               <div>
                 {team.author?.userId ? (
-                  <Link to={`/users/${team.author.userId}`} className="font-medium text-white transition duration-300 ease-out hover:text-cyan-200">
+                  <Link
+                    to={`/users/${team.author.userId}`}
+                    className="font-medium text-white transition duration-300 ease-out hover:text-cyan-200"
+                  >
                     {team.author.displayName}
                   </Link>
                 ) : (

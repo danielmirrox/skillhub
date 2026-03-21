@@ -9,6 +9,11 @@ export type DemoAuthUser = {
 
 export const DEMO_AUTH_STORAGE_KEY = "skillhub.demoAuthUser";
 export const DEMO_AUTH_CHANGE_EVENT = "skillhub:demo-auth-change";
+export const DEMO_AUTH_ENABLED = import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEMO_AUTH === "true";
+
+export function isDemoAuthEnabled() {
+  return DEMO_AUTH_ENABLED;
+}
 
 export const DEMO_AUTH_USER: DemoAuthUser = {
   id: "user-daniel",

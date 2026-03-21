@@ -1,10 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { getDemoAuthUser, DEMO_PRO_AUTH_USER, setDemoAuthUser } from "../api/demoAuth";
+import { DEMO_PRO_AUTH_USER, getDemoAuthUser, isDemoAuthEnabled, setDemoAuthUser } from "../api/demoAuth";
 import { getOwnProfile, scoreProfile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
+import { ArrowRightIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../components/ui/Icons";
 
 export function ProfilePage() {
+  const demoAuthEnabled = isDemoAuthEnabled();
   const [loading, setLoading] = React.useState(true);
   const [scoring, setScoring] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -68,14 +70,39 @@ export function ProfilePage() {
     return <p className="text-red-300">{error}</p>;
   }
 
-  const currentDemoUser = getDemoAuthUser();
+  const currentDemoUser = demoAuthEnabled ? getDemoAuthUser() : null;
   const profile = profileData?.profile;
+  const isDraftProfile =
+    Boolean(profile) &&
+    !profile?.bio &&
+    (profile?.primaryStack?.length ?? 0) === 0 &&
+    (profile?.experienceYears ?? 0) === 0 &&
+    (profile?.hackathonsCount ?? 0) === 0 &&
+    (profile?.projectLinks?.length ?? 0) === 0 &&
+    !profile?.rating;
+
   if (!profile) {
     return (
       <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
         <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль</p>
-        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Профиль еще не создан</h2>
-        <p className="mt-3 max-w-2xl text-slate-300">Заполни профиль, чтобы запустить AI-скоринг и показать себя в поиске.</p>
+        <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Профиль ещё не создан</h2>
+        <p className="mt-3 max-w-2xl text-slate-300">
+          Сначала заполни базовые данные, чтобы поиск, AI-рейтинг и рекомендации выглядели как полноценный продукт, а не как пустая карточка.
+        </p>
+        <div className="mt-6 grid gap-3 md:grid-cols-3">
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+            <p className="text-sm text-slate-400">Шаг 1</p>
+            <p className="mt-2 text-lg font-semibold text-white">Заполни роль и стек</p>
+          </article>
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+            <p className="text-sm text-slate-400">Шаг 2</p>
+            <p className="mt-2 text-lg font-semibold text-white">Добавь проекты и опыт</p>
+          </article>
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+            <p className="text-sm text-slate-400">Шаг 3</p>
+            <p className="mt-2 text-lg font-semibold text-white">Запусти AI-скоринг</p>
+          </article>
+        </div>
         <Link
           to="/profile/edit"
           className="mt-6 inline-flex rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
@@ -102,7 +129,8 @@ export function ProfilePage() {
 
             <div className="flex flex-wrap items-center gap-3">
               {profileData?.user.isPro ? (
-                <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                  <ShieldCheckIcon className="h-3.5 w-3.5" />
                   PRO-режим
                 </span>
               ) : (
@@ -110,28 +138,28 @@ export function ProfilePage() {
                   to="/paywall"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-950 shadow-lg shadow-emerald-500/20 transition duration-300 ease-out hover:shadow-emerald-500/30"
                 >
-                  <svg viewBox="0 0 16 16" className="h-3.5 w-3.5" aria-hidden="true" fill="currentColor">
-                    <path d="M5 6V4a3 3 0 1 1 6 0v2h1.5A1.5 1.5 0 0 1 14 7.5v5A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-5A1.5 1.5 0 0 1 3.5 6H5Zm1.5 0h3V4a1.5 1.5 0 0 0-3 0v2Z" />
-                  </svg>
+                  <LockIcon className="h-3.5 w-3.5" />
                   Стать PRO
                 </Link>
               )}
-              {!profileData?.user.isPro ? (
+              {!profileData?.user.isPro && demoAuthEnabled ? (
                 <button
                   type="button"
                   onClick={() => {
                     setDemoAuthUser(DEMO_PRO_AUTH_USER);
                     window.location.reload();
                   }}
-                  className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"
                 >
+                  <SparklesIcon className="h-3.5 w-3.5" />
                   Включить PRO-демо
                 </button>
               ) : null}
               <Link
                 to="/profile/edit"
-                className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10"
               >
+                <ArrowRightIcon className="h-3.5 w-3.5" />
                 Редактировать
               </Link>
             </div>
@@ -165,9 +193,37 @@ export function ProfilePage() {
           ) : null}
 
           {currentDemoUser?.id ? (
-            <p className="mt-6 rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-300">
+            <p className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-300">
+              <SparklesIcon className="h-4 w-4 text-cyan-200" />
               Демо-пользователь: {currentDemoUser.displayName ?? currentDemoUser.username}
             </p>
+          ) : null}
+
+          {isDraftProfile ? (
+            <div className="mt-6 rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5">
+              <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Стартовый профиль</p>
+              <p className="mt-2 text-lg font-semibold text-white">Собери профиль за 3 шага</p>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Сейчас профиль ещё пустой, но это нормальный первый экран после входа. Дальше достаточно заполнить
+                роль, стек и пару проектов, чтобы он выглядел как живой продуктовый профиль.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  to="/profile/edit"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950"
+                >
+                  <ArrowRightIcon className="h-4 w-4" />
+                  Заполнить профиль
+                </Link>
+                <Link
+                  to="/profile/edit#github-import"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-medium text-slate-100 hover:bg-white/10"
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                  Импортировать GitHub
+                </Link>
+              </div>
+            </div>
           ) : null}
 
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -187,7 +243,9 @@ export function ProfilePage() {
 
           <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-5">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Описание и проекты</p>
-            <p className="mt-3 text-slate-300">{profile.bio || "Добавь описание, чтобы профиль выглядел убедительнее."}</p>
+            <p className="mt-3 text-slate-300">
+              {profile.bio || "Добавь описание, чтобы профиль выглядел убедительнее."}
+            </p>
 
             {profile.projectLinks.length > 0 ? (
               <div className="mt-5 grid gap-3">
@@ -211,7 +269,10 @@ export function ProfilePage() {
         </article>
 
         <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
-          <p className="text-sm uppercase tracking-[0.24em] text-slate-400">AI-рейтинг</p>
+          <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-slate-400">
+            <SparklesIcon className="h-4 w-4" />
+            AI-рейтинг
+          </p>
 
           {typeof profile.rating?.score === "number" ? (
             <>

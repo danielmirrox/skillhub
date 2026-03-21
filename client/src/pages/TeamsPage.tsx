@@ -3,16 +3,17 @@ import { Link } from "react-router-dom";
 import { getCurrentUser } from "../api/auth";
 import { createTeam, getTeamById, getTeams, updateTeam, type TeamRole, type TeamSummary, type TeamDetail, type TeamFormPayload } from "../api/teams";
 import { TeamFormModal } from "../components/teams/TeamFormModal";
+import { ArrowRightIcon, ShieldCheckIcon, UsersIcon } from "../components/ui/Icons";
 
 const ROLE_OPTIONS: Array<{ value: TeamRole | ""; label: string }> = [
   { value: "", label: "Любая роль" },
-  { value: "frontend", label: "Frontend" },
-  { value: "backend", label: "Backend" },
-  { value: "fullstack", label: "Fullstack" },
-  { value: "design", label: "Design" },
+  { value: "frontend", label: "Фронтенд" },
+  { value: "backend", label: "Бэкенд" },
+  { value: "fullstack", label: "Фуллстек" },
+  { value: "design", label: "Дизайн" },
   { value: "ml", label: "ML" },
-  { value: "mobile", label: "Mobile" },
-  { value: "other", label: "Other" },
+  { value: "mobile", label: "Мобильная" },
+  { value: "other", label: "Другое" },
 ];
 
 function TeamCard({ team }: { team: TeamSummary }) {
@@ -29,11 +30,12 @@ function TeamCard({ team }: { team: TeamSummary }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className={`text-xs uppercase tracking-[0.24em] ${isBoosted ? 'text-emerald-100/85' : 'text-cyan-200/80'}`}>{team.hackathonName}</p>
+          <p className={`text-xs uppercase tracking-[0.24em] ${isBoosted ? "text-emerald-100/85" : "text-cyan-200/80"}`}>{team.hackathonName}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <h3 className="text-2xl font-semibold tracking-tight text-white">{team.name}</h3>
             {team.author?.isPro ? (
-              <span className="rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-100">
+              <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-100">
+                <ShieldCheckIcon className="h-3 w-3" />
                 PRO-буст
               </span>
             ) : null}
@@ -47,7 +49,10 @@ function TeamCard({ team }: { team: TeamSummary }) {
         </div>
         <div className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-right text-sm text-slate-300">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Слоты</p>
-          <p className="mt-1 text-lg font-semibold text-white">{team.slotsOpen}</p>
+          <p className="mt-1 inline-flex items-center gap-2 text-lg font-semibold text-white">
+            <UsersIcon className="h-4 w-4 text-cyan-200" />
+            {team.slotsOpen}
+          </p>
         </div>
       </div>
 
@@ -78,8 +83,9 @@ function TeamCard({ team }: { team: TeamSummary }) {
         <div className="flex flex-wrap gap-2">
           <Link
             to={`/teams/${team.id}`}
-            className="rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out hover:shadow-cyan-500/30"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out hover:shadow-cyan-500/30"
           >
+            <ArrowRightIcon className="h-4 w-4" />
             Открыть
           </Link>
         </div>
@@ -183,15 +189,16 @@ export function TeamsPage() {
             <h2 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">Лента команд для хакатона</h2>
             <p className="mt-4 max-w-3xl text-lg leading-8 text-slate-300">
               Здесь видно, кто ищет людей, какие роли нужны и насколько команда уже собрана.
-              PRO-капитаны получают буст в выдаче, а страница команды даёт контекст и кнопку вступления.
+              PRO-капитаны получают более заметную подачу, а страница команды даёт контекст и кнопку вступления.
             </p>
           </div>
 
           <button
             type="button"
             onClick={openCreateForm}
-            className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
           >
+            <UsersIcon className="h-4 w-4" />
             Создать команду
           </button>
         </div>

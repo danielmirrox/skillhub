@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: skillhub
+      POSTGRES_USER: skillhub_user
+      POSTGRES_PASSWORD: skillhub_password
+    volumes:
+      - skillhub_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skillhub_user -d skillhub"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./server
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      DATABASE_URL: postgresql://skillhub_user:skillhub_password@postgres:5432/skillhub
+      CLIENT_URL: http://localhost:8080
+      CLIENT_URLS: http://localhost:8080
+      GITHUB_CALLBACK_URL: http://localhost:8080/auth/github/callback
+      COOKIE_SECURE: "false"
+    env_file:
+      - ./server/.env
+    expose:
+      - "5000"
+
+  web:
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: /
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  skillhub_postgres:

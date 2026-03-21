@@ -40,12 +40,13 @@ This note describes the recommended deployment path when the project is hosted o
 
 - build from the `server/` folder
 - pass `DATABASE_URL`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `GITHUB_CALLBACK_URL`, `YANDEXGPT_SA_KEY_PATH` or `YANDEXGPT_IAM_TOKEN` or `YANDEXGPT_API_KEY`, `YANDEXGPT_MODEL_URI` or `YANDEXGPT_FOLDER_ID`, `YANDEXGPT_LLM_ENDPOINT`, `JWT_SECRET`, `CLIENT_URL`
+- pass `COOKIE_SECURE=false` for plain HTTP on the VM; switch it to `true` only after adding HTTPS
 - expose only the internal app port to the compose network
 
 ### YandexGPT auth
 
 - preferred path: mount the service-account JSON into the backend container and point `YANDEXGPT_SA_KEY_PATH` to that file
-- optional fallback: use a pre-generated `YANDEXGPT_IAM_TOKEN`
+- дополнительный fallback: использовать заранее подготовленный `YANDEXGPT_IAM_TOKEN`
 - legacy fallback: use `YANDEXGPT_API_KEY` only if that is what the current Yandex setup provides
 - set `YANDEXGPT_MODEL_URI` explicitly when possible, for example `gpt://<folder_id>/yandexgpt-4-lite/latest`
 - keep `YANDEXGPT_LLM_ENDPOINT` on the completion endpoint used by the backend
@@ -74,7 +75,7 @@ GITHUB_CALLBACK_URL=https://api.example.com/api/v1/auth/github/callback
 YANDEXGPT_SA_KEY_PATH=/run/secrets/yandex-service-account.json
 YANDEXGPT_MODEL_URI=gpt://b1gcdrk0le310t723e9o/yandexgpt-4-lite/latest
 YANDEXGPT_LLM_ENDPOINT=https://llm.api.cloud.yandex.net/foundationModels/v1/completion
-# Optional fallback if you already have them:
+# Дополнительный fallback, если они у вас уже есть:
 YANDEXGPT_IAM_TOKEN=...
 YANDEXGPT_API_KEY=...
 YANDEXGPT_FOLDER_ID=b1gcdrk0le310t723e9o
@@ -82,6 +83,7 @@ JWT_SECRET=long-random-secret
 JWT_EXPIRES_IN=7d
 CLIENT_URL=https://skillhub.example.com
 CLIENT_URLS=https://www.skillhub.example.com
+COOKIE_SECURE=true
 LOG_LEVEL=info
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
@@ -89,15 +91,15 @@ RATE_LIMIT_MAX_REQUESTS=100
 
 ## Deployment flow
 
-1. Prepare the VM.
-2. Install Docker and Docker Compose.
-3. Copy the repo to `/opt/skillhub`.
-4. Create `.env`.
-5. Build the frontend.
-6. Start the stack with `docker compose up -d --build`.
-7. Check `GET /health`.
-8. Test GitHub OAuth callback.
-9. Test profile loading, search, teams, and applications.
+1. Подготовить VM.
+2. Установить Docker и Docker Compose.
+3. Скопировать репозиторий в `/opt/skillhub`.
+4. Создать `.env`.
+5. Собрать фронтенд.
+6. Запустить стек командой `docker compose up -d --build`.
+7. Проверить `GET /health`.
+8. Протестировать callback GitHub OAuth.
+9. Протестировать загрузку профиля, поиск, команды и заявки.
 
 ## Operational checklist
 
@@ -107,6 +109,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 - `YANDEXGPT_SA_KEY_PATH` points to a mounted service-account JSON file, or `YANDEXGPT_IAM_TOKEN` / `YANDEXGPT_API_KEY` are present as fallback.
 - `YANDEXGPT_MODEL_URI` matches the real Yandex model URI, or `YANDEXGPT_FOLDER_ID` plus `YANDEXGPT_MODEL` can build it.
 - `YANDEXGPT_LLM_ENDPOINT` points to the completion endpoint used by the backend.
+- `COOKIE_SECURE` is `false` on plain HTTP and `true` once HTTPS is enabled.
 - `skillhub.session` cookie is `HttpOnly`.
 - `Secure` cookies are enabled if HTTPS is used.
 - Postgres data is persisted across restarts.
@@ -128,3 +131,4 @@ docker compose down -v
 - Keep the public port only on `nginx`.
 - Do not publish Postgres to the internet.
 - If you want the simplest production path, keep frontend and backend separate and use Compose only for backend + Postgres.
+- If the frontend and backend share the same public domain through nginx, build the frontend with `VITE_API_URL=/` so requests stay same-origin.

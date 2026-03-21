@@ -724,12 +724,14 @@ async function main() {
     );
 
     console.log('Building client for smoke checks...');
-    await runCommandAndCapture(npmCommand, ['run', 'build'], {
+    await runCommandAndCapture('npm run build', [], {
       cwd: clientDir,
       env: {
         ...process.env,
+        VITE_ENABLE_DEMO_AUTH: 'true',
         VITE_API_URL: api.baseUrl,
       },
+      shell: true,
     });
 
     uiServer = await startStaticServer(clientDistDir);
@@ -745,7 +747,7 @@ async function main() {
       {
         label: 'dashboard',
         route: '/dashboard',
-        expectedTexts: [demoUser.displayName, 'Dashboard'],
+        expectedTexts: [demoUser.displayName, 'Дашборд'],
       },
       {
         label: 'search',

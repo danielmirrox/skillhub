@@ -1,6 +1,6 @@
 # Client - SkillHub
 
-Frontend foundation for Block 1 (Denis scope): React + Vite + Tailwind + routing + auth-check.
+Frontend foundation for SkillHub: React + Vite + Tailwind + routing + auth-check.
 
 ## Run locally
 
@@ -19,9 +19,11 @@ Create `client/.env` when backend runs on another host/port:
 
 ```env
 VITE_API_URL=http://localhost:5000
+VITE_ENABLE_DEMO_AUTH=true
 ```
 
 If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
+`VITE_ENABLE_DEMO_AUTH=true` keeps the demo auth flow available for local development and smoke checks only.
 
 ## Implemented in Block 1
 
@@ -29,7 +31,7 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 - Protected `/dashboard` route
 - Auth check via `GET /api/v1/auth/me` with cookies (`credentials: include`)
 - Login screen offers real GitHub OAuth plus demo buttons for local testing
-- Demo auth persists in localStorage and is used only as a local fallback
+- Demo auth persists in localStorage and is used only when demo mode is explicitly enabled
 - Search page uses `GET /api/v1/users` with filters for role, grade, minRating and stack
 - Teams page uses `GET /api/v1/teams` with filters for hackathon, role and stack
 - Team detail page uses `GET /api/v1/teams/:id` and offers a team join flow
@@ -39,4 +41,4 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 - Applications now strictly mean joining a team
 - Profile page can promote the current demo user to PRO via `POST /api/v1/profile/pro`
 - Profile edit page supports GitHub import preview and can post `githubData` to `POST /api/v1/profile/import-github`
-- Basic app layout and dashboard placeholder
+- Basic app layout and dashboard entry screen

@@ -73,7 +73,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Profile editor</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль</p>
           <h2 className="mt-2 text-2xl font-semibold">Редактирование профиля</h2>
           <p className="mt-2 text-sm text-slate-400">
             Заполни профиль так, чтобы AI-рейтинг и поиск работали на тебя, а не против.
@@ -89,9 +89,9 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
         </button>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <div className="space-y-4 rounded-[1.5rem] border border-white/10 bg-slate-950/45 p-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Identity</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Основное</p>
           <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm">
               Специализация
@@ -100,13 +100,13 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 value={values.role}
                 onChange={(event) => setField("role", event.target.value as ProfileRole)}
               >
-                <option value="frontend">frontend</option>
-                <option value="backend">backend</option>
-                <option value="fullstack">fullstack</option>
-                <option value="design">design</option>
-                <option value="ml">ml</option>
-                <option value="mobile">mobile</option>
-                <option value="other">other</option>
+                <option value="frontend">Frontend</option>
+                <option value="backend">Backend</option>
+                <option value="fullstack">Fullstack</option>
+                <option value="design">Design</option>
+                <option value="ml">ML</option>
+                <option value="mobile">Mobile</option>
+                <option value="other">Другое</option>
               </select>
             </label>
 
@@ -117,9 +117,9 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 value={values.claimedGrade}
                 onChange={(event) => setField("claimedGrade", event.target.value as ClaimedGrade)}
               >
-                <option value="junior">junior</option>
-                <option value="middle">middle</option>
-                <option value="senior">senior</option>
+                <option value="junior">Junior</option>
+                <option value="middle">Middle</option>
+                <option value="senior">Senior</option>
               </select>
             </label>
 
@@ -174,10 +174,10 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
         </div>
 
         <div className="space-y-4 rounded-[1.5rem] border border-white/10 bg-slate-950/45 p-5">
-          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Reach & work</p>
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Контакты и ссылки</p>
           <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm">
-              Telegram username
+              Telegram
               <input
                 className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.telegramUsername}
@@ -188,7 +188,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             </label>
 
             <label className="flex flex-col gap-2 text-sm">
-              GitHub URL
+              GitHub
               <input
                 className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
                 value={values.githubUrl}

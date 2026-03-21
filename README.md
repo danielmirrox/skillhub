@@ -1,53 +1,55 @@
 # SkillHub
 
-SkillHub is a hackathon matchmaking platform for participants and teams.
-The product helps users find teammates, evaluate skill fit, share profiles, and manage team applications.
+SkillHub — платформа для мэтчинга участников и команд на хакатоне.
+Проект помогает находить тиммейтов, оценивать соответствие по скиллам, шарить профили и управлять заявками в команды.
+Проект сделан для хакатона «Идея. Код. Релиз» от IT-сообщества МГУ Viribus Unitis.
 
-## Project Overview
+## Обзор проекта
 
-- AI-based skill scoring for participant profiles
-- participant search with filters by role, stack, grade, and rating
-- team feed with team detail pages and application workflow
-- GitHub OAuth login
-- PostgreSQL-backed data model with seed data for demo and smoke testing
-- YandexGPT integration for profile scoring
-- PRO mode with expanded visibility and profile insights
+- AI-скоринг навыков для профилей участников
+- поиск участников с фильтрами по роли, стеку, грейду и рейтингу
+- лента команд, страницы команд и сценарий заявок
+- вход через GitHub OAuth
+- модель данных на PostgreSQL с seed-данными для демо и smoke-проверок
+- интеграция с YandexGPT для оценки профиля
+- PRO-режим с расширенной видимостью и инсайтами по профилю
 
-## Tech Stack
+## Технологический стек
 
 - Frontend: React, Vite, TypeScript, Tailwind CSS, React Router
 - Backend: Node.js, Express
-- Database: PostgreSQL
-- Auth: GitHub OAuth, signed session cookies, demo fallback for local development
+- База данных: PostgreSQL
+- Авторизация: GitHub OAuth, подписанные session cookies, demo fallback для локальной разработки
 - AI: YandexGPT
 
-## Repository Structure
+## Структура репозитория
 
-| Path | Responsibility |
+| Путь | Зона ответственности |
 |------|----------------|
-| `client/` | Frontend application, UI, routing, and API integration |
-| `server/` | Backend API, authentication, scoring, and database integration |
-| `scripts/` | Seed data, smoke tests, and maintenance scripts |
-| `docs/` | Product specification, plans, deployment notes, and checklists |
+| `client/` | Frontend-приложение, UI, роутинг и интеграция с API |
+| `server/` | Backend API, авторизация, скоринг и интеграция с данными |
+| `scripts/` | Seed-данные, smoke-тесты и служебные скрипты |
+| `docs/` | Спецификация продукта, планы, заметки по деплою и чеклисты |
 
-## Team and Responsibilities
+## Команда и зоны ответственности
 
-| Author | Zone of Responsibility |
+| Автор | Зона ответственности |
 |--------|------------------------|
-| Даниэл | Backend, PostgreSQL, GitHub OAuth, YandexGPT, deployment and stability |
-| Денис | Frontend, layout, routing, search, profile and team screens |
-| Дени | Seed data, smoke tests, scripts, documentation support, presentation materials |
+| Даниэл | Backend, YandexGPT, деплой и стабильность |
+| Денис | Frontend, layout, роутинг, поиск, профиль и экраны команд |
+| Дени | Seed data, smoke tests, scripts, documentation support, presentation materials, PostgreSQL, GitHub OAuth |
 
-## Current Status
+## Текущий статус
 
-- Core product flows are implemented: login, profile, search, teams, and applications
-- Backend can work with PostgreSQL when `DATABASE_URL` is provided
-- If the database is unavailable, the server can fall back to in-memory demo data for local development
-- GitHub OAuth is wired into the backend
-- YandexGPT is wired into profile scoring
-- Documentation and smoke tests are maintained in `docs/` and `scripts/`
+- Основные продуктовые флоу реализованы: login, profile, search, teams и applications
+- Backend может работать с PostgreSQL, если задан `DATABASE_URL`
+- Если база недоступна, сервер может перейти на in-memory demo data для локальной разработки
+- GitHub OAuth подключён к backend
+- YandexGPT подключён к скорингу профиля
+- Для VM предусмотрен `docker compose`-путь с Postgres, backend и фронтендом через nginx
+- Документация и smoke-тесты поддерживаются в `docs/` и `scripts/`
 
-## Local Development
+## Локальная разработка
 
 ### Backend
 
@@ -65,44 +67,53 @@ npm install
 npm run dev
 ```
 
-## Environment Variables
+## Переменные окружения
 
 ### Backend
 
-Create `server/.env` based on `server/.env.example`.
+Создай `server/.env` по примеру из `server/.env.example`.
 
-Important variables:
+Важные переменные:
 
 - `DATABASE_URL`
 - `GITHUB_CLIENT_ID`
 - `GITHUB_CLIENT_SECRET`
 - `GITHUB_CALLBACK_URL`
-- `YANDEXGPT_SA_KEY_PATH`, `YANDEXGPT_IAM_TOKEN`, or `YANDEXGPT_API_KEY`
-- `YANDEXGPT_MODEL_URI` or `YANDEXGPT_FOLDER_ID`
+- `YANDEXGPT_SA_KEY_PATH`, `YANDEXGPT_IAM_TOKEN` или `YANDEXGPT_API_KEY`
+- `YANDEXGPT_MODEL_URI` или `YANDEXGPT_FOLDER_ID`
 - `YANDEXGPT_LLM_ENDPOINT`
 - `JWT_SECRET`
 - `CLIENT_URL`
+- `COOKIE_SECURE` для включения secure-cookie режима на HTTPS
 
 ### Frontend
 
-If the backend is not running on `http://localhost:5000`, create `client/.env`:
+Если backend работает не на `http://localhost:5000`, создай `client/.env`:
 
 ```env
 VITE_API_URL=http://localhost:5000
+VITE_ENABLE_DEMO_AUTH=true
 ```
 
-## API Notes
+`VITE_ENABLE_DEMO_AUTH=true` нужен только для локальной разработки и smoke-сборки. В production его не включают.
 
-- All backend routes are exposed under `/api/v1`
-- GitHub login starts at `/api/v1/auth/github`
-- Profile data is available via `/api/v1/profile` and `/api/v1/auth/me`
-- Search and teams are available through `/api/v1/users` and `/api/v1/teams`
+### Deployment on VM
 
-## Documentation
+Для запуска на одной виртуальной машине смотри [docs/DEPLOYMENT_COMPOSE.md](./docs/DEPLOYMENT_COMPOSE.md).
+Там описан `docker compose`-путь с PostgreSQL, backend и nginx-контейнером для фронтенда.
 
-Full project documentation is stored in `docs/`.
+## Примечания по API
 
-Recommended starting points:
+- Все backend-маршруты доступны под префиксом `/api/v1`
+- Вход через GitHub стартует с `/api/v1/auth/github`
+- Данные профиля доступны через `/api/v1/profile` и `/api/v1/auth/me`
+- Поиск и команды доступны через `/api/v1/users` и `/api/v1/teams`
+
+## Документация
+
+Полная документация проекта лежит в `docs/`.
+
+Рекомендуемые точки входа:
 
 - `docs/PRODUCT_SPEC_FULL.md`
 - `docs/HAKATHON_30H_PLAN_V2.md`
@@ -110,13 +121,7 @@ Recommended starting points:
 - `docs/DEPLOYMENT.md`
 - `docs/DEPLOYMENT_COMPOSE.md`
 
-## Testing
+## Тестирование
 
-- smoke tests: `cd server && npm run smoke`
-- seed and maintenance utilities: `scripts/`
-
-## Notes
-
-- Demo flow is kept for local development and smoke testing.
-- For production or defense, use the real GitHub OAuth flow and a configured PostgreSQL instance.
-- If you change environment variables, deployment settings, or schema, update the corresponding files in `docs/` and `server/.env.example`.
+- smoke-тесты: `cd server && npm run smoke`
+- seed и служебные утилиты: `scripts/`

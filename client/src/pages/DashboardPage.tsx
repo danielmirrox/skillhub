@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { AuthUser } from "../api/auth";
 import { getOwnProfile, type Profile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
+import { ArrowRightIcon, GithubIcon, SearchIcon, ShieldCheckIcon, SparklesIcon, UserRoundIcon, UsersIcon } from "../components/ui/Icons";
 
 type DashboardPageProps = {
   user: AuthUser;
@@ -31,12 +32,23 @@ export function DashboardPage({ user }: DashboardPageProps) {
   const roleLabel = profile?.role
     ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1)
     : null;
+  const isDraftProfile =
+    Boolean(profile) &&
+    !profile?.bio &&
+    (profile?.primaryStack?.length ?? 0) === 0 &&
+    (profile?.experienceYears ?? 0) === 0 &&
+    (profile?.hackathonsCount ?? 0) === 0 &&
+    (profile?.projectLinks?.length ?? 0) === 0 &&
+    !profile?.rating;
 
   return (
     <section className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
-          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Dashboard</p>
+          <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-cyan-300">
+            <SparklesIcon className="h-4 w-4" />
+            Дашборд
+          </p>
           <div className="mt-4 flex flex-wrap items-center gap-4">
             {user.avatarUrl ? (
               <img
@@ -55,7 +67,8 @@ export function DashboardPage({ user }: DashboardPageProps) {
                   {user.displayName ?? user.username}
                 </h2>
                 {user.isPro ? (
-                  <span className="rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
+                    <ShieldCheckIcon className="h-3.5 w-3.5" />
                     PRO
                   </span>
                 ) : null}
@@ -73,7 +86,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
             ) : null}
           </div>
 
-          {!loadingProfile && profile ? (
+          {!loadingProfile && profile && !isDraftProfile ? (
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
                 <p className="text-sm text-slate-400">AI-рейтинг</p>
@@ -100,6 +113,31 @@ export function DashboardPage({ user }: DashboardPageProps) {
                 </p>
               </div>
             </div>
+          ) : !loadingProfile && profile && isDraftProfile ? (
+            <div className="mt-6 rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5">
+              <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Стартовый сценарий</p>
+              <p className="mt-2 text-lg font-semibold text-white">Профиль ещё пустой, это нормально для первого входа</p>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Чтобы всё выглядело как законченный продукт, заполни роль, стек и пару проектов. После этого
+                поиск, рейтинг и карточка профиля начнут выглядеть убедительно.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Link
+                  to="/profile/edit"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950"
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                  Заполнить профиль
+                </Link>
+                <Link
+                  to="/profile/edit#github-import"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-medium text-slate-100 hover:bg-white/10"
+                >
+                  <GithubIcon className="h-4 w-4" />
+                  Импортировать GitHub
+                </Link>
+              </div>
+            </div>
           ) : !loadingProfile ? (
             <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4">
               <p className="text-sm text-amber-100">
@@ -120,35 +158,40 @@ export function DashboardPage({ user }: DashboardPageProps) {
         </article>
 
         <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-6 shadow-2xl shadow-slate-950/35 backdrop-blur-xl">
-          <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Quick actions</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Быстрые действия</p>
           <Link
             to="/search"
-            className="block rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
           >
+            <SearchIcon className="h-4 w-4" />
             Поиск участников
           </Link>
           <Link
             to="/teams"
-            className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
+            <UsersIcon className="h-4 w-4" />
             Поиск команд
           </Link>
           <Link
             to="/applications"
-            className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
+            <ArrowRightIcon className="h-4 w-4" />
             Заявки
           </Link>
           <Link
             to="/profile"
-            className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
+            <UserRoundIcon className="h-4 w-4" />
             Мой профиль
           </Link>
           <Link
             to="/profile/edit"
-            className="block rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
+            <SparklesIcon className="h-4 w-4" />
             Редактировать профиль
           </Link>
         </aside>
@@ -156,7 +199,10 @@ export function DashboardPage({ user }: DashboardPageProps) {
 
       {!loadingProfile && profile?.rating?.strengths && profile.rating.strengths.length > 0 ? (
         <section className="rounded-[2rem] border border-emerald-300/15 bg-emerald-300/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
-          <p className="text-sm uppercase tracking-[0.24em] text-emerald-300">AI Insights · PRO</p>
+          <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-emerald-300">
+            <SparklesIcon className="h-4 w-4" />
+            Сильные стороны · PRO
+          </p>
           <h3 className="mt-2 text-xl font-semibold">Сильные стороны</h3>
           <ul className="mt-4 grid gap-2 sm:grid-cols-2">
             {profile.rating.strengths.map((strength, index) => (
@@ -194,8 +240,8 @@ export function DashboardPage({ user }: DashboardPageProps) {
         <section className="grid gap-4 md:grid-cols-3">
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Статус</p>
-            <p className="mt-2 text-xl font-semibold text-white">Демо-режим готов</p>
-            <p className="mt-2 text-sm text-slate-400">Можно проверять все экраны без OAuth.</p>
+            <p className="mt-2 text-xl font-semibold text-white">Сценарий готов</p>
+            <p className="mt-2 text-sm text-slate-400">Можно проверять все экраны локально и без OAuth.</p>
           </article>
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">AI-скоринг</p>

@@ -1,4 +1,5 @@
 import type { ClaimedGrade, UserRole, UsersQuery } from "../../api/users";
+import { SearchIcon, SlidersIcon } from "../ui/Icons";
 
 type SearchFiltersProps = {
   value: UsersQuery;
@@ -8,12 +9,12 @@ type SearchFiltersProps = {
 
 const roleOptions: Array<{ label: string; value: UserRole | "" }> = [
   { label: "Все роли", value: "" },
-  { label: "Frontend", value: "frontend" },
-  { label: "Backend", value: "backend" },
-  { label: "Fullstack", value: "fullstack" },
+  { label: "Фронтенд", value: "frontend" },
+  { label: "Бэкенд", value: "backend" },
+  { label: "Фуллстек", value: "fullstack" },
   { label: "Дизайн", value: "design" },
   { label: "ML", value: "ml" },
-  { label: "Mobile", value: "mobile" },
+  { label: "Мобильная", value: "mobile" },
   { label: "Другое", value: "other" },
 ];
 
@@ -51,6 +52,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
             onClick={onSubmit}
             className="rounded-full border border-cyan-300/30 bg-cyan-300/15 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/25"
           >
+            <SearchIcon className="mr-2 inline h-4 w-4" />
             Обновить результаты
           </button>
         </div>
@@ -127,7 +129,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
             onClick={onSubmit}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:shadow-cyan-500/30"
           >
-            <span aria-hidden="true">↻</span>
+            <SlidersIcon className="h-4 w-4" />
             Применить фильтры
           </button>
         </div>

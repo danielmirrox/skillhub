@@ -31,6 +31,11 @@ const envSchema = z.object({
   YANDEX_CLOUD_BASE_URL: z.string().optional().default(''),
   JWT_SECRET: z.string().optional().default('dev-secret'),
   JWT_EXPIRES_IN: z.string().optional().default('7d'),
+  COOKIE_SECURE: z
+    .string()
+    .optional()
+    .default('false')
+    .transform((value) => ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())),
   CLIENT_URL: z.string().optional().default('http://localhost:5173'),
   CLIENT_URLS: z
     .string()

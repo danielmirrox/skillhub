@@ -1,5 +1,5 @@
-import { API_BASE_URL, apiGet, getApiRequestHeaders } from "./client";
-import { getDemoAuthUser } from "./demoAuth";
+import { apiGet, getApiRequestHeaders, getApiUrl } from "./client";
+import { getDemoAuthUser, isDemoAuthEnabled } from "./demoAuth";
 
 export type AuthUser = {
   id: string;
@@ -19,7 +19,7 @@ export async function getCurrentUser(): Promise<AuthUser> {
     const data = await apiGet<AuthMeResponse>("/api/v1/auth/me", { useDemoAuth: false });
     return data.user;
   } catch {
-    const demoUser = getDemoAuthUser();
+    const demoUser = isDemoAuthEnabled() ? getDemoAuthUser() : null;
     if (demoUser) {
       return demoUser;
     }
@@ -29,7 +29,7 @@ export async function getCurrentUser(): Promise<AuthUser> {
 }
 
 export async function logout() {
-  await fetch(`${API_BASE_URL}/api/v1/auth/logout`, {
+  await fetch(getApiUrl("/api/v1/auth/logout"), {
     method: "POST",
     credentials: "include",
     headers: getApiRequestHeaders(),

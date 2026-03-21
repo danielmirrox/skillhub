@@ -21,13 +21,13 @@ const GITHUB_IMPORT_SAMPLE = {
   topRepos: [
     {
       name: "skillhub-matcher",
-      description: "Hackathon matching prototype with profile scoring",
+      description: "Прототип матчинга хакатона с оценкой профиля",
       stars: 31,
       primaryLanguage: "TypeScript",
     },
     {
       name: "team-boards",
-      description: "Team planning dashboard for fast collaboration",
+      description: "Панель планирования команды для быстрой совместной работы",
       stars: 22,
       primaryLanguage: "React",
     },
@@ -137,13 +137,13 @@ export function ProfileEditPage() {
   return (
     <div className="grid gap-6 xl:grid-cols-[0.86fr_1.14fr]">
       {error ? <p className="mb-4 text-red-300">{error}</p> : null}
-      <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl xl:sticky xl:top-28 xl:self-start">
+      <section id="github-import" className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl xl:sticky xl:top-28 xl:self-start">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-violet-300">GitHub import</p>
+            <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Импорт из GitHub</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Импорт GitHub</h2>
             <p className="mt-2 text-sm text-slate-400">
-              Проверяем импорт профиля через GitHub data и сразу подставляем подсказки в форму.
+              Проверяем импорт профиля через данные GitHub и сразу подставляем подсказки в форму.
             </p>
           </div>
           <button
@@ -157,7 +157,7 @@ export function ProfileEditPage() {
         </div>
 
         <label className="mt-4 flex flex-col gap-2 text-sm text-slate-300">
-          JSON GitHub data
+          JSON с данными GitHub
           <textarea
             rows={10}
             className="rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 font-mono text-xs text-slate-100 shadow-inner shadow-black/20"
@@ -173,7 +173,7 @@ export function ProfileEditPage() {
           <div className="mt-4 rounded-[1.5rem] border border-emerald-300/20 bg-emerald-300/10 p-4 text-sm text-emerald-50">
             <p className="font-semibold">Подсказки применены к форме</p>
             <p className="mt-2 text-emerald-200">
-              Stack: {importResult.suggestedPrimaryStack.join(", ") || "не найден"}
+              Стек: {importResult.suggestedPrimaryStack.join(", ") || "не найден"}
             </p>
             <ul className="mt-2 list-inside list-disc text-emerald-100/90">
               {importResult.suggestedProjectLinks.map((project, index) => (

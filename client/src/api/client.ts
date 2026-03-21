@@ -1,6 +1,18 @@
-import { getDemoAuthUser } from "./demoAuth";
+import { getDemoAuthUser, isDemoAuthEnabled } from "./demoAuth";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+const RAW_API_BASE_URL = import.meta.env.VITE_API_URL ?? "http://localhost:5000";
+
+function normalizeApiBaseUrl(value: string) {
+  const trimmed = value.replace(/\/+$/, "");
+  return trimmed.replace(/\/api\/v1$/, "");
+}
+
+const API_BASE_URL = normalizeApiBaseUrl(RAW_API_BASE_URL);
+
+export function getApiUrl(path: string) {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+}
 
 type RequestHeaderOptions = {
   useDemoAuth?: boolean;
@@ -8,7 +20,7 @@ type RequestHeaderOptions = {
 
 function getRequestHeaders(initHeaders?: HeadersInit, options: RequestHeaderOptions = {}) {
   const headers = new Headers(initHeaders ?? {});
-  const demoUser = options.useDemoAuth === false ? null : getDemoAuthUser();
+  const demoUser = options.useDemoAuth === false || !isDemoAuthEnabled() ? null : getDemoAuthUser();
 
   if (demoUser) {
     headers.set("x-demo-user-id", demoUser.id);
@@ -18,7 +30,7 @@ function getRequestHeaders(initHeaders?: HeadersInit, options: RequestHeaderOpti
 }
 
 export async function apiGet<T>(path: string, options: RequestHeaderOptions = {}): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(getApiUrl(path), {
     credentials: "include",
     headers: getRequestHeaders(undefined, options),
   });

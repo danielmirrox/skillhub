@@ -19,14 +19,16 @@ Backend API for the SkillHub hackathon product.
 
 ## Defaults for local development
 
-- In local development only, if no real session is present, the API can still resolve a demo viewer by `X-Demo-User-Id` or the demo buttons in the client.
-- Demo headers and demo auth helpers are intentionally disabled in production.
+- In local development only, if demo auth is enabled in the client, the API can still resolve a demo viewer by `X-Demo-User-Id` or the demo buttons in the client.
+- Demo headers and demo auth helpers are intentionally disabled in production and should not affect the real GitHub OAuth flow.
 - GitHub OAuth issues a signed `skillhub.session` cookie on callback and validates OAuth `state`.
+- `COOKIE_SECURE` controls whether auth cookies are marked `Secure`; keep it `false` for HTTP and set it to `true` behind HTTPS.
 - If `DATABASE_URL` is set, the server boots PostgreSQL from `sql/schema.sql` and hydrates the demo store from the database.
 - If the database is unavailable, the server logs a warning and falls back to in-memory demo data instead of crashing.
 - Local dev CORS accepts `localhost` and `127.0.0.1` origins on any port, so the frontend can run on a free port.
 - For production, set `CLIENT_URL` to the main frontend origin and optionally add more origins in `CLIENT_URLS` as a comma-separated allowlist.
 - `GET /health` reports database, GitHub OAuth, and YandexGPT readiness.
+- For a one-machine deployment, see `docs/DEPLOYMENT_COMPOSE.md`.
 
 ## Main routes
 

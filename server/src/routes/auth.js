@@ -42,7 +42,7 @@ function buildSessionCookie(token) {
     'SameSite=Lax',
   ];
 
-  if (env.NODE_ENV === 'production') {
+  if (env.COOKIE_SECURE) {
     parts.push('Secure');
   }
 
@@ -58,7 +58,7 @@ function clearSessionCookie() {
     'SameSite=Lax',
   ];
 
-  if (env.NODE_ENV === 'production') {
+  if (env.COOKIE_SECURE) {
     parts.push('Secure');
   }
 
@@ -74,7 +74,7 @@ function buildOAuthStateCookie(state) {
     'SameSite=Lax',
   ];
 
-  if (env.NODE_ENV === 'production') {
+  if (env.COOKIE_SECURE) {
     parts.push('Secure');
   }
 
@@ -90,7 +90,7 @@ function clearOAuthStateCookie() {
     'SameSite=Lax',
   ];
 
-  if (env.NODE_ENV === 'production') {
+  if (env.COOKIE_SECURE) {
     parts.push('Secure');
   }
 

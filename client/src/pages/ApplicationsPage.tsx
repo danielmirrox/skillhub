@@ -29,11 +29,11 @@ function ApplicationCard({
       <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/55 p-3">
         <img
           src={application.applicant?.avatarUrl ?? "https://avatars.githubusercontent.com/u/1?v=4"}
-          alt={application.applicant?.displayName ?? "Applicant"}
+          alt={application.applicant?.displayName ?? "Участник"}
           className="h-11 w-11 rounded-2xl border border-white/10 object-cover"
         />
         <div>
-          <p className="font-medium text-slate-100">{application.applicant?.displayName ?? "Applicant"}</p>
+          <p className="font-medium text-slate-100">{application.applicant?.displayName ?? "Участник"}</p>
           <p className="text-sm text-slate-400">
             {application.applicant?.rating ? `Рейтинг ${application.applicant.rating.score}` : "Рейтинг не указан"}
           </p>
@@ -89,7 +89,7 @@ export function ApplicationsPage() {
       })
       .catch(() => {
         if (active) {
-          setError("Не удалось загрузить applications.");
+          setError("Не удалось загрузить заявки.");
         }
       })
       .finally(() => {
@@ -146,7 +146,7 @@ export function ApplicationsPage() {
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Статус</p>
-            <p className="mt-2 text-lg font-semibold text-white">{loading ? "Синхронизируем" : "Ready"}</p>
+            <p className="mt-2 text-lg font-semibold text-white">{loading ? "Синхронизируем" : "Готово"}</p>
           </article>
         </div>
       </section>
@@ -190,7 +190,7 @@ export function ApplicationsPage() {
 
       {!loading && !error && activeItems.length === 0 ? (
         <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 text-slate-300 backdrop-blur-xl">
-            <p className="text-lg font-semibold text-white">Пока пусто</p>
+          <p className="text-lg font-semibold text-white">Пока пусто</p>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
             Здесь появятся заявки после поиска и отправки запроса на вступление. Если ты ждёшь входящие, проверь поиск или открой профиль участника, чтобы отправить первый запрос.
           </p>

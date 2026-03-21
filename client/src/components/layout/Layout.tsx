@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, NavLink, Outlet } from "react-router-dom";
 import type { AuthUser } from "../../api/auth";
+import { LogOutIcon, SearchIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from "../ui/Icons";
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
   [
@@ -26,9 +27,9 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
 
   const authenticatedLinks = [
     { to: "/dashboard", label: "Дашборд" },
-    { to: "/search", label: "Поиск" },
-    { to: "/teams", label: "Команды" },
-    { to: "/applications", label: "Заявки" },
+    { to: "/search", label: "Поиск", icon: SearchIcon },
+    { to: "/teams", label: "Команды", icon: UsersIcon },
+    { to: "/applications", label: "Заявки", icon: ShieldCheckIcon },
   ];
 
   return (
@@ -58,13 +59,22 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
           <nav className="hidden items-center justify-end gap-2 text-sm md:flex">
             {user ? (
               <>
-                {authenticatedLinks.map((item) => (
-                  <NavLink key={item.to} to={item.to} className={navLinkClassName}>
-                    {item.label}
-                  </NavLink>
-                ))}
+                {authenticatedLinks.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <NavLink key={item.to} to={item.to} className={navLinkClassName}>
+                      <span className="inline-flex items-center gap-2">
+                        {Icon ? <Icon className="h-4 w-4" /> : null}
+                        {item.label}
+                      </span>
+                    </NavLink>
+                  );
+                })}
                 <NavLink to="/profile" className={navLinkClassName}>
-                  Профиль
+                  <span className="inline-flex items-center gap-2">
+                    <UserRoundIcon className="h-4 w-4" />
+                    Профиль
+                  </span>
                 </NavLink>
                 <button
                   type="button"
@@ -72,12 +82,18 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
                   className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 backdrop-blur-xl transition hover:bg-white/8 hover:text-white"
                   disabled={loading}
                 >
-                  Выход
+                  <span className="inline-flex items-center gap-2">
+                    <LogOutIcon className="h-4 w-4" />
+                    Выход
+                  </span>
                 </button>
               </>
             ) : (
               <NavLink to="/login" className={navLinkClassName}>
-                Вход
+                <span className="inline-flex items-center gap-2">
+                  <UserRoundIcon className="h-4 w-4" />
+                  Вход
+                </span>
               </NavLink>
             )}
           </nav>
@@ -86,13 +102,22 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             <nav className="grid w-full gap-2 rounded-[1.5rem] border border-white/10 bg-slate-950/90 p-3 text-sm backdrop-blur-xl md:hidden">
               {user ? (
                 <>
-                  {authenticatedLinks.map((item) => (
-                    <NavLink key={item.to} to={item.to} onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                      {item.label}
-                    </NavLink>
-                  ))}
+                  {authenticatedLinks.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <NavLink key={item.to} to={item.to} onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
+                        <span className="inline-flex items-center gap-2">
+                          {Icon ? <Icon className="h-4 w-4" /> : null}
+                          {item.label}
+                        </span>
+                      </NavLink>
+                    );
+                  })}
                   <NavLink to="/profile" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                    Профиль
+                    <span className="inline-flex items-center gap-2">
+                      <UserRoundIcon className="h-4 w-4" />
+                      Профиль
+                    </span>
                   </NavLink>
                   <button
                     type="button"
@@ -103,12 +128,18 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
                     className="rounded-full px-4 py-2 text-left text-sm font-medium text-slate-300 backdrop-blur-xl transition hover:bg-white/8 hover:text-white"
                     disabled={loading}
                   >
-                    Выход
+                    <span className="inline-flex items-center gap-2">
+                      <LogOutIcon className="h-4 w-4" />
+                      Выход
+                    </span>
                   </button>
                 </>
               ) : (
                 <NavLink to="/login" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                  Вход
+                  <span className="inline-flex items-center gap-2">
+                    <UserRoundIcon className="h-4 w-4" />
+                    Вход
+                  </span>
                 </NavLink>
               )}
             </nav>
