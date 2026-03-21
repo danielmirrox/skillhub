@@ -16,6 +16,15 @@ const ROLE_OPTIONS: Array<{ value: TeamRole | ""; label: string }> = [
   { value: "other", label: "Другое" },
 ];
 
+function formatMemberCount(count: number) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+
+  if (mod10 === 1 && mod100 !== 11) return `${count} участник`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${count} участника`;
+  return `${count} участников`;
+}
+
 function TeamCard({ team }: { team: TeamSummary }) {
   const isBoosted = Boolean(team.author?.isPro);
 
@@ -78,7 +87,7 @@ function TeamCard({ team }: { team: TeamSummary }) {
             {team.author ? <Link to={`/users/${team.author.userId}`} className="text-slate-200 transition duration-300 ease-out hover:text-cyan-200">{team.author.displayName}</Link> : "Автор не указан"}
             {team.author?.isPro ? <span className="text-emerald-200">PRO</span> : null}
           </p>
-          <p>{team.membersCount} участников</p>
+          <p>{formatMemberCount(team.membersCount)}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link

@@ -31,8 +31,17 @@ export function ProfilePage() {
     } catch (err) {
       const typed = err as Error & { status?: number; nextAllowedAt?: string | null };
       if (typed.status === 429) {
+        const formattedNextAllowedAt = typed.nextAllowedAt
+          ? new Intl.DateTimeFormat("ru-RU", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }).format(new Date(typed.nextAllowedAt))
+          : "позже";
         setError(
-          `Лимит скоринга исчерпан. Следующая попытка: ${typed.nextAllowedAt ?? "позже"}.`,
+          `Лимит скоринга исчерпан. Следующая попытка: ${formattedNextAllowedAt}.`,
         );
       } else {
         setError(typed.message || "Не удалось выполнить скоринг.");

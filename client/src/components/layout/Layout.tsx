@@ -42,7 +42,7 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             </div>
             <div>
               <h1 className="text-lg font-semibold tracking-wide">SkillHub</h1>
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Платформа для хакатон-матчинга</p>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Платформа для IT-матчинга</p>
             </div>
           </Link>
 

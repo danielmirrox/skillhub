@@ -35,6 +35,15 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
   );
 
   React.useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, []);
+
+  React.useEffect(() => {
     setName(team?.name ?? "");
     setDescription(team?.description ?? "");
     setHackathonName(team?.hackathonName ?? "");
