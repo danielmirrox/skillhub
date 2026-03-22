@@ -280,10 +280,9 @@ export function TeamsPage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Команды</p>
-            <h2 className="text-balance mt-3 text-[clamp(2rem,6.6vw,4.4rem)] font-semibold tracking-tight text-white">Лента команд для хакатона</h2>
-            <p className="mt-4 max-w-3xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-              Здесь видно, кто ищет людей, какие роли нужны и насколько команда уже собрана.
-              PRO-капитаны получают более заметную подачу, а страница команды даёт контекст и кнопку вступления.
+            <h2 className="text-balance mt-3 text-[clamp(1.7rem,5vw,3rem)] font-semibold tracking-tight text-white">Команды хакатона</h2>
+            <p className="mt-4 max-w-3xl text-pretty text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+              Здесь видно, кто ищет людей, какие роли нужны и сколько мест осталось.
             </p>
           </div>
 

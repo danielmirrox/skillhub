@@ -179,8 +179,15 @@ export function DashboardPage({ user }: DashboardPageProps) {
         <aside className="space-y-4 rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Быстрые действия</p>
           <Link
+            to="/match"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+          >
+            <SparklesIcon className="h-4 w-4" />
+            Подбор участников и команд
+          </Link>
+          <Link
             to="/search"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <SearchIcon className="h-4 w-4" />
             Поиск участников

@@ -245,11 +245,14 @@ export function ProfileEditPage() {
         </button>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[0.86fr_1.14fr]">
-      <div className="xl:col-span-2 min-h-[2.25rem]">
-        {error ? <p className="text-red-300">{error}</p> : null}
-      </div>
-      <section id="github-import" className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl xl:sticky xl:top-28 xl:self-start">
+      <div className="grid gap-6 xl:grid-cols-[minmax(280px,0.58fr)_minmax(0,1.42fr)] 2xl:grid-cols-[minmax(300px,0.55fr)_minmax(0,1.45fr)]">
+        <div className="xl:col-span-2 min-h-[2.25rem]">
+          {error ? <p className="text-red-300">{error}</p> : null}
+        </div>
+        <section
+          id="github-import"
+          className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl xl:sticky xl:top-28 xl:max-h-[calc(100vh-9rem)] xl:self-start xl:overflow-y-auto xl:pr-3"
+        >
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Импорт из GitHub</p>
@@ -363,9 +366,9 @@ export function ProfileEditPage() {
           </div>
         ) : null}
       </section>
-      <div className="xl:pt-0">
-        <ProfileForm values={values} onChange={setValues} onSubmit={onSubmit} loading={saving} />
-      </div>
+        <div className="xl:pt-0">
+          <ProfileForm values={values} onChange={setValues} onSubmit={onSubmit} loading={saving} />
+        </div>
       </div>
     </div>
   );

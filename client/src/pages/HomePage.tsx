@@ -29,10 +29,10 @@ export function HomePage() {
             SkillHub
           </div>
           <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-[1.03] tracking-tight text-white">
-            Мэтчинг участников и команд без лишних шагов.
+            Быстрый подбор участников и команд.
           </h2>
           <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            После входа доступны поиск людей, команды, AI-рейтинг и заявки. Интерфейс сразу ведёт в рабочие разделы.
+            GitHub-вход, профиль, поиск и заявки в одном интерфейсе.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -53,16 +53,16 @@ export function HomePage() {
           <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-4 sm:p-6">
             <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Главное действие</p>
             <h3 className="text-balance mt-3 text-xl font-semibold text-white sm:text-2xl">{user ? "Продолжить работу" : "Войти и открыть продукт"}</h3>
-            <p className="mt-3 text-sm leading-7 text-slate-300">После GitHub входа открываются рабочие разделы без лишних переходов и дублирования сценария.</p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">После входа сразу открывается рабочий интерфейс.</p>
 
             <div className="mt-6 grid gap-3">
               {user ? (
                 <>
                   <Link
-                    to="/dashboard"
+                    to="/match"
                     className="inline-flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px] sm:w-auto"
                   >
-                    Перейти в дашборд
+                    Перейти в подбор
                   </Link>
                   <Link
                     to="/profile"
@@ -99,7 +99,7 @@ export function HomePage() {
 
             <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
               <p className="font-semibold text-white">Что важно на показе</p>
-              <p className="mt-2 leading-7">Предсказуемый вход, рабочий поиск, команды и профиль без лишнего шума.</p>
+              <p className="mt-2 leading-7">Предсказуемый вход, подбор, команды и профиль без лишних шагов.</p>
             </div>
           </div>
         </aside>

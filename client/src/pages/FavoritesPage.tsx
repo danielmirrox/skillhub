@@ -40,12 +40,11 @@ export function FavoritesPage() {
               <StarIcon className="h-4 w-4" />
               Избранные
             </p>
-            <h2 className="text-balance mt-3 text-[clamp(2rem,6.4vw,4rem)] font-semibold tracking-tight text-white">
-              Быстрый доступ к людям, которых ты уже отметил
+            <h2 className="text-balance mt-3 text-[clamp(1.7rem,5vw,3rem)] font-semibold tracking-tight text-white">
+              Избранные участники
             </h2>
-            <p className="mt-4 max-w-3xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-              Здесь собраны участники, которых можно быстро открыть, переоценить или убрать из списка.
-              Избранное остаётся синхронизированным между страницами и работает только для авторизованного пользователя.
+            <p className="mt-4 max-w-3xl text-pretty text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
+              Здесь собраны люди, которых ты отметил для быстрого доступа.
             </p>
           </div>
 

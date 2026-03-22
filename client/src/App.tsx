@@ -7,6 +7,7 @@ import { Layout } from "./components/layout/Layout";
 import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
+import { MatchingPage } from "./pages/MatchingPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { ProfileEditPage } from "./pages/ProfileEditPage";
@@ -164,6 +165,16 @@ function SearchRoute() {
   return <SearchPage />;
 }
 
+function MatchingRoute() {
+  const { loading, user } = useAuth();
+  const location = useLocation();
+  if (loading) return <AuthStatus />;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+  return <MatchingPage />;
+}
+
 function FavoritesRoute() {
   const { loading, user } = useAuth();
   const location = useLocation();
@@ -236,6 +247,7 @@ export const routes = {
   ProfileRoute,
   ProfileEditRoute,
   SearchRoute,
+  MatchingRoute,
   FavoritesRoute,
   TeamsRoute,
   TeamDetailRoute,

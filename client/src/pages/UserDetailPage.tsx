@@ -143,10 +143,30 @@ export function UserDetailPage() {
             </div>
           </div>
 
-          <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Реакция сообщества</p>
-            <div className="mt-3">
-              <UserSocialActions userId={user.id} social={user} canInteract={canInteract} />
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-cyan-300/15 bg-cyan-300/8 p-4">
+              <p className="text-sm text-slate-300">Рейтинг пользователя</p>
+              {user.rating ? (
+                <>
+                  <div className="mt-3 flex items-center justify-between gap-3">
+                    <div>
+                      <p className="text-3xl font-semibold text-white">{user.rating.score}/100</p>
+                      <p className="mt-1 text-sm text-slate-300">{formatRatingGradeLabel(user.rating.grade, user.role)}</p>
+                    </div>
+                    <RatingBadge score={user.rating.score} />
+                  </div>
+                  <p className="mt-3 text-xs uppercase tracking-[0.2em] text-cyan-100/70">AI-скоринг профиля</p>
+                </>
+              ) : (
+                <p className="mt-3 text-sm text-slate-300">Рейтинг пока не рассчитан.</p>
+              )}
+            </div>
+
+            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-sm text-slate-400">Реакция сообщества</p>
+              <div className="mt-3">
+                <UserSocialActions userId={user.id} social={user} canInteract={canInteract} />
+              </div>
             </div>
           </div>
 

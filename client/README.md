@@ -27,7 +27,7 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 
 ## Implemented in Block 1
 
-- Router with `/`, `/login`, `/dashboard`, `/search`, `/teams`, `/teams/:id`, `/users/:id`, `/applications`
+- Router with `/`, `/login`, `/dashboard`, `/match`, `/search`, `/teams`, `/teams/:id`, `/users/:id`, `/applications`
 - Protected `/dashboard` route
 - Auth check via `GET /api/v1/auth/me` with cookies (`credentials: include`)
 - Login screen offers real GitHub OAuth plus demo buttons for local testing

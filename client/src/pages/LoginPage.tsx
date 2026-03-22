@@ -19,10 +19,10 @@ export function LoginPage() {
           GitHub OAuth
         </div>
         <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-[1.03] tracking-tight text-white">
-          Единый вход в SkillHub и сразу в рабочий интерфейс.
+          GitHub-вход и сразу в продукт.
         </h2>
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          После авторизации откроются поиск, команды, заявки и профиль без лишних переходов и развилок.
+          После авторизации откроются подбор, команды, заявки и профиль.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -34,7 +34,6 @@ export function LoginPage() {
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Результат</p>
             <p className="mt-2 text-2xl font-semibold text-white">Рабочий экран</p>
-            <p className="mt-2 text-sm text-slate-400">После входа открывается полноценный продуктовый интерфейс.</p>
           </article>
         </div>
       </div>
@@ -43,9 +42,7 @@ export function LoginPage() {
         <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-4 sm:p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Панель входа</p>
           <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти через GitHub</h3>
-          <p className="mt-3 text-sm leading-7 text-slate-300">
-            GitHub-кнопка открывает серверный OAuth-флоу и сразу переводит в рабочие разделы продукта.
-          </p>
+          <p className="mt-3 text-sm leading-7 text-slate-300">Один вход и сразу переход в рабочий интерфейс.</p>
 
           <div className="mt-6 grid gap-3">
             <button
@@ -64,7 +61,6 @@ export function LoginPage() {
             </button>
           </div>
 
-          <p className="mt-5 text-sm text-slate-400">GitHub-кнопка открывает серверный OAuth-флоу.</p>
         </div>
       </aside>
     </section>

@@ -23,6 +23,10 @@ export const router = createBrowserRouter([
         element: <routes.DashboardRoute />,
       },
       {
+        path: "/match",
+        element: <routes.MatchingRoute />,
+      },
+      {
         path: "/search",
         element: <routes.SearchRoute />,
       },

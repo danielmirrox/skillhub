@@ -108,9 +108,6 @@ export function ProfilePage() {
       <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Профиль ещё не создан</h2>
-        <p className="mt-3 max-w-2xl text-slate-300">
-          Сначала заполни базовые данные, чтобы поиск, AI-рейтинг и рекомендации работали на твою видимость в продукте.
-        </p>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Шаг 1</p>
@@ -150,9 +147,6 @@ export function ProfilePage() {
                 <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
                 <h2 className="text-balance mt-3 text-[clamp(2rem,6.2vw,3.5rem)] font-semibold tracking-tight text-white">{profileData?.user.displayName ?? profileData?.user.username}</h2>
                 <p className="mt-2 text-slate-400">{formatProfileHeadline(profile.role, profile.claimedGrade)}</p>
-                <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-                  Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и понять, как тебя видят другие участники.
-                </p>
               </div>
             </div>
 

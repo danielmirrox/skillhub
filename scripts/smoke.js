@@ -750,6 +750,11 @@ async function main() {
         expectedTexts: [demoUser.displayName, 'Дашборд'],
       },
       {
+        label: 'match',
+        route: '/match',
+        expectedTexts: ['Подбор', 'Подобрать участников', 'Подобрать команду'],
+      },
+      {
         label: 'search',
         route: '/search',
         expectedTexts: [apiData.firstUserName, 'Поиск'],

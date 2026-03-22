@@ -3,13 +3,13 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: skillhub
-      POSTGRES_USER: skillhub_user
-      POSTGRES_PASSWORD: skillhub_password
+      POSTGRES_DB: ${POSTGRES_DB:-skillhub}
+      POSTGRES_USER: ${POSTGRES_USER:-skillhub_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-skillhub_password}
     volumes:
       - skillhub_postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U skillhub_user -d skillhub"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-skillhub_user} -d ${POSTGRES_DB:-skillhub}"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -25,11 +25,11 @@ services:
     environment:
       NODE_ENV: production
       PORT: 5000
-      DATABASE_URL: postgresql://skillhub_user:skillhub_password@postgres:5432/skillhub
-      CLIENT_URL: http://localhost:8080
-      CLIENT_URLS: http://localhost:8080
-      GITHUB_CALLBACK_URL: http://localhost:8080/auth/github/callback
-      COOKIE_SECURE: "false"
+      DATABASE_URL: ${DATABASE_URL:-postgresql://skillhub_user:skillhub_password@postgres:5432/skillhub}
+      CLIENT_URL: ${PUBLIC_APP_URL:-http://localhost:8080}
+      CLIENT_URLS: ${CLIENT_URLS:-http://localhost:8080}
+      GITHUB_CALLBACK_URL: ${GITHUB_CALLBACK_URL:-http://localhost:8080/api/v1/auth/github/callback}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
     env_file:
       - ./server/.env
     expose:
@@ -44,7 +44,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "8080:80"
+      - "${PUBLIC_APP_PORT:-8080}:80"
 
 volumes:
   skillhub_postgres:
