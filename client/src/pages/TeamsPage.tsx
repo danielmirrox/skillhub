@@ -31,17 +31,17 @@ function TeamCard({ team }: { team: TeamSummary }) {
   return (
     <article
       className={[
-        "group rounded-[1.75rem] border p-5 shadow-xl backdrop-blur-xl transition duration-300 ease-out hover:shadow-2xl",
+        "group rounded-[1.75rem] border p-4 shadow-xl backdrop-blur-xl transition duration-300 ease-out hover:shadow-2xl sm:p-5",
         isBoosted
           ? "border-emerald-300/20 bg-gradient-to-br from-emerald-300/10 via-white/5 to-cyan-300/8 shadow-emerald-950/20 hover:border-emerald-300/35 hover:shadow-emerald-950/35"
           : "border-white/10 bg-white/5 shadow-slate-950/20 hover:border-cyan-300/20 hover:bg-white/[0.07] hover:shadow-slate-950/35",
       ].join(" ")}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
           <p className={`text-xs uppercase tracking-[0.24em] ${isBoosted ? "text-emerald-100/85" : "text-cyan-200/80"}`}>{team.hackathonName}</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
-            <h3 className="text-2xl font-semibold tracking-tight text-white">{team.name}</h3>
+            <h3 className="text-balance text-2xl font-semibold tracking-tight text-white">{team.name}</h3>
             {team.author?.isPro ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-emerald-100">
                 <ShieldCheckIcon className="h-3 w-3" />
@@ -56,7 +56,7 @@ function TeamCard({ team }: { team: TeamSummary }) {
           </div>
           <p className="mt-3 line-clamp-3 text-sm leading-6 text-slate-300">{team.description}</p>
         </div>
-        <div className="rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-right text-sm text-slate-300">
+        <div className="shrink-0 rounded-2xl border border-white/10 bg-slate-950/70 px-3 py-2 text-left text-sm text-slate-300 sm:text-right">
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Слоты</p>
           <p className="mt-1 inline-flex items-center gap-2 text-lg font-semibold text-white">
             <UsersIcon className="h-4 w-4 text-cyan-200" />
@@ -81,7 +81,7 @@ function TeamCard({ team }: { team: TeamSummary }) {
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-4">
+      <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-slate-400">
           <p className="flex items-center gap-2">
             {team.author ? <Link to={`/users/${team.author.userId}`} className="text-slate-200 transition duration-300 ease-out hover:text-cyan-200">{team.author.displayName}</Link> : "Автор не указан"}
@@ -92,7 +92,7 @@ function TeamCard({ team }: { team: TeamSummary }) {
         <div className="flex flex-wrap gap-2">
           <Link
             to={`/teams/${team.id}`}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out hover:shadow-cyan-500/30"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out hover:shadow-cyan-500/30 sm:w-auto"
           >
             <ArrowRightIcon className="h-4 w-4" />
             Открыть
@@ -191,12 +191,12 @@ export function TeamsPage() {
 
   return (
     <section className="space-y-6">
-      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
+      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Команды</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-5xl">Лента команд для хакатона</h2>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+            <h2 className="text-balance mt-3 text-[clamp(2rem,6.6vw,4.4rem)] font-semibold tracking-tight text-white">Лента команд для хакатона</h2>
+            <p className="mt-4 max-w-3xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
               Здесь видно, кто ищет людей, какие роли нужны и насколько команда уже собрана.
               PRO-капитаны получают более заметную подачу, а страница команды даёт контекст и кнопку вступления.
             </p>
@@ -205,7 +205,7 @@ export function TeamsPage() {
           <button
             type="button"
             onClick={openCreateForm}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 sm:w-auto"
           >
             <UsersIcon className="h-4 w-4" />
             Создать команду
@@ -258,7 +258,7 @@ export function TeamsPage() {
         <div className="flex flex-col justify-end gap-3 sm:flex-row md:flex-col">
           <button
             type="submit"
-            className="rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            className="w-full rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-3 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 sm:w-auto"
           >
             Применить
           </button>
@@ -269,7 +269,7 @@ export function TeamsPage() {
               setStack("");
               setHackathon("");
             }}
-            className="rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10"
+            className="w-full rounded-2xl border border-white/10 bg-white/5 px-5 py-3 font-medium text-slate-100 hover:bg-white/10 sm:w-auto"
           >
             Сбросить
           </button>

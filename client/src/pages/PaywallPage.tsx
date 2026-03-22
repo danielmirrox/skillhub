@@ -27,21 +27,21 @@ export function PaywallPage() {
   };
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
+    <section className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+      <article className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="inline-flex rounded-full border border-emerald-300/20 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-emerald-100">
           <LockIcon className="mr-2 h-3.5 w-3.5" />
           PRO paywall
         </div>
-        <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+        <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.4vw,4.2rem)] font-semibold leading-[1.03] tracking-tight text-white">
           Экран оплаты уже на месте и готов к подключению YuMoney.
         </h2>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+        <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
           Здесь позже подключится YuMoney. Для защиты достаточно показать сам экран, сценарий переключения
           и то, что он переводит пользователя в PRO-режим.
         </p>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">План</p>
             <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white">
@@ -66,8 +66,8 @@ export function PaywallPage() {
         </div>
       </article>
 
-      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
-        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-emerald-300/15 via-slate-950 to-cyan-300/10 p-5 sm:p-6">
+      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
+        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-emerald-300/15 via-slate-950 to-cyan-300/10 p-4 sm:p-6">
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-emerald-300 sm:text-sm sm:tracking-[0.24em]">
             <SparklesIcon className="h-4 w-4" />
             Платёж позже
@@ -83,14 +83,14 @@ export function PaywallPage() {
               type="button"
               onClick={handlePurchase}
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <ArrowRightIcon className="h-4 w-4" />
               {loading ? "Проверяем оплату..." : "Оплатить и включить PRO"}
             </button>
             <Link
               to="/profile"
-              className="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 transition hover:bg-white/10"
+              className="inline-flex w-full items-center justify-center rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 transition hover:bg-white/10"
             >
               Вернуться в профиль
             </Link>

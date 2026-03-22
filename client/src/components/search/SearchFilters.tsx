@@ -29,11 +29,11 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
   const activeFiltersCount = [value.search, value.role, value.grade, value.minRating, value.stack].filter(Boolean).length;
 
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Filters</p>
-          <h2 className="mt-2 text-2xl font-semibold">Фильтры поиска участников</h2>
+          <h2 className="text-balance mt-2 text-2xl font-semibold">Фильтры поиска участников</h2>
           <p className="mt-2 text-sm text-slate-400">Настрой выдачу под команду, а не под шум.</p>
           <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
             Активных фильтров: {activeFiltersCount}
@@ -43,14 +43,14 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
           <button
             type="button"
             onClick={() => onChange({ search: "", role: "", grade: "", minRating: "", stack: "", page: 1, limit: 12 })}
-            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10"
+            className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10 sm:w-auto"
           >
             Сбросить
           </button>
           <button
             type="button"
             onClick={onSubmit}
-            className="rounded-full border border-cyan-300/30 bg-cyan-300/15 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/25"
+            className="w-full rounded-full border border-cyan-300/30 bg-cyan-300/15 px-4 py-2 text-sm font-semibold text-cyan-100 hover:bg-cyan-300/25 sm:w-auto"
           >
             <SearchIcon className="mr-2 inline h-4 w-4" />
             Обновить результаты

@@ -30,15 +30,15 @@ export function LoginPage() {
 
   return (
     <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
+      <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="inline-flex rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100">
           <GithubIcon className="mr-2 h-3.5 w-3.5" />
           GitHub OAuth
         </div>
-        <h2 className="mt-5 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-5xl">
+        <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-[1.03] tracking-tight text-white">
           SkillHub делает поиск людей и команд быстрым и понятным.
         </h2>
-        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+        <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
           Основной путь входа подключён к серверу через GitHub OAuth. Для проверки сценариев предусмотрен
           отдельный режим разработки.
         </p>
@@ -69,8 +69,8 @@ export function LoginPage() {
         </div>
       </div>
 
-      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-5 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
-        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-5 sm:p-6">
+      <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
+        <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-4 sm:p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Панель входа</p>
           <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
@@ -81,7 +81,7 @@ export function LoginPage() {
             <button
               type="button"
               onClick={handleGithubLogin}
-              className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-100 via-cyan-200 to-sky-300 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
+              className="inline-flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-100 via-cyan-200 to-sky-300 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
             >
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-950/10 text-slate-950">
                 <GithubIcon className="h-5 w-5" />
@@ -97,7 +97,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => handleLogin(false)}
-                  className="inline-flex items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
+                  className="inline-flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
                 >
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/30 text-slate-950">
                     <SparklesIcon className="h-5 w-5" />
@@ -111,7 +111,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => handleLogin(true)}
-                  className="inline-flex items-center gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-left font-semibold text-emerald-50 shadow-lg shadow-emerald-950/20 transition hover:translate-y-[-1px]"
+                  className="inline-flex w-full items-center gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-left font-semibold text-emerald-50 shadow-lg shadow-emerald-950/20 transition hover:translate-y-[-1px]"
                 >
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-emerald-200/30 bg-emerald-200/15 text-emerald-50">
                     <ShieldCheckIcon className="h-5 w-5" />
@@ -125,7 +125,7 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left font-medium text-slate-200 transition hover:bg-white/10"
+                  className="inline-flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left font-medium text-slate-200 transition hover:bg-white/10"
                 >
                   <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/10 text-slate-200">
                     <LogOutIcon className="h-5 w-5" />

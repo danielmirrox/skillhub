@@ -63,13 +63,13 @@ export function SearchPage() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-6 shadow-2xl shadow-slate-950/30 sm:p-7 lg:grid-cols-[1.15fr_0.85fr]">
+      <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-5 shadow-2xl shadow-slate-950/30 sm:p-7 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Поиск</p>
-          <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          <h2 className="text-balance mt-3 max-w-2xl text-[clamp(2rem,6.6vw,4.4rem)] font-semibold tracking-tight text-white">
             Ищи участников по роли, грейду и стеку
           </h2>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+          <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
             Живой экран поверх API `/api/v1/users`. Фильтры по роли, грейду, минимальному рейтингу и стеку
             работают, а AI-релевантность и PRO-доступ к контактам подтягиваются из бэка.
           </p>
@@ -80,21 +80,21 @@ export function SearchPage() {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-3 backdrop-blur-xl sm:p-4">
             <p className="text-sm text-slate-400">Всего найдено</p>
-            <p className="mt-2 inline-flex items-center gap-2 text-3xl font-semibold text-white">
+            <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white sm:text-3xl">
               <UsersIcon className="h-5 w-5 text-cyan-200" />
               {total}
             </p>
           </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-3 backdrop-blur-xl sm:p-4">
             <p className="text-sm text-slate-400">На экране</p>
-            <p className="mt-2 inline-flex items-center gap-2 text-3xl font-semibold text-white">
+            <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white sm:text-3xl">
               <SearchIcon className="h-5 w-5 text-cyan-200" />
               {items.length}
             </p>
           </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl sm:col-span-2 lg:col-span-1 xl:col-span-2">
+          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-3 backdrop-blur-xl sm:col-span-2 sm:p-4 lg:col-span-1 xl:col-span-2">
             <p className="text-sm text-slate-400">Фокус</p>
             <p className="mt-2 text-sm leading-7 text-slate-300">
               PRO-режим открывает рекомендации и контактные данные только там, где это действительно полезно.

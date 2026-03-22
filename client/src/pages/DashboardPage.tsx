@@ -43,27 +43,27 @@ export function DashboardPage({ user }: DashboardPageProps) {
 
   return (
     <section className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
+      <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <p className="inline-flex items-center gap-2 text-sm uppercase tracking-[0.24em] text-cyan-300">
             <SparklesIcon className="h-4 w-4" />
             Дашборд
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+          <div className="mt-4 flex flex-wrap items-start gap-4 sm:items-center">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
                 alt={user.displayName ?? user.username}
-                className="h-16 w-16 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20"
+                className="h-14 w-14 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-16 sm:w-16"
               />
             ) : (
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/20">
+              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/20 sm:h-16 sm:w-16">
                 {(user.displayName ?? user.username).slice(0, 1).toUpperCase()}
               </div>
             )}
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+                <h2 className="text-balance text-[clamp(1.9rem,5.8vw,3.5rem)] font-semibold tracking-tight text-white">
                   {user.displayName ?? user.username}
                 </h2>
                 {user.isPro ? (
@@ -124,14 +124,14 @@ export function DashboardPage({ user }: DashboardPageProps) {
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   to="/profile/edit"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 sm:w-auto"
                 >
                   <SparklesIcon className="h-4 w-4" />
                   Заполнить профиль
                 </Link>
                 <Link
                   to="/profile/edit#github-import"
-                  className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-medium text-slate-100 hover:bg-white/10"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-medium text-slate-100 hover:bg-white/10 sm:w-auto"
                 >
                   <GithubIcon className="h-4 w-4" />
                   Импортировать GitHub
@@ -161,35 +161,35 @@ export function DashboardPage({ user }: DashboardPageProps) {
           <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Быстрые действия</p>
           <Link
             to="/search"
-            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
           >
             <SearchIcon className="h-4 w-4" />
             Поиск участников
           </Link>
           <Link
             to="/teams"
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <UsersIcon className="h-4 w-4" />
             Поиск команд
           </Link>
           <Link
             to="/applications"
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <ArrowRightIcon className="h-4 w-4" />
             Заявки
           </Link>
           <Link
             to="/profile"
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <UserRoundIcon className="h-4 w-4" />
             Мой профиль
           </Link>
           <Link
             to="/profile/edit"
-            className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <SparklesIcon className="h-4 w-4" />
             Редактировать профиль

@@ -12,17 +12,17 @@ export function UserCard({ user }: UserCardProps) {
   const relevance = user.searchMatch?.score ?? null;
 
   return (
-    <article className="group relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl transition duration-300 ease-out hover:border-cyan-300/25 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-slate-950/35">
+    <article className="group relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-4 shadow-xl shadow-slate-950/25 backdrop-blur-xl transition duration-300 ease-out hover:border-cyan-300/25 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-slate-950/35 sm:p-5">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
-      <div className="flex items-start gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
         <img
           src={user.avatarUrl}
           alt={user.displayName}
-          className="h-16 w-16 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20"
+          className="h-14 w-14 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-16 sm:w-16"
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold tracking-tight text-white">{user.displayName}</h3>
+            <h3 className="text-balance text-[1.05rem] font-semibold tracking-tight text-white sm:text-lg">{user.displayName}</h3>
             {user.isPro ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
                 <ShieldCheckIcon className="h-3.5 w-3.5" />
@@ -36,7 +36,7 @@ export function UserCard({ user }: UserCardProps) {
           <p className="mt-3 text-sm leading-6 text-slate-300">{user.bio || "Описание пока не заполнено."}</p>
         </div>
         {user.rating ? (
-          <div className="flex flex-col items-end gap-2">
+          <div className="flex items-start justify-between gap-2 sm:flex-col sm:items-end">
             <span className="inline-flex items-center gap-1 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-cyan-100">
               <SparklesIcon className="h-3.5 w-3.5" />
               AI-рейтинг
@@ -141,13 +141,13 @@ export function UserCard({ user }: UserCardProps) {
         )}
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
+      <div className="mt-5 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-400">
           {user.rating ? `AI-рейтинг ${user.rating.score}/100` : "Рейтинг не рассчитан"}
         </p>
         <Link
           to={`/users/${user.id}`}
-          className="inline-flex items-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition duration-300 ease-out hover:bg-cyan-300/20 hover:text-white"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-sm font-medium text-cyan-100 transition duration-300 ease-out hover:bg-cyan-300/20 hover:text-white sm:w-auto"
         >
           <ArrowRightIcon className="h-4 w-4" />
           Открыть профиль

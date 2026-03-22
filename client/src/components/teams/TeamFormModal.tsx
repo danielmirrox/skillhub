@@ -57,32 +57,32 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/75 px-4 py-4 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-950/75 px-4 py-2 backdrop-blur-sm sm:items-center sm:py-4"
       onClick={onClose}
     >
       <div
-        className="relative flex w-full max-w-2xl max-h-[calc(100vh-2rem)] flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-slate-950/95 p-6 shadow-2xl shadow-cyan-950/30"
+        className="relative flex w-full max-w-2xl max-h-[calc(100dvh-1rem)] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/95 p-4 shadow-2xl shadow-cyan-950/30 sm:max-h-[calc(100dvh-2rem)] sm:rounded-[1.75rem] sm:p-6"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400" />
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h3 className="text-2xl font-semibold text-white">{title}</h3>
-            <p className="mt-1 text-sm text-slate-400">
+        <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h3 className="text-balance text-xl font-semibold text-white sm:text-2xl">{title}</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-400">
               Команда выглядит сильнее, когда сразу ясно, кого вы ищете, какой стек нужен и почему сюда хочется откликнуться.
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-slate-700 px-3 py-1 text-sm text-slate-300 transition duration-300 ease-out hover:bg-slate-900"
+            className="w-full rounded-full border border-slate-700 px-3 py-2 text-sm text-slate-300 transition duration-300 ease-out hover:bg-slate-900 sm:w-auto sm:px-3 sm:py-1"
           >
             Закрыть
           </button>
         </div>
 
         <form
-          className="mt-5 grid flex-1 min-h-0 gap-4 overflow-y-auto pr-1 md:grid-cols-2"
+          className="mt-4 grid flex-1 min-h-0 gap-4 overflow-y-auto overscroll-contain pr-1 pb-2 md:grid-cols-2"
           onSubmit={(event) => {
             event.preventDefault();
             const normalizedSlotsOpen = Number(slotsOpen || 0);
@@ -196,18 +196,18 @@ export function TeamFormModal({ title, submitLabel, team, loading, error, onSubm
             </select>
           </label>
 
-          <div className="md:col-span-2 flex flex-wrap justify-end gap-3 pt-2">
+          <div className="md:col-span-2 flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-700 px-4 py-2 text-slate-200 transition duration-300 ease-out hover:bg-slate-900"
+              className="w-full rounded-lg border border-slate-700 px-4 py-3 text-slate-200 transition duration-300 ease-out hover:bg-slate-900 sm:w-auto sm:py-2"
             >
               Отмена
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="rounded-lg bg-cyan-400 px-4 py-2 font-medium text-slate-950 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-lg bg-cyan-400 px-4 py-3 font-medium text-slate-950 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:py-2"
             >
               {submitLabel}
             </button>

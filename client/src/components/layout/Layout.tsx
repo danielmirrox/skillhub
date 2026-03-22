@@ -51,16 +51,16 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen overflow-x-hidden text-slate-100">
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 backdrop-blur-2xl">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/" onClick={handleLogoClick} className="flex items-center gap-3 transition duration-300 ease-out hover:-translate-y-px">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out">
+    <div className="min-h-dvh overflow-x-hidden text-slate-100">
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 pt-[env(safe-area-inset-top)] backdrop-blur-2xl">
+        <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
+          <Link to="/" onClick={handleLogoClick} className="flex min-w-0 items-center gap-3 transition duration-300 ease-out hover:-translate-y-px">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out sm:h-11 sm:w-11">
               S
             </div>
-            <div>
-              <h1 className="text-lg font-semibold tracking-wide">SkillHub</h1>
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Платформа для IT-матчинга</p>
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold tracking-wide sm:text-lg">SkillHub</h1>
+              <p className="hidden text-xs uppercase tracking-[0.18em] text-slate-400 sm:block">Платформа для IT-матчинга</p>
             </div>
           </Link>
 
@@ -121,7 +121,9 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             aria-hidden={!mobileMenuOpen}
             className={[
               "grid w-full gap-2 overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/90 text-sm backdrop-blur-xl transition-[max-height,opacity,transform,padding] duration-300 ease-out md:hidden",
-              mobileMenuOpen ? "max-h-[28rem] px-3 py-3 opacity-100 translate-y-0" : "max-h-0 px-3 py-0 opacity-0 -translate-y-2 pointer-events-none",
+              mobileMenuOpen
+                ? "max-h-[calc(100dvh-5rem)] overflow-y-auto px-3 py-3 opacity-100 translate-y-0 overscroll-contain"
+                : "max-h-0 pointer-events-none px-3 py-0 opacity-0 -translate-y-2",
             ].join(" ")}
           >
             <div className="flex items-center justify-between border-b border-white/10 pb-2">
@@ -183,7 +185,7 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
         </div>
       </header>
 
-      <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+      <main className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <div key={location.pathname} className="ui-page-enter">
           <Outlet />
         </div>
