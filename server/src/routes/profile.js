@@ -20,11 +20,27 @@ const profileUpdateSchema = z.object({
   primaryStack: z.array(z.string().min(1).max(64)).optional(),
   experienceYears: z.number().int().min(0).max(50).optional(),
   hackathonsCount: z.number().int().min(0).max(100).optional(),
-  bio: z.string().min(1).max(2000).optional(),
+  bio: z.string().max(2000).optional().nullable(),
   projectLinks: z.array(projectLinkSchema).optional(),
-  telegramUsername: z.string().min(1).max(64).optional().nullable(),
-  githubUrl: z.string().url().optional().nullable(),
+  telegramUsername: z.preprocess((value) => {
+    if (typeof value === 'string' && value.trim() === '') {
+      return null;
+    }
+
+    return value;
+  }, z.string().min(1).max(64).optional().nullable()),
+  githubUrl: z.preprocess((value) => {
+    if (typeof value === 'string' && value.trim() === '') {
+      return null;
+    }
+
+    return value;
+  }, z.string().url().optional().nullable()),
   isPublic: z.boolean().optional(),
+});
+
+const scoreProfileSchema = profileUpdateSchema.partial().extend({
+  bypassRateLimit: z.boolean().optional(),
 });
 
 const githubImportSchema = z.object({
@@ -48,6 +64,31 @@ const githubImportSchema = z.object({
     })
     .optional(),
 });
+
+function isValidationError(error) {
+  return Boolean(error && (error.name === 'ZodError' || Array.isArray(error.issues)));
+}
+
+function formatValidationError(error, fallbackMessage) {
+  const issues = (Array.isArray(error?.issues) ? error.issues : []).map((issue) => ({
+    path: issue.path.join('.'),
+    message: issue.message,
+  }));
+
+  const fields = {};
+  for (const issue of issues) {
+    if (!fields[issue.path]) {
+      fields[issue.path] = issue.message;
+    }
+  }
+
+  return {
+    error: 'VALIDATION_ERROR',
+    message: fallbackMessage,
+    fields,
+    issues,
+  };
+}
 
 function extractGithubUsername(githubUrl) {
   if (!githubUrl) {
@@ -142,14 +183,70 @@ profileRouter.put('/', requireAuth, async (req, res, next) => {
       profile,
     });
   } catch (error) {
+    if (isValidationError(error)) {
+      return res.status(400).json(formatValidationError(error, 'Проверь поля профиля.'));
+    }
+
     return next(error);
   }
 });
 
 profileRouter.post('/score', requireAuth, (req, res) => {
   (async () => {
-    const payload = profileUpdateSchema.partial().parse(req.body || {});
+    const body = scoreProfileSchema.parse(req.body || {});
+    const { bypassRateLimit = false, ...payload } = body;
     const rateLimitStatus = demoStore.getRateLimitStatus(req.user.id);
+
+    if (bypassRateLimit && env.NODE_ENV !== 'production') {
+      // Dev-only escape hatch for repeated scoring during local development.
+      if (Object.keys(payload).length > 0) {
+        await demoStore.updateProfile(req.user.id, payload);
+      }
+
+      const currentProfile = demoStore.getProfileByUserId(req.user.id);
+      const mergedProfile = currentProfile
+        ? {
+            ...currentProfile,
+            ...payload,
+            primaryStack: payload.primaryStack || currentProfile.primaryStack,
+            projectLinks: payload.projectLinks || currentProfile.projectLinks,
+            githubData: payload.githubData || currentProfile.githubData,
+          }
+        : payload;
+
+      let aiResult = null;
+      let aiSource = 'formula';
+
+      try {
+        aiResult = await scoreWithYandexGpt(mergedProfile, {
+          mode: req.user.isPro ? 'pro' : 'free',
+        });
+        if (aiResult) {
+          aiSource = 'yandexgpt';
+        }
+      } catch (aiError) {
+        aiSource = 'formula_fallback';
+      }
+
+      const rating = await demoStore.scoreProfile(req.user.id, payload, aiResult);
+      const ownProfile = demoStore.getAuthMe(req.user.id).profile;
+
+      const ratingResponse = req.user.isPro
+        ? { ...rating, source: aiSource }
+        : {
+            score: rating.score,
+            grade: rating.grade,
+            roleLabel: rating.roleLabel,
+          };
+
+      return res.json({
+        jobId: rating.id,
+        rating: ratingResponse,
+        profile: ownProfile,
+        nextAllowedAt: null,
+        bypassRateLimit: true,
+      });
+    }
 
     if (!rateLimitStatus.allowed) {
       return res.status(429).json({
@@ -206,11 +303,8 @@ profileRouter.post('/score', requireAuth, (req, res) => {
       nextAllowedAt: demoStore.getRateLimitStatus(req.user.id).nextAllowedAt,
     });
   })().catch((error) => {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: error.errors.map((issue) => issue.message).join(', '),
-      });
+    if (isValidationError(error)) {
+      return res.status(400).json(formatValidationError(error, 'Проверь поля для оценки.'));
     }
 
     return res.status(500).json({
@@ -253,6 +347,10 @@ profileRouter.post('/import-github', requireAuth, (req, res) => {
       profile: result.profile,
     });
   })().catch((error) => {
+    if (isValidationError(error)) {
+      return res.status(400).json(formatValidationError(error, 'Проверь данные GitHub импорта.'));
+    }
+
     if (error.statusCode) {
       return res.status(error.statusCode).json({
         error: error.code || 'GITHUB_IMPORT_FAILED',

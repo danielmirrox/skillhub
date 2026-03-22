@@ -115,9 +115,18 @@ export function TeamsPage() {
   const [editingTeam, setEditingTeam] = React.useState<TeamDetail | null>(null);
   const [formLoading, setFormLoading] = React.useState(false);
   const [formError, setFormError] = React.useState<string | null>(null);
+  const [formFieldErrors, setFormFieldErrors] = React.useState<Record<string, string>>({});
   const [formMode, setFormMode] = React.useState<"create" | "edit">("create");
 
   const activeFilters = [role, stack, hackathon].filter(Boolean).length;
+  const myTeams = React.useMemo(
+    () => teams.filter((team) => team.author?.userId === currentUser?.id),
+    [currentUser?.id, teams]
+  );
+  const otherTeams = React.useMemo(
+    () => teams.filter((team) => team.author?.userId !== currentUser?.id),
+    [currentUser?.id, teams]
+  );
 
   React.useEffect(() => {
     getCurrentUser()
@@ -147,11 +156,13 @@ export function TeamsPage() {
     setEditingTeam(null);
     setFormMode("create");
     setFormError(null);
+    setFormFieldErrors({});
     setFormOpen(true);
   };
 
   const openEditForm = async (teamId: string) => {
     setFormError(null);
+    setFormFieldErrors({});
     try {
       const response = await getTeamById(teamId);
       setEditingTeam(response.team);
@@ -166,6 +177,7 @@ export function TeamsPage() {
   const handleSubmit = async (payload: TeamFormPayload) => {
     setFormLoading(true);
     setFormError(null);
+    setFormFieldErrors({});
 
     try {
       if (formMode === "edit") {
@@ -180,14 +192,47 @@ export function TeamsPage() {
 
       setFormOpen(false);
       setEditingTeam(null);
+      setFormFieldErrors({});
       await loadTeams();
     } catch (err) {
       const typed = err as Error;
+      const fields = (typed as Error & { fields?: Record<string, string> }).fields;
+      const code = (typed as Error & { code?: string }).code;
+      const issues = (typed as Error & { issues?: Array<{ path: string; message: string }> }).issues;
+
+      if (code === "VALIDATION_ERROR") {
+        const nextFieldErrors = fields && Object.keys(fields).length > 0
+          ? fields
+          : (issues || []).reduce<Record<string, string>>((acc, issue) => {
+              if (!acc[issue.path]) {
+                acc[issue.path] = issue.message;
+              }
+              return acc;
+            }, {});
+
+        setFormFieldErrors(nextFieldErrors);
+        setFormError(typed.message || "Проверь обязательные поля команды.");
+        return;
+      }
+
+      setFormFieldErrors({});
       setFormError(typed.message || "Не удалось сохранить команду.");
     } finally {
       setFormLoading(false);
     }
   };
+
+  const clearFormFieldError = React.useCallback((field: string) => {
+    setFormFieldErrors((current) => {
+      if (!current[field]) {
+        return current;
+      }
+
+      const next = { ...current };
+      delete next[field];
+      return next;
+    });
+  }, []);
 
   return (
     <section className="space-y-6">
@@ -225,7 +270,7 @@ export function TeamsPage() {
           <input
             value={hackathon}
             onChange={(event) => setHackathon(event.target.value)}
-            placeholder="Например, Viribus"
+            placeholder="Например, Viribus Unitis"
             className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 placeholder:text-slate-500"
           />
         </label>
@@ -250,7 +295,7 @@ export function TeamsPage() {
           <input
             value={stack}
             onChange={(event) => setStack(event.target.value)}
-            placeholder="react, node"
+            placeholder="React, Node.js"
             className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100 placeholder:text-slate-500"
           />
         </label>
@@ -291,29 +336,77 @@ export function TeamsPage() {
         </div>
       ) : error ? (
         <p className="text-red-300">{error}</p>
-      ) : teams.length === 0 ? (
-        <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-white/5 p-8 text-slate-300">
-          <p className="text-lg font-semibold text-white">Команды не найдены</p>
-          <p className="mt-2 text-sm text-slate-400">Попробуй снять часть фильтров или изменить стек.</p>
-        </div>
       ) : (
-        <div className="grid gap-4 lg:grid-cols-2">
-          {teams.map((team) => (
-            <div key={team.id} className="space-y-3">
-              <TeamCard team={team} />
-              {currentUser?.id === team.author?.userId ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    void openEditForm(team.id);
-                  }}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 hover:bg-white/10"
-                >
-                  Редактировать
-                </button>
+        <div className="space-y-6">
+          <section className="space-y-4 rounded-[1.75rem] border border-cyan-300/15 bg-cyan-300/8 p-5 shadow-xl shadow-slate-950/20 backdrop-blur-xl sm:p-6">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-cyan-200">Мои команды</p>
+              </div>
+              {myTeams.length > 0 ? (
+                <p className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
+                  {myTeams.length} {myTeams.length === 1 ? "команда" : myTeams.length < 5 ? "команды" : "команд"}
+                </p>
               ) : null}
             </div>
-          ))}
+
+            {myTeams.length > 0 ? (
+              <div className="grid gap-4 lg:grid-cols-2">
+                {myTeams.map((team) => (
+                  <div key={team.id} className="space-y-3">
+                    <TeamCard team={team} />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void openEditForm(team.id);
+                      }}
+                      className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-slate-100 hover:bg-white/10"
+                    >
+                      Редактировать
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-[1.5rem] border border-dashed border-white/15 bg-slate-950/40 p-5 text-slate-300">
+                <p className="text-lg font-semibold text-white">Пока нет созданных команд</p>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  Когда ты создашь первую команду, она появится здесь отдельно от общего списка.
+                </p>
+                <button
+                  type="button"
+                  onClick={openCreateForm}
+                  className="mt-4 inline-flex rounded-full bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-cyan-500/20"
+                >
+                  Создать команду
+                </button>
+              </div>
+            )}
+          </section>
+
+          {otherTeams.length > 0 ? (
+            <section className="space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.24em] text-slate-400">Остальные команды</p>
+                  <h3 className="mt-2 text-xl font-semibold tracking-tight text-white">Подборка по фильтрам</h3>
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                {otherTeams.map((team) => (
+                  <TeamCard key={team.id} team={team} />
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {teams.length === 0 ? (
+            <div className="rounded-[1.75rem] border border-dashed border-white/15 bg-white/5 p-8 text-slate-300">
+              <p className="text-lg font-semibold text-white">Команды не найдены</p>
+              <p className="mt-2 text-sm text-slate-400">Попробуй снять часть фильтров или изменить стек.</p>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -324,10 +417,14 @@ export function TeamsPage() {
           team={editingTeam}
           loading={formLoading}
           error={formError}
+          fieldErrors={formFieldErrors}
+          onFieldChange={clearFormFieldError}
           onSubmit={handleSubmit}
           onClose={() => {
             setFormOpen(false);
             setEditingTeam(null);
+            setFormError(null);
+            setFormFieldErrors({});
           }}
         />
       ) : null}

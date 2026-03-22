@@ -7,16 +7,41 @@ const { demoStore } = require('../data/demoStore');
 const teamsRouter = express.Router();
 
 const teamSchema = z.object({
-  name: z.string().min(2).max(120),
-  description: z.string().min(10).max(2000),
-  hackathonName: z.string().min(2).max(120),
+  name: z.string().trim().min(2).max(120),
+  description: z.string().trim().min(10).max(2000),
+  hackathonName: z.string().trim().min(2).max(120),
   requiredRoles: z.array(z.enum(['frontend', 'backend', 'fullstack', 'design', 'ml', 'mobile', 'other'])).min(1),
   minRating: z.number().int().min(0).max(100).optional().nullable(),
-  stack: z.array(z.string().min(1).max(64)).min(1),
+  stack: z.array(z.string().trim().min(1).max(64)).min(1),
   slotsOpen: z.number().int().min(2).max(20),
   isActive: z.boolean().optional(),
   status: z.enum(['active', 'paused', 'closed']).optional(),
 });
+
+function formatValidationError(error) {
+  const issues = (Array.isArray(error?.issues) ? error.issues : []).map((issue) => ({
+    path: issue.path.join('.'),
+    message: issue.message,
+  }));
+
+  const fields = {};
+  for (const issue of issues) {
+    if (!fields[issue.path]) {
+      fields[issue.path] = issue.message;
+    }
+  }
+
+  return {
+    error: 'VALIDATION_ERROR',
+    message: 'Проверь обязательные поля команды.',
+    fields,
+    issues,
+  };
+}
+
+function isValidationError(error) {
+  return Boolean(error && (error.name === 'ZodError' || Array.isArray(error.issues)));
+}
 
 teamsRouter.get('/', requireAuth, (req, res) => {
   const query = {
@@ -50,6 +75,10 @@ teamsRouter.post('/', requireAuth, async (req, res, next) => {
 
     return res.status(201).json({ team });
   } catch (error) {
+    if (isValidationError(error)) {
+      return res.status(400).json(formatValidationError(error));
+    }
+
     return next(error);
   }
 });
@@ -77,6 +106,10 @@ teamsRouter.put('/:teamId', requireAuth, async (req, res, next) => {
 
     return res.json({ team: updatedTeam });
   } catch (error) {
+    if (isValidationError(error)) {
+      return res.status(400).json(formatValidationError(error));
+    }
+
     return next(error);
   }
 });

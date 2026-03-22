@@ -52,6 +52,18 @@ export type TeamFormPayload = {
   status?: "active" | "paused" | "closed";
 };
 
+export type ValidationIssue = {
+  path: string;
+  message: string;
+};
+
+export type ValidationErrorPayload = {
+  error?: string;
+  message?: string;
+  fields?: Record<string, string>;
+  issues?: ValidationIssue[];
+};
+
 export type TeamsListResponse = {
   items: TeamSummary[];
 };
@@ -96,6 +108,20 @@ async function submitTeam(teamId: string | null, payload: TeamFormPayload, metho
   if (!response.ok) {
     const error = new Error(typeof body.message === "string" ? body.message : `Request failed with status ${response.status}`);
     (error as Error & { status?: number }).status = response.status;
+    if (body && typeof body === "object") {
+      const payload = body as ValidationErrorPayload;
+      if (payload.fields && typeof payload.fields === "object") {
+        (error as Error & { fields?: Record<string, string> }).fields = payload.fields;
+      }
+
+      if (Array.isArray(payload.issues)) {
+        (error as Error & { issues?: ValidationIssue[] }).issues = payload.issues;
+      }
+
+      if (typeof payload.error === "string") {
+        (error as Error & { code?: string }).code = payload.error;
+      }
+    }
     throw error;
   }
 
