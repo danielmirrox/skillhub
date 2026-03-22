@@ -48,18 +48,12 @@ export function FavoritesPage() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="grid gap-3">
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">В избранном</p>
               <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white">
                 <UsersIcon className="h-5 w-5 text-emerald-200" />
                 {total}
-              </p>
-            </article>
-            <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-              <p className="text-sm text-slate-400">Быстрые действия</p>
-              <p className="mt-2 text-sm leading-7 text-slate-300">
-                Кнопки в карточке позволяют удалить человека из избранного или изменить оценку без лишней навигации.
               </p>
             </article>
           </div>

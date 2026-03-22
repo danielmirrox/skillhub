@@ -50,17 +50,9 @@ export function PaywallPage() {
             <p className="mt-2 text-sm text-slate-400">Контакты, расширенные инсайты и более уверенная выдача.</p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Платёж</p>
-            <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white">
-              <SparklesIcon className="h-5 w-5 text-cyan-200" />
-              Оформление
-            </p>
-            <p className="mt-2 text-sm text-slate-400">Осталось только подтвердить доступ и вернуться в профиль.</p>
-          </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Флоу</p>
-            <p className="mt-2 text-2xl font-semibold text-white">Стабильный</p>
-            <p className="mt-2 text-sm text-slate-400">После подтверждения пользователь возвращается в профиль.</p>
+            <p className="text-sm text-slate-400">После оплаты</p>
+            <p className="mt-2 text-2xl font-semibold text-white">Возврат в профиль</p>
+            <p className="mt-2 text-sm text-slate-400">Доступ включается сразу.</p>
           </article>
         </div>
       </article>

@@ -34,19 +34,6 @@ export function HomePage() {
           <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
             GitHub-вход, профиль, поиск и заявки в одном интерфейсе.
           </p>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-              <p className="text-sm text-slate-400">Сценарий</p>
-              <p className="mt-2 text-2xl font-semibold text-white">Главный поток</p>
-              <p className="mt-2 text-sm text-slate-400">Один экран, один сценарий, один переход в рабочие разделы.</p>
-            </article>
-            <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-              <p className="text-sm text-slate-400">Авторизация</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{user ? "Сессия активна" : "GitHub OAuth"}</p>
-              <p className="mt-2 text-sm text-slate-400">Хедер меняется под состояние сессии автоматически.</p>
-            </article>
-          </div>
         </article>
 
         <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
@@ -95,11 +82,6 @@ export function HomePage() {
                   </Link>
                 </>
               )}
-            </div>
-
-            <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
-              <p className="font-semibold text-white">Что важно на показе</p>
-              <p className="mt-2 leading-7">Предсказуемый вход, подбор, команды и профиль без лишних шагов.</p>
             </div>
           </div>
         </aside>

@@ -207,7 +207,7 @@ export function ApplicationsPage() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Входящие</p>
             <p className="mt-2 text-3xl font-semibold text-white">{incoming.length}</p>
@@ -215,10 +215,6 @@ export function ApplicationsPage() {
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Исходящие</p>
             <p className="mt-2 text-3xl font-semibold text-white">{outgoing.length}</p>
-          </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4 backdrop-blur-xl">
-            <p className="text-sm text-slate-400">Статус</p>
-            <p className="mt-2 text-lg font-semibold text-white">{loading ? "Синхронизируем" : "Готово"}</p>
           </article>
         </div>
       </section>
