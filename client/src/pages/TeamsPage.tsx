@@ -211,7 +211,7 @@ export function TeamsPage() {
             }, {});
 
         setFormFieldErrors(nextFieldErrors);
-        setFormError(typed.message || "Проверь обязательные поля команды.");
+        setFormError(Object.keys(nextFieldErrors).length > 0 ? null : typed.message || "Проверь поля команды.");
         return;
       }
 

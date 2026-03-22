@@ -6,11 +6,19 @@ const { demoStore } = require('../data/demoStore');
 
 const teamsRouter = express.Router();
 
+const teamRoleSchema = z.preprocess((value) => {
+  if (typeof value === 'string') {
+    return value.trim().toLowerCase();
+  }
+
+  return value;
+}, z.enum(['frontend', 'backend', 'fullstack', 'design', 'ml', 'mobile', 'other']));
+
 const teamSchema = z.object({
   name: z.string().trim().min(2).max(120),
   description: z.string().trim().min(10).max(2000),
   hackathonName: z.string().trim().min(2).max(120),
-  requiredRoles: z.array(z.enum(['frontend', 'backend', 'fullstack', 'design', 'ml', 'mobile', 'other'])).min(1),
+  requiredRoles: z.array(teamRoleSchema).min(1),
   minRating: z.number().int().min(0).max(100).optional().nullable(),
   stack: z.array(z.string().trim().min(1).max(64)).min(1),
   slotsOpen: z.number().int().min(2).max(20),
@@ -33,7 +41,7 @@ function formatValidationError(error) {
 
   return {
     error: 'VALIDATION_ERROR',
-    message: 'Проверь обязательные поля команды.',
+    message: 'Исправь поля команды.',
     fields,
     issues,
   };

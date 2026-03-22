@@ -24,6 +24,14 @@ const toList = (value: string) =>
     .map((item) => item.trim())
     .filter(Boolean);
 
+const normalizeTeamRoles = (value: string) => toList(value).map((role) => role.toLowerCase());
+
+const requiredBadgeClass =
+  "inline-flex h-5 min-w-5 items-center justify-center rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100 leading-none";
+
+const optionalBadgeClass =
+  "inline-flex h-5 items-center justify-center rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300 leading-none";
+
 function validateTeamForm(values: {
   name: string;
   description: string;
@@ -202,7 +210,7 @@ export function TeamFormModal({
                 name,
                 description,
                 hackathonName,
-                requiredRoles: toList(requiredRoles) as TeamRole[],
+                requiredRoles: normalizeTeamRoles(requiredRoles) as TeamRole[],
                 stack: toList(stack),
                 slotsOpen: Number.isFinite(normalizedSlotsOpen) ? Math.min(20, Math.max(2, normalizedSlotsOpen)) : 2,
                 minRating: Number.isFinite(normalizedMinRating as number)
@@ -216,9 +224,7 @@ export function TeamFormModal({
             <label className={labelClassName}>
               <span className="flex items-center gap-2">
                 Название
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
+                <span className={requiredBadgeClass}>*</span>
               </span>
               <input
                 value={name}
@@ -233,10 +239,8 @@ export function TeamFormModal({
 
             <label className={labelClassName}>
               <span className="flex items-center gap-2">
-                Хакатон
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
+                Событие
+                <span className={requiredBadgeClass}>*</span>
               </span>
               <input
                 value={hackathonName}
@@ -244,7 +248,7 @@ export function TeamFormModal({
                 required
                 minLength={2}
                 className={`${inputBaseClass} ${hasFieldError("hackathonName") ? inputErrorClass : ""}`}
-                placeholder="Viribus Hackathon"
+                placeholder="Viribus Unitis 2026"
               />
               {submitAttempted && fieldErrorText("hackathonName") ? <span className="text-xs text-rose-200">{fieldErrorText("hackathonName")}</span> : null}
             </label>
@@ -252,9 +256,7 @@ export function TeamFormModal({
             <label className="md:col-span-2 flex flex-col gap-2 text-sm text-slate-300">
               <span className="flex items-center gap-2">
                 Описание
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
+                <span className={requiredBadgeClass}>*</span>
               </span>
               <textarea
                 rows={5}
@@ -272,12 +274,8 @@ export function TeamFormModal({
             <label className="md:col-span-2 flex flex-col gap-2 text-sm text-slate-300">
               <span className="flex items-center gap-2">
                 Нужные роли
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
-                <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  через запятую
-                </span>
+                <span className={requiredBadgeClass}>*</span>
+                <span className={optionalBadgeClass}>через запятую</span>
               </span>
               <input
                 value={requiredRoles}
@@ -286,19 +284,15 @@ export function TeamFormModal({
                 className={`${inputBaseClass} ${hasFieldError("requiredRoles") ? inputErrorClass : ""}`}
                 placeholder="backend, design"
               />
-              <span className="text-xs text-slate-500">Например: backend, design, mobile. Нужна хотя бы одна роль.</span>
+              <span className="text-xs text-slate-500">Например: backend, design, mobile. Можно вводить с заглавной буквы, система приведёт роли к нужному виду.</span>
               {submitAttempted && fieldErrorText("requiredRoles") ? <span className="text-xs text-rose-200">{fieldErrorText("requiredRoles")}</span> : null}
             </label>
 
             <label className="md:col-span-2 flex flex-col gap-2 text-sm text-slate-300">
               <span className="flex items-center gap-2">
                 Стек
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
-                <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  через запятую
-                </span>
+                <span className={requiredBadgeClass}>*</span>
+                <span className={optionalBadgeClass}>через запятую</span>
               </span>
               <input
                 value={stack}
@@ -314,9 +308,7 @@ export function TeamFormModal({
             <label className={labelClassName}>
               <span className="flex items-center gap-2">
                 Слоты
-                <span className="rounded-full border border-rose-300/20 bg-rose-300/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-rose-100">
-                  *
-                </span>
+                <span className={requiredBadgeClass}>*</span>
               </span>
               <input
                 type="number"
@@ -335,9 +327,7 @@ export function TeamFormModal({
             <label className="flex flex-col gap-2 text-sm text-slate-300">
               <span className="flex items-center gap-2">
                 Мин. рейтинг
-                <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  необязательно
-                </span>
+                <span className={optionalBadgeClass}>необязательно</span>
               </span>
               <input
                 type="number"
@@ -356,9 +346,7 @@ export function TeamFormModal({
             <label className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
               <span className="flex items-center gap-2">
                 Активная команда
-                <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  необязательно
-                </span>
+                <span className={optionalBadgeClass}>необязательно</span>
               </span>
               <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} />
             </label>
@@ -366,9 +354,7 @@ export function TeamFormModal({
             <label className="flex flex-col gap-2 text-sm text-slate-300">
               <span className="flex items-center gap-2">
                 Статус
-                <span className="rounded-full border border-slate-700 bg-slate-900/70 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-300">
-                  необязательно
-                </span>
+                <span className={optionalBadgeClass}>необязательно</span>
               </span>
               <select
                 value={status}
