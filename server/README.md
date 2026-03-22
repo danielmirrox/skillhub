@@ -28,7 +28,7 @@ Backend API for the SkillHub hackathon product.
 - Local dev CORS accepts `localhost` and `127.0.0.1` origins on any port, so the frontend can run on a free port.
 - For production, set `CLIENT_URL` to the main frontend origin and optionally add more origins in `CLIENT_URLS` as a comma-separated allowlist.
 - `GET /health` reports database, GitHub OAuth, and YandexGPT readiness.
-- For a one-machine deployment, see `docs/DEPLOYMENT_COMPOSE.md`.
+- For a one-machine deployment, see `docs/DEPLOYMENT_GUIDE.md`.
 
 ## Main routes
 
