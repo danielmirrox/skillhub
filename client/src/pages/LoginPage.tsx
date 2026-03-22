@@ -39,8 +39,8 @@ export function LoginPage() {
           SkillHub делает поиск людей и команд быстрым и понятным.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Основной путь входа подключён к серверу через GitHub OAuth. В локальной среде доступны дополнительные
-          сценарии проверки без внешней авторизации.
+          Основной путь входа подключён к серверу через GitHub OAuth. Для проверки сценариев предусмотрен
+          отдельный режим разработки.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3 text-sm">

@@ -56,7 +56,7 @@ export function PaywallPage() {
               <SparklesIcon className="h-5 w-5 text-cyan-200" />
               Готов
             </p>
-            <p className="mt-2 text-sm text-slate-400">Кнопка уже симулирует успешную оплату до интеграции YuMoney.</p>
+            <p className="mt-2 text-sm text-slate-400">Кнопка уже переводит сценарий в PRO до подключения YuMoney.</p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Флоу</p>

@@ -281,7 +281,7 @@ authRouter.post('/pro/upgrade', requireAuth, async (req, res, next) => {
 
     return res.json({
       success: true,
-      message: 'PRO status activated for demo.',
+      message: 'PRO status activated.',
       user: result,
     });
   } catch (error) {

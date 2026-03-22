@@ -124,7 +124,7 @@ export function HomePage() {
               <p className="font-semibold text-white">Проверка на защите</p>
               <p className="mt-2 leading-7">
                 Для показа важно только, что всё стартует предсказуемо: GitHub вход, Postgres, YandexGPT и
-                проверка на тестовых данных.
+                проверка основного сценария.
               </p>
             </div>
           </div>
