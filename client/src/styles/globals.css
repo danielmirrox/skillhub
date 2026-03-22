@@ -9,11 +9,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
   --font-display: "Space Grotesk", "Manrope", sans-serif;
 }
 
 html {
   scroll-behavior: smooth;
+  scrollbar-gutter: stable;
 }
 
 * {
@@ -28,6 +30,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   color: #eff5ff;
   background:
     radial-gradient(circle at top left, rgba(34, 211, 238, 0.18), transparent 28%),
@@ -69,11 +72,18 @@ body::after {
   min-height: 100vh;
 }
 
+.ui-page-enter {
+  animation: ui-page-enter 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, opacity;
+}
+
 a,
 button,
 input,
 textarea,
 select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   transition:
     color 180ms ease,
     border-color 180ms ease,
@@ -123,5 +133,17 @@ select:focus-visible {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@keyframes ui-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

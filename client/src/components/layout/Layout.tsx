@@ -1,14 +1,14 @@
 import React from "react";
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import type { AuthUser } from "../../api/auth";
-import { LogOutIcon, SearchIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon } from "../ui/Icons";
+import { LogOutIcon, MenuIcon, SearchIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon, XIcon } from "../ui/Icons";
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
   [
-    "rounded-full px-4 py-2 text-sm font-medium backdrop-blur-xl transition",
+    "rounded-full px-4 py-2 text-sm font-medium backdrop-blur-xl transition duration-200 ease-out",
     isActive
       ? "bg-white/12 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-      : "text-slate-300 hover:bg-white/8 hover:text-white",
+      : "text-slate-300 hover:bg-white/8 hover:text-white hover:-translate-y-px",
   ].join(" ");
 
 type LayoutProps = {
@@ -19,6 +19,24 @@ type LayoutProps = {
 
 export function Layout({ user, loading, onLogout }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  React.useEffect(() => {
+    if (!mobileMenuOpen) {
+      return undefined;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileMenuOpen]);
 
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -33,11 +51,11 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen text-slate-100">
+    <div className="min-h-screen overflow-x-hidden text-slate-100">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-slate-950/60 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <Link to="/" onClick={handleLogoClick} className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20">
+          <Link to="/" onClick={handleLogoClick} className="flex items-center gap-3 transition duration-300 ease-out hover:-translate-y-px">
+            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-sm font-black text-slate-950 shadow-lg shadow-cyan-500/20 transition duration-300 ease-out">
               S
             </div>
             <div>
@@ -49,11 +67,12 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
           <button
             type="button"
             onClick={() => setMobileMenuOpen((value) => !value)}
-            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-white/10 md:hidden"
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 transition duration-200 ease-out hover:-translate-y-px hover:bg-white/10 md:hidden"
             aria-expanded={mobileMenuOpen}
-            aria-label="Открыть меню"
+            aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
           >
-            {mobileMenuOpen ? "Закрыть" : "Меню"}
+            {mobileMenuOpen ? <XIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
+            <span>{mobileMenuOpen ? "Закрыть" : "Меню"}</span>
           </button>
 
           <nav className="hidden items-center justify-end gap-2 text-sm md:flex">
@@ -76,10 +95,10 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
                     Профиль
                   </span>
                 </NavLink>
-                <button
+                  <button
                   type="button"
                   onClick={onLogout}
-                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 backdrop-blur-xl transition hover:bg-white/8 hover:text-white"
+                  className="rounded-full px-4 py-2 text-sm font-medium text-slate-300 backdrop-blur-xl transition duration-200 ease-out hover:-translate-y-px hover:bg-white/8 hover:text-white"
                   disabled={loading}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -98,8 +117,25 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             )}
           </nav>
 
-          {mobileMenuOpen ? (
-            <nav className="grid w-full gap-2 rounded-[1.5rem] border border-white/10 bg-slate-950/90 p-3 text-sm backdrop-blur-xl md:hidden">
+          <nav
+            aria-hidden={!mobileMenuOpen}
+            className={[
+              "grid w-full gap-2 overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/90 text-sm backdrop-blur-xl transition-[max-height,opacity,transform,padding] duration-300 ease-out md:hidden",
+              mobileMenuOpen ? "max-h-[28rem] px-3 py-3 opacity-100 translate-y-0" : "max-h-0 px-3 py-0 opacity-0 -translate-y-2 pointer-events-none",
+            ].join(" ")}
+          >
+            <div className="flex items-center justify-between border-b border-white/10 pb-2">
+              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Меню</p>
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-200 transition duration-200 ease-out hover:-translate-y-px hover:bg-white/10"
+                aria-label="Закрыть меню"
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="grid gap-2 pt-1">
               {user ? (
                 <>
                   {authenticatedLinks.map((item) => {
@@ -125,7 +161,7 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
                       setMobileMenuOpen(false);
                       onLogout();
                     }}
-                    className="rounded-full px-4 py-2 text-left text-sm font-medium text-slate-300 backdrop-blur-xl transition hover:bg-white/8 hover:text-white"
+                    className="rounded-full px-4 py-2 text-left text-sm font-medium text-slate-300 backdrop-blur-xl transition duration-200 ease-out hover:-translate-y-px hover:bg-white/8 hover:text-white"
                     disabled={loading}
                   >
                     <span className="inline-flex items-center gap-2">
@@ -142,13 +178,15 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
                   </span>
                 </NavLink>
               )}
-            </nav>
-          ) : null}
+            </div>
+          </nav>
         </div>
       </header>
 
       <main className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
-        <Outlet />
+        <div key={location.pathname} className="ui-page-enter">
+          <Outlet />
+        </div>
       </main>
     </div>
   );

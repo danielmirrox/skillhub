@@ -32,6 +32,14 @@ export const LogInIcon = makeIcon(<path d="M10 17l5-5-5-5" />);
 
 export const LogOutIcon = makeIcon(<path d="M10 17l5-5-5-5M15 12H3" />);
 
+export const MenuIcon = makeIcon(<>
+  <path d="M4 7h16" />
+  <path d="M4 12h16" />
+  <path d="M4 17h16" />
+</>);
+
+export const XIcon = makeIcon(<path d="M6 6l12 12M18 6 6 18" />);
+
 export const UserRoundIcon = makeIcon(<>
   <circle cx="12" cy="8" r="4" />
   <path d="M4 20c1.8-3.2 4.7-5 8-5s6.2 1.8 8 5" />
