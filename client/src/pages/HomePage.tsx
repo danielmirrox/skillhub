@@ -96,11 +96,6 @@ export function HomePage() {
                 </>
               )}
             </div>
-
-            <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
-              <p className="font-semibold text-white">Что важно на показе</p>
-              <p className="mt-2 leading-7">Предсказуемый вход, подбор, команды и профиль без лишних шагов.</p>
-            </div>
           </div>
         </aside>
       </div>

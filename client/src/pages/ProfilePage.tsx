@@ -327,9 +327,9 @@ export function ProfilePage() {
                   <RatingBadge score={profile.rating.score} />
                 </div>
                 <p className="mt-4 text-sm text-slate-300">{formatRatingGradeLabel(profile.rating.grade, profile.role)}</p>
-                <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                  {profileData?.user.isPro ? "Без лимита в PRO" : "1 попытка / 7 дней в стандартном режиме"}
-                </p>
+                {!profileData?.user.isPro ? (
+                  <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-500">1 попытка / 7 дней</p>
+                ) : null}
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">

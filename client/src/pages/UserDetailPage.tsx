@@ -144,6 +144,13 @@ export function UserDetailPage() {
           </div>
 
           <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-sm text-slate-400">Социальные действия</p>
+              <div className="mt-3">
+                <UserSocialActions userId={user.id} social={user} canInteract={canInteract} />
+              </div>
+            </div>
+
             <div className="rounded-[1.5rem] border border-cyan-300/15 bg-cyan-300/8 p-4">
               <p className="text-sm text-slate-300">Рейтинг пользователя</p>
               {user.rating ? (
@@ -160,13 +167,6 @@ export function UserDetailPage() {
               ) : (
                 <p className="mt-3 text-sm text-slate-300">Рейтинг пока не рассчитан.</p>
               )}
-            </div>
-
-            <div className="rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-4">
-              <p className="text-sm text-slate-400">Реакция сообщества</p>
-              <div className="mt-3">
-                <UserSocialActions userId={user.id} social={user} canInteract={canInteract} />
-              </div>
             </div>
           </div>
 

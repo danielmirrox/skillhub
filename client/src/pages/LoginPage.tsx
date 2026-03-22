@@ -24,18 +24,6 @@ export function LoginPage() {
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
           После авторизации откроются подбор, команды, заявки и профиль.
         </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Вход</p>
-            <p className="mt-2 text-2xl font-semibold text-white">GitHub OAuth</p>
-            <p className="mt-2 text-sm text-slate-400">Один основной сценарий без лишних развилок.</p>
-          </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Результат</p>
-            <p className="mt-2 text-2xl font-semibold text-white">Рабочий экран</p>
-          </article>
-        </div>
       </div>
 
       <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">

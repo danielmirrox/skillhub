@@ -97,77 +97,89 @@ export function UserSocialActions({ userId, social, canInteract, onChange, class
   const downvoteActive = value.myVote === -1;
 
   return (
-    <div className={["flex flex-col gap-2", className].filter(Boolean).join(" ")}>
-      <div className="flex flex-wrap gap-2">
-        <button
-          type="button"
-          onClick={() => void handleFavoriteClick()}
-          disabled={!canInteract || loading !== null}
-          aria-pressed={value.isFavorite}
-          aria-label={value.isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
-          title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет действие"}
-          className={[
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
-            favoriteButtonClass,
-          ].join(" ")}
-        >
-          {favoriteLabel}
-          <span className="rounded-full border border-current/20 bg-black/10 px-2 py-0.5 text-[11px] normal-case tracking-normal">
-            {value.favoriteCount}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => void handleVoteClick(1)}
-          disabled={!canInteract || loading !== null}
-          aria-pressed={upvoteActive}
-          aria-label="Поставить плюс"
-          title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет голос"}
-          className={[
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
-            upvoteActive
-              ? "border-lime-300/30 bg-lime-300/15 text-lime-100"
-              : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
-          ].join(" ")}
-        >
-          +
-          <span className="rounded-full border border-current/20 bg-black/10 px-2 py-0.5 text-[11px] normal-case tracking-normal">
-            {value.upvotes}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => void handleVoteClick(-1)}
-          disabled={!canInteract || loading !== null}
-          aria-pressed={downvoteActive}
-          aria-label="Поставить минус"
-          title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет голос"}
-          className={[
-            "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
-            downvoteActive
-              ? "border-rose-300/30 bg-rose-300/15 text-rose-100"
-              : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
-          ].join(" ")}
-        >
-          −
-          <span className="rounded-full border border-current/20 bg-black/10 px-2 py-0.5 text-[11px] normal-case tracking-normal">
-            {value.downvotes}
-          </span>
-        </button>
-
-        <span className="inline-flex items-center rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-300">
-          Счёт {value.voteScore >= 0 ? "+" : ""}
-          {value.voteScore}
-        </span>
+    <div className={["grid gap-3", className].filter(Boolean).join(" ")}>
+      <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Избранное</p>
+          <button
+            type="button"
+            onClick={() => void handleFavoriteClick()}
+            disabled={!canInteract || loading !== null}
+            aria-pressed={value.isFavorite}
+            aria-label={value.isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+            title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет действие"}
+            className={[
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
+              favoriteButtonClass,
+            ].join(" ")}
+          >
+            {favoriteLabel}
+          </button>
+        </div>
+        {!canInteract ? (
+          <p className="mt-2 text-xs leading-5 text-slate-400">Избранное для собственного профиля недоступно.</p>
+        ) : (
+          <p className="mt-2 text-xs leading-5 text-slate-400">Повторный клик уберёт человека из избранного.</p>
+        )}
       </div>
 
-      {!canInteract ? (
-        <p className="text-xs leading-5 text-slate-400">
-          Это ваш профиль. Голоса и избранное для себя недоступны.
-        </p>
-      ) : null}
+      <div className="rounded-[1.25rem] border border-white/10 bg-white/5 p-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Рейтинг</p>
+          <span className="inline-flex items-center rounded-full border border-white/10 bg-slate-950/55 px-3 py-1.5 text-xs text-slate-300">
+            Рейтинг {value.voteScore >= 0 ? "+" : ""}
+            {value.voteScore}
+          </span>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => void handleVoteClick(1)}
+            disabled={!canInteract || loading !== null}
+            aria-pressed={upvoteActive}
+            aria-label="Поставить плюс"
+            title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет голос"}
+            className={[
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
+              upvoteActive
+                ? "border-lime-300/30 bg-lime-300/15 text-lime-100"
+                : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
+            ].join(" ")}
+          >
+            +
+            <span className="rounded-full border border-current/20 bg-black/10 px-2 py-0.5 text-[11px] normal-case tracking-normal">
+              {value.upvotes}
+            </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => void handleVoteClick(-1)}
+            disabled={!canInteract || loading !== null}
+            aria-pressed={downvoteActive}
+            aria-label="Поставить минус"
+            title={!canInteract ? "Недоступно для собственного профиля" : "Повторный клик снимет голос"}
+            className={[
+              "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] transition duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-50",
+              downvoteActive
+                ? "border-rose-300/30 bg-rose-300/15 text-rose-100"
+                : "border-white/10 bg-white/5 text-slate-200 hover:bg-white/10",
+            ].join(" ")}
+          >
+            −
+            <span className="rounded-full border border-current/20 bg-black/10 px-2 py-0.5 text-[11px] normal-case tracking-normal">
+              {value.downvotes}
+            </span>
+          </button>
+        </div>
+        {canInteract ? (
+          <p className="mt-2 text-xs leading-5 text-slate-400">Голоса влияют на социальный счёт и сортировку в поиске.</p>
+        ) : (
+          <p className="mt-2 text-xs leading-5 text-slate-400">
+            Это ваш профиль. Голоса и избранное для себя недоступны.
+          </p>
+        )}
+      </div>
 
       {error ? <p className="text-xs leading-5 text-rose-200">{error}</p> : null}
     </div>
