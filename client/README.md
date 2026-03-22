@@ -34,11 +34,13 @@ If `VITE_API_URL` is not set, app uses `http://localhost:5000`.
 - Demo auth persists in localStorage and is used only when demo mode is explicitly enabled
 - Search page uses `GET /api/v1/users` with filters for role, grade, minRating and stack
 - Teams page uses `GET /api/v1/teams` with filters for hackathon, role and stack
-- Team detail page uses `GET /api/v1/teams/:id` and offers a team join flow
+- Team detail page uses `GET /api/v1/teams/:id`, offers a team join flow, and supports captain-only member removal plus recruitment closing
 - PRO captains get a visible boost in the teams feed; there is no separate paid teams-only paywall
 - Public user detail page uses `GET /api/v1/users/:id` and respects PRO visibility
 - Applications page uses `GET /api/v1/applications` and allows accept/decline for incoming items
 - Applications now strictly mean joining a team
+- Search cards support favorites and votes for participants
 - Profile page can promote the current demo user to PRO via `POST /api/v1/profile/pro`
 - Profile edit page supports GitHub import preview and can post `githubData` to `POST /api/v1/profile/import-github`
+- Avatar rendering always falls back to a built-in default image and prefers GitHub OAuth avatars when available
 - Basic app layout and dashboard entry screen

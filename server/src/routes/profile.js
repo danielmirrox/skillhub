@@ -14,6 +14,16 @@ const projectLinkSchema = z.object({
   description: z.string().min(1).max(240),
 });
 
+const githubRepositorySchema = z.object({
+  name: z.string().min(1),
+  url: z.string().url().optional().nullable(),
+  description: z.string().optional().nullable(),
+  stars: z.number().int().min(0).optional(),
+  forks: z.number().int().min(0).optional(),
+  primaryLanguage: z.string().optional().nullable(),
+  updatedAt: z.string().optional().nullable(),
+});
+
 const profileUpdateSchema = z.object({
   role: z.enum(['frontend', 'backend', 'fullstack', 'design', 'ml', 'mobile', 'other']).optional(),
   claimedGrade: z.enum(['junior', 'middle', 'senior']).optional(),
@@ -77,18 +87,7 @@ const githubImportSchema = z.object({
       activityRecencyDays: z.number().int().min(0).optional().nullable(),
       activityBucket: z.enum(['fresh', 'recent', 'steady', 'stale']).optional().nullable(),
       languages: z.record(z.number().min(0)).optional(),
-      topRepos: z
-        .array(
-          z.object({
-            name: z.string().min(1),
-            description: z.string().optional().nullable(),
-            stars: z.number().int().min(0).optional(),
-            forks: z.number().int().min(0).optional(),
-            primaryLanguage: z.string().optional().nullable(),
-            updatedAt: z.string().optional().nullable(),
-          })
-        )
-        .optional(),
+      topRepos: z.array(githubRepositorySchema).optional(),
     })
     .optional(),
 });
@@ -152,6 +151,28 @@ async function fetchGitHubJson(url) {
   return response.json();
 }
 
+async function fetchAllGitHubRepos(githubUsername) {
+  const repos = [];
+
+  for (let page = 1; page <= 5; page += 1) {
+    const batch = await fetchGitHubJson(
+      `https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated&type=owner&page=${page}`,
+    );
+
+    if (!Array.isArray(batch) || batch.length === 0) {
+      break;
+    }
+
+    repos.push(...batch);
+
+    if (batch.length < 100) {
+      break;
+    }
+  }
+
+  return repos;
+}
+
 function getActivityBucket(activityRecencyDays) {
   if (activityRecencyDays == null) {
     return null;
@@ -170,6 +191,76 @@ function getActivityBucket(activityRecencyDays) {
   }
 
   return 'stale';
+}
+
+function normalizeGitHubRepositoryUrl(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+
+    if (host !== 'github.com') {
+      return null;
+    }
+
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    if (segments.length !== 2) {
+      return null;
+    }
+
+    return `https://github.com/${segments[0]}/${segments[1]}`;
+  } catch {
+    return null;
+  }
+}
+
+function inferGitHubRepoName(url, explicitName) {
+  const trimmedName = String(explicitName || '').trim();
+  if (trimmedName) {
+    return trimmedName;
+  }
+
+  const normalizedUrl = normalizeGitHubRepositoryUrl(url);
+  if (!normalizedUrl) {
+    return '';
+  }
+
+  const parsed = new URL(normalizedUrl);
+  const segments = parsed.pathname.split('/').filter(Boolean);
+  return segments[1] || '';
+}
+
+function normalizeGithubRepoCandidate(repo, githubUsername) {
+  if (!repo || typeof repo !== 'object') {
+    return null;
+  }
+
+  const normalizedUrl = normalizeGitHubRepositoryUrl(repo.url || repo.html_url);
+  if (!normalizedUrl) {
+    return null;
+  }
+
+  const normalizedName = inferGitHubRepoName(normalizedUrl, repo.name);
+  const normalizedUsername = String(githubUsername || '').trim().toLowerCase();
+  if (!normalizedName) {
+    return null;
+  }
+  if (normalizedName && normalizedUsername && normalizedName.toLowerCase() === normalizedUsername) {
+    return null;
+  }
+
+  return {
+    name: normalizedName,
+    url: normalizedUrl,
+    description: repo.description || null,
+    stars: repo.stars_count ?? repo.stargazers_count ?? 0,
+    forks: repo.forks_count ?? 0,
+    primaryLanguage: repo.language || repo.primaryLanguage || null,
+    updatedAt: repo.updated_at || repo.updatedAt || null,
+  };
 }
 
 async function buildGithubDataFromGitHub(userId) {
@@ -200,23 +291,26 @@ async function buildGithubDataFromGitHub(userId) {
   }
 
   try {
-    githubRepos = await fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated`);
+    githubRepos = await fetchAllGitHubRepos(githubUsername);
   } catch {
     githubRepos = [];
   }
 
   const normalizedRepos = Array.isArray(githubRepos) ? githubRepos : [];
+  const repoCandidates = normalizedRepos
+    .map((repo) => normalizeGithubRepoCandidate(repo, githubUsername))
+    .filter(Boolean);
 
   const languages = {};
-  for (const repo of normalizedRepos) {
-    if (!repo.language) continue;
-    languages[repo.language] = (languages[repo.language] || 0) + 1;
+  for (const repo of repoCandidates) {
+    if (!repo.primaryLanguage) continue;
+    languages[repo.primaryLanguage] = (languages[repo.primaryLanguage] || 0) + 1;
   }
 
-  const totalStars = normalizedRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
-  const totalForks = normalizedRepos.reduce((sum, repo) => sum + (repo.forks_count || 0), 0);
-  const lastActivityAt = normalizedRepos
-    .map((repo) => repo.pushed_at || repo.updated_at || repo.created_at || null)
+  const totalStars = repoCandidates.reduce((sum, repo) => sum + (repo.stars || 0), 0);
+  const totalForks = repoCandidates.reduce((sum, repo) => sum + (repo.forks || 0), 0);
+  const lastActivityAt = repoCandidates
+    .map((repo) => repo.updatedAt || null)
     .filter(Boolean)
     .sort()
     .at(-1) || null;
@@ -224,16 +318,17 @@ async function buildGithubDataFromGitHub(userId) {
     ? Math.max(0, Math.floor((Date.now() - new Date(lastActivityAt).getTime()) / (24 * 60 * 60 * 1000)))
     : null;
 
-  const topRepos = [...normalizedRepos]
-    .sort((left, right) => (right.stargazers_count || 0) - (left.stargazers_count || 0))
+  const topRepos = [...repoCandidates]
+    .sort((left, right) => (right.stars || 0) - (left.stars || 0))
     .slice(0, 3)
     .map((repo) => ({
       name: repo.name,
+      url: repo.url,
       description: repo.description,
-      stars: repo.stargazers_count || 0,
-      forks: repo.forks_count || 0,
-      primaryLanguage: repo.language,
-      updatedAt: repo.updated_at || null,
+      stars: repo.stars || 0,
+      forks: repo.forks || 0,
+      primaryLanguage: repo.primaryLanguage,
+      updatedAt: repo.updatedAt || null,
     }));
 
   const accountAgeYears = githubUser?.created_at
@@ -247,7 +342,7 @@ async function buildGithubDataFromGitHub(userId) {
     avatarUrl: githubUser?.avatar_url || null,
     bio: githubUser?.bio || null,
     githubUrl: githubUser?.html_url || `https://github.com/${githubUsername}`,
-    publicRepos: githubUser?.public_repos || 0,
+    publicRepos: repoCandidates.length,
     followers: githubUser?.followers || 0,
     totalStars,
     totalForks,

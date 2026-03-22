@@ -4,6 +4,8 @@ import type { AuthUser } from "../api/auth";
 import { getOwnProfile, type Profile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { GithubIcon, SearchIcon, ShieldCheckIcon, SparklesIcon, UserRoundIcon, UsersIcon } from "../components/ui/Icons";
+import { UserAvatar } from "../components/ui/UserAvatar";
+import { formatProfileHeadline, formatRatingGradeLabel } from "../utils/profileLabels";
 
 type DashboardPageProps = {
   user: AuthUser;
@@ -40,12 +42,6 @@ export function DashboardPage({ user }: DashboardPageProps) {
       .finally(() => setLoadingProfile(false));
   }, []);
 
-  const gradeLabel = profile?.claimedGrade
-    ? profile.claimedGrade.charAt(0).toUpperCase() + profile.claimedGrade.slice(1)
-    : null;
-  const roleLabel = profile?.role
-    ? profile.role.charAt(0).toUpperCase() + profile.role.slice(1)
-    : null;
   const isDraftProfile =
     Boolean(profile) &&
     !profile?.bio &&
@@ -64,17 +60,11 @@ export function DashboardPage({ user }: DashboardPageProps) {
             Дашборд
           </p>
           <div className="mt-4 flex flex-wrap items-start gap-4 sm:items-center">
-            {user.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.displayName ?? user.username}
-                className="h-14 w-14 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-16 sm:w-16"
-              />
-            ) : (
-              <div className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-cyan-300 via-sky-400 to-violet-400 text-2xl font-black text-slate-950 shadow-lg shadow-cyan-500/20 sm:h-16 sm:w-16">
-                {(user.displayName ?? user.username).slice(0, 1).toUpperCase()}
-              </div>
-            )}
+            <UserAvatar
+              src={user.avatarUrl}
+              alt={user.displayName ?? user.username}
+              className="h-14 w-14 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-16 sm:w-16"
+            />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-balance text-[clamp(1.9rem,5.8vw,3.5rem)] font-semibold tracking-tight text-white">
@@ -87,9 +77,9 @@ export function DashboardPage({ user }: DashboardPageProps) {
                   </span>
                 ) : null}
               </div>
-              {!loadingProfile && (gradeLabel || roleLabel) ? (
+              {!loadingProfile && profile ? (
                 <p className="mt-1 text-slate-400">
-                  {[gradeLabel, roleLabel].filter(Boolean).join(" ")}
+                  {formatProfileHeadline(profile.role, profile.claimedGrade)}
                 </p>
               ) : null}
             </div>
@@ -108,7 +98,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
                   {profile.rating ? `${profile.rating.score}/100` : "Не рассчитан"}
                 </p>
                 {profile.rating ? (
-                  <p className="mt-1 text-xs text-slate-400">{profile.rating.grade}</p>
+                  <p className="mt-1 text-xs text-slate-400">{formatRatingGradeLabel(profile.rating.grade, profile.role)}</p>
                 ) : null}
               </div>
               <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
@@ -255,8 +245,8 @@ export function DashboardPage({ user }: DashboardPageProps) {
         <section className="grid gap-4 md:grid-cols-3">
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Статус</p>
-            <p className="mt-2 text-xl font-semibold text-white">Сценарий готов</p>
-            <p className="mt-2 text-sm text-slate-400">Можно пройти весь сценарий без лишних шагов.</p>
+            <p className="mt-2 text-xl font-semibold text-white">Профиль ещё не оценён</p>
+            <p className="mt-2 text-sm text-slate-400">Заполни данные и запусти скоринг, чтобы увидеть рекомендации и следующий шаг.</p>
           </article>
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">AI-скоринг</p>

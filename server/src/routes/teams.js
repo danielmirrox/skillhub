@@ -52,14 +52,16 @@ function isValidationError(error) {
 }
 
 teamsRouter.get('/', requireAuth, (req, res) => {
+  const includeClosed = req.query.includeClosed === 'true' || req.query.includeClosed === '1';
   const query = {
     role: req.query.role,
     stack: req.query.stack,
     hackathon: req.query.hackathon,
+    includeClosed,
   };
 
   return res.json({
-    items: demoStore.listTeams(query),
+    items: demoStore.listTeams(query, req.user.id),
   });
 });
 
@@ -116,6 +118,46 @@ teamsRouter.put('/:teamId', requireAuth, async (req, res, next) => {
   } catch (error) {
     if (isValidationError(error)) {
       return res.status(400).json(formatValidationError(error));
+    }
+
+    return next(error);
+  }
+});
+
+teamsRouter.delete('/:teamId/members/:userId', requireAuth, async (req, res, next) => {
+  try {
+    const team = demoStore.getTeamById(req.params.teamId);
+
+    if (!team) {
+      return res.status(404).json({
+        error: 'TEAM_NOT_FOUND',
+        message: 'Team not found.',
+      });
+    }
+
+    if (team.authorId !== req.user.id) {
+      return res.status(403).json({
+        error: 'FORBIDDEN',
+        message: 'Only the team captain can remove members.',
+      });
+    }
+
+    const updatedTeam = await demoStore.removeTeamMember(req.params.teamId, req.params.userId);
+
+    return res.json({ team: updatedTeam });
+  } catch (error) {
+    if (error.code === 'TEAM_MEMBER_NOT_FOUND' || error.code === 'TEAM_NOT_FOUND') {
+      return res.status(error.statusCode || 404).json({
+        error: error.code,
+        message: error.message,
+      });
+    }
+
+    if (error.code === 'CANNOT_REMOVE_TEAM_AUTHOR') {
+      return res.status(409).json({
+        error: error.code,
+        message: error.message,
+      });
     }
 
     return next(error);

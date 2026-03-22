@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { getOwnProfile, scoreProfile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { ArrowRightIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../components/ui/Icons";
+import { UserAvatar } from "../components/ui/UserAvatar";
+import { formatGithubActivityLabel, formatGradeLabel, formatProfileHeadline, formatRatingGradeLabel, formatRoleLabel } from "../utils/profileLabels";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -138,12 +140,20 @@ export function ProfilePage() {
       <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
-              <h2 className="text-balance mt-3 text-[clamp(2rem,6.2vw,3.5rem)] font-semibold tracking-tight text-white">{profileData?.user.displayName ?? profileData?.user.username}</h2>
-              <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-                Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и понять, как тебя видят другие участники.
-              </p>
+            <div className="flex min-w-0 flex-1 flex-wrap items-start gap-4">
+              <UserAvatar
+                src={profileData?.user.avatarUrl}
+                alt={profileData?.user.displayName ?? profileData?.user.username ?? "Профиль"}
+                className="h-20 w-20 rounded-[1.5rem] border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-24 sm:w-24"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
+                <h2 className="text-balance mt-3 text-[clamp(2rem,6.2vw,3.5rem)] font-semibold tracking-tight text-white">{profileData?.user.displayName ?? profileData?.user.username}</h2>
+                <p className="mt-2 text-slate-400">{formatProfileHeadline(profile.role, profile.claimedGrade)}</p>
+                <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
+                  Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и понять, как тебя видят другие участники.
+                </p>
+              </div>
             </div>
 
             <div className="flex w-full flex-wrap items-center gap-3 sm:w-auto">
@@ -227,11 +237,11 @@ export function ProfilePage() {
           <div className="mt-6 grid gap-4 md:grid-cols-4">
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Роль</p>
-              <p className="mt-2 text-lg font-semibold text-white">{profile.role}</p>
+              <p className="mt-2 text-lg font-semibold text-white">{formatRoleLabel(profile.role)}</p>
             </article>
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Грейд</p>
-              <p className="mt-2 text-lg font-semibold text-white">{profile.claimedGrade}</p>
+              <p className="mt-2 text-lg font-semibold text-white">{formatGradeLabel(profile.claimedGrade)}</p>
             </article>
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Стек</p>
@@ -251,6 +261,33 @@ export function ProfilePage() {
               </p>
             </article>
           </div>
+
+          {profile.githubData ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm text-slate-400">Публичные репозитории</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{profile.githubData.publicRepos ?? 0}</p>
+              </article>
+              <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm text-slate-400">Звезды</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{profile.githubData.totalStars ?? 0}</p>
+              </article>
+              <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm text-slate-400">Подписчики</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{profile.githubData.followers ?? 0}</p>
+              </article>
+              <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm text-slate-400">Активность</p>
+                <p className="mt-2 text-2xl font-semibold text-white">
+                  {profile.githubData.activityBucket
+                    ? formatGithubActivityLabel(profile.githubData.activityBucket)
+                    : profile.githubData.lastActivityAt
+                      ? formatDateTime(profile.githubData.lastActivityAt) ?? "обновлена"
+                      : "нет данных"}
+                </p>
+              </article>
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-5">
             <p className="text-sm font-semibold uppercase tracking-[0.22em] text-slate-400">Описание и проекты</p>
@@ -295,7 +332,7 @@ export function ProfilePage() {
                   </div>
                   <RatingBadge score={profile.rating.score} />
                 </div>
-                <p className="mt-4 text-sm text-slate-300">{profile.rating.grade}</p>
+                <p className="mt-4 text-sm text-slate-300">{formatRatingGradeLabel(profile.rating.grade, profile.role)}</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-500">
                   {profileData?.user.isPro ? "Без лимита в PRO" : "1 попытка / 7 дней в стандартном режиме"}
                 </p>

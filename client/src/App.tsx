@@ -8,6 +8,7 @@ import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ApplicationsPage } from "./pages/ApplicationsPage";
+import { FavoritesPage } from "./pages/FavoritesPage";
 import { ProfileEditPage } from "./pages/ProfileEditPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { PaywallPage } from "./pages/PaywallPage";
@@ -163,6 +164,16 @@ function SearchRoute() {
   return <SearchPage />;
 }
 
+function FavoritesRoute() {
+  const { loading, user } = useAuth();
+  const location = useLocation();
+  if (loading) return <AuthStatus />;
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+  return <FavoritesPage />;
+}
+
 function TeamsRoute() {
   const { loading, user } = useAuth();
   const location = useLocation();
@@ -225,6 +236,7 @@ export const routes = {
   ProfileRoute,
   ProfileEditRoute,
   SearchRoute,
+  FavoritesRoute,
   TeamsRoute,
   TeamDetailRoute,
   UserDetailRoute,

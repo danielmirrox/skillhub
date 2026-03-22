@@ -6,12 +6,111 @@ const nowIso = () => new Date().toISOString();
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const capitalize = (value) => value.charAt(0).toUpperCase() + value.slice(1);
 
+const DEFAULT_AVATAR_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-hidden="true">
+  <defs>
+    <linearGradient id="bg" x1="16" y1="12" x2="114" y2="116" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#22d3ee" />
+      <stop offset="52%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+    <linearGradient id="shine" x1="28" y1="18" x2="92" y2="106" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.36" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="32" fill="url(#bg)" />
+  <circle cx="64" cy="54" r="22" fill="#eff6ff" fill-opacity="0.92" />
+  <path d="M26 108c6-22 24-32 38-32s32 10 38 32" fill="#eff6ff" fill-opacity="0.92" />
+  <circle cx="46" cy="38" r="32" fill="url(#shine)" />
+  <circle cx="92" cy="96" r="22" fill="#0f172a" fill-opacity="0.08" />
+</svg>`;
+
+const DEFAULT_AVATAR_URL = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(DEFAULT_AVATAR_SVG.trim())}`;
+
+function resolveAvatarUrl(value) {
+  const trimmed = typeof value === 'string' ? value.trim() : '';
+  return trimmed || DEFAULT_AVATAR_URL;
+}
+
+function normalizeGitHubRepositoryUrl(value) {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  try {
+    const parsed = new URL(value);
+    const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
+
+    if (host !== 'github.com') {
+      return null;
+    }
+
+    const segments = parsed.pathname.split('/').filter(Boolean);
+    if (segments.length !== 2) {
+      return null;
+    }
+
+    return `https://github.com/${segments[0]}/${segments[1]}`;
+  } catch {
+    return null;
+  }
+}
+
+function inferGitHubRepoName(url, explicitName) {
+  const trimmedName = String(explicitName || '').trim();
+  if (trimmedName) {
+    return trimmedName;
+  }
+
+  const normalizedUrl = normalizeGitHubRepositoryUrl(url);
+  if (!normalizedUrl) {
+    return '';
+  }
+
+  const parsed = new URL(normalizedUrl);
+  const segments = parsed.pathname.split('/').filter(Boolean);
+  return segments[1] || '';
+}
+
+function normalizeImportedGithubRepo(repo, githubUsername) {
+  if (!repo || typeof repo !== 'object') {
+    return null;
+  }
+
+  const normalizedUrl = normalizeGitHubRepositoryUrl(repo.url || repo.html_url || repo.htmlUrl);
+  if (!normalizedUrl) {
+    return null;
+  }
+
+  const normalizedName = inferGitHubRepoName(normalizedUrl, repo.name);
+  const normalizedUsername = String(githubUsername || '').trim().toLowerCase();
+  if (!normalizedName) {
+    return null;
+  }
+  if (normalizedName && normalizedUsername && normalizedName.toLowerCase() === normalizedUsername) {
+    return null;
+  }
+
+  return {
+    name: normalizedName,
+    url: normalizedUrl,
+    description: repo.description || null,
+    stars: Number(repo.stars ?? repo.stars_count ?? repo.stargazers_count ?? 0),
+    forks: Number(repo.forks ?? repo.forks_count ?? 0),
+    primaryLanguage: repo.primaryLanguage || repo.language || null,
+    updatedAt: repo.updatedAt || repo.updated_at || null,
+  };
+}
+
 const users = clone(seedData.users);
 const profiles = clone(seedData.profiles);
 const ratings = clone(seedData.ratings);
 const teams = clone(seedData.teams);
 const teamMembers = clone(seedData.teamMembers);
 const applications = clone(seedData.applications);
+const favorites = clone(seedData.favorites || []);
+const votes = clone(seedData.votes || []);
 
 function replaceCollection(target, source) {
   target.splice(0, target.length, ...clone(source));
@@ -28,6 +127,8 @@ function hydrateFromSnapshot(snapshot) {
   replaceCollection(teams, snapshot.teams || []);
   replaceCollection(teamMembers, snapshot.teamMembers || []);
   replaceCollection(applications, snapshot.applications || []);
+  replaceCollection(favorites, snapshot.favorites || []);
+  replaceCollection(votes, snapshot.votes || []);
 }
 
 async function initializeStore() {
@@ -258,6 +359,112 @@ async function persistApplication(application) {
   );
 }
 
+async function deleteTeamMember(teamId, userId) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `DELETE FROM team_members WHERE team_id = $1 AND user_id = $2`,
+    [teamId, userId],
+  );
+}
+
+async function persistFavorite(favorite) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO user_favorites (id, user_id, favorite_user_id, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (user_id, favorite_user_id) DO UPDATE SET
+       updated_at = EXCLUDED.updated_at`,
+    [
+      favorite.id,
+      favorite.userId,
+      favorite.favoriteUserId,
+      favorite.createdAt ?? nowIso(),
+      favorite.updatedAt ?? nowIso(),
+    ],
+  );
+}
+
+async function deleteFavorite(userId, favoriteUserId) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    'DELETE FROM user_favorites WHERE user_id = $1 AND favorite_user_id = $2',
+    [userId, favoriteUserId],
+  );
+}
+
+async function persistVote(vote) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    `INSERT INTO user_votes (id, voter_id, target_user_id, value, created_at, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6)
+     ON CONFLICT (voter_id, target_user_id) DO UPDATE SET
+       value = EXCLUDED.value,
+       updated_at = EXCLUDED.updated_at`,
+    [
+      vote.id,
+      vote.voterId,
+      vote.targetUserId,
+      vote.value,
+      vote.createdAt ?? nowIso(),
+      vote.updatedAt ?? nowIso(),
+    ],
+  );
+}
+
+async function deleteVote(voterId, targetUserId) {
+  if (!isDatabaseReady()) {
+    return;
+  }
+
+  await query(
+    'DELETE FROM user_votes WHERE voter_id = $1 AND target_user_id = $2',
+    [voterId, targetUserId],
+  );
+}
+
+function getUserSocialStats(targetUserId, viewerId = null) {
+  const relatedFavorites = favorites.filter((favorite) => favorite.favoriteUserId === targetUserId);
+  const relatedVotes = votes.filter((vote) => vote.targetUserId === targetUserId);
+  const myVote = viewerId
+    ? relatedVotes.find((vote) => vote.voterId === viewerId)?.value ?? null
+    : null;
+  const isFavorite = viewerId
+    ? favorites.some((favorite) => favorite.userId === viewerId && favorite.favoriteUserId === targetUserId)
+    : false;
+
+  const upvotes = relatedVotes.filter((vote) => vote.value === 1).length;
+  const downvotes = relatedVotes.filter((vote) => vote.value === -1).length;
+
+  return {
+    favoriteCount: relatedFavorites.length,
+    isFavorite,
+    upvotes,
+    downvotes,
+    voteScore: upvotes - downvotes,
+    myVote,
+  };
+}
+
+function getFavoriteEntry(userId, favoriteUserId) {
+  return favorites.find((favorite) => favorite.userId === userId && favorite.favoriteUserId === favoriteUserId) || null;
+}
+
+function getVoteEntry(voterId, targetUserId) {
+  return votes.find((vote) => vote.voterId === voterId && vote.targetUserId === targetUserId) || null;
+}
+
 function getUserById(id) {
   return users.find((user) => user.id === id) || null;
 }
@@ -283,6 +490,44 @@ function getRatingByUserId(userId) {
 
 function calculateContactVisible(viewer, targetRating) {
   return Boolean(viewer?.isPro && targetRating?.score >= 80);
+}
+
+function buildUserListItem(user, viewer, search = '') {
+  const profile = getProfileByUserId(user.id);
+  const rating = profile ? getRatingByProfileId(profile.id) : null;
+  const social = getUserSocialStats(user.id, viewer?.id || null);
+
+  const searchMatch = search
+    ? scoreSearchItem(
+        {
+          id: user.id,
+          username: user.username,
+          displayName: user.displayName,
+          primaryStack: profile ? clone(profile.primaryStack) : [],
+          bio: profile?.bio || '',
+          role: profile?.role || null,
+          claimedGrade: profile?.claimedGrade || null,
+          projectLinks: profile ? clone(profile.projectLinks) : [],
+          rating: formatRating(rating, viewer),
+        },
+        search,
+      )
+    : null;
+
+  return {
+    id: user.id,
+    displayName: user.displayName,
+    avatarUrl: resolveAvatarUrl(user.avatarUrl),
+    role: profile?.role || null,
+    claimedGrade: profile?.claimedGrade || null,
+    primaryStack: profile ? clone(profile.primaryStack) : [],
+    rating: formatRating(rating, viewer),
+    contactVisible: calculateContactVisible(viewer, rating),
+    isPro: user.isPro,
+    bio: profile?.bio || '',
+    ...social,
+    searchMatch,
+  };
 }
 
 const SEARCH_SYNONYM_GROUPS = [
@@ -524,17 +769,20 @@ function formatRating(rating, viewer) {
 function buildPublicProfile(profile, viewer) {
   const user = getUserById(profile.userId);
   const rating = getRatingByProfileId(profile.id);
+  const social = getUserSocialStats(profile.userId, viewer?.id || null);
 
   return {
     id: profile.id,
     userId: profile.userId,
     displayName: user.displayName,
-    avatarUrl: user.avatarUrl,
+    avatarUrl: resolveAvatarUrl(user.avatarUrl),
     role: profile.role,
     claimedGrade: profile.claimedGrade,
     primaryStack: clone(profile.primaryStack),
     bio: profile.bio,
     projectLinks: clone(profile.projectLinks),
+    githubData: clone(profile.githubData || null),
+    ...social,
     rating: formatRating(rating, viewer),
     contactVisible: calculateContactVisible(viewer, rating),
     telegramUsername: calculateContactVisible(viewer, rating) ? profile.telegramUsername : null,
@@ -551,7 +799,7 @@ function buildOwnProfile(userId, viewer) {
       id: user.id,
       username: user.username,
       displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
+      avatarUrl: resolveAvatarUrl(user.avatarUrl),
       email: user.email,
       isPro: user.isPro,
       proExpiresAt: user.proExpiresAt,
@@ -585,38 +833,7 @@ function listUsers(query = {}, viewer) {
   const search = query.search ? String(query.search).toLowerCase() : '';
 
   let items = users
-    .map((user) => {
-      const profile = getProfileByUserId(user.id);
-      const rating = profile ? getRatingByProfileId(profile.id) : null;
-      const searchMatch = scoreSearchItem(
-        {
-          id: user.id,
-          username: user.username,
-          displayName: user.displayName,
-          primaryStack: profile ? clone(profile.primaryStack) : [],
-          bio: profile?.bio || '',
-          role: profile?.role || null,
-          claimedGrade: profile?.claimedGrade || null,
-          projectLinks: profile ? clone(profile.projectLinks) : [],
-          rating: formatRating(rating, viewer),
-        },
-        query.search || ''
-      );
-
-      return {
-        id: user.id,
-        displayName: user.displayName,
-        avatarUrl: user.avatarUrl,
-        role: profile?.role || null,
-        claimedGrade: profile?.claimedGrade || null,
-        primaryStack: profile ? clone(profile.primaryStack) : [],
-        rating: formatRating(rating, viewer),
-        contactVisible: calculateContactVisible(viewer, rating),
-        isPro: user.isPro,
-        bio: profile?.bio || '',
-        searchMatch,
-      };
-    })
+    .map((user) => buildUserListItem(user, viewer, search))
     .filter((item) => {
       if (query.role && item.role !== query.role) return false;
       if (query.grade && item.claimedGrade !== query.grade) return false;
@@ -642,6 +859,13 @@ function listUsers(query = {}, viewer) {
         }
       }
 
+      const leftScore = (left.rating?.score || 0) + (left.voteScore || 0) * 2 + (left.favoriteCount || 0) * 0.5;
+      const rightScore = (right.rating?.score || 0) + (right.voteScore || 0) * 2 + (right.favoriteCount || 0) * 0.5;
+
+      if (rightScore !== leftScore) {
+        return rightScore - leftScore;
+      }
+
       return (right.rating?.score || 0) - (left.rating?.score || 0);
     });
 
@@ -657,6 +881,30 @@ function listUsers(query = {}, viewer) {
   };
 }
 
+function listFavoriteUsers(viewer) {
+  const viewerId = viewer?.id || null;
+  if (!viewerId) {
+    return {
+      items: [],
+      total: 0,
+    };
+  }
+
+  const favoriteItems = favorites
+    .filter((favorite) => favorite.userId === viewerId)
+    .sort((left, right) => new Date(right.updatedAt || right.createdAt || 0) - new Date(left.updatedAt || left.createdAt || 0))
+    .map((favorite) => {
+      const user = getUserById(favorite.favoriteUserId);
+      return user ? buildUserListItem(user, viewer, '') : null;
+    })
+    .filter(Boolean);
+
+  return {
+    items: favoriteItems,
+    total: favoriteItems.length,
+  };
+}
+
 function buildUserSummary(userId, viewer) {
   const user = getUserById(userId);
   if (!user) {
@@ -665,11 +913,12 @@ function buildUserSummary(userId, viewer) {
 
   const profile = getProfileByUserId(userId);
   const rating = profile ? getRatingByProfileId(profile.id) : null;
+  const social = getUserSocialStats(userId, viewer?.id || null);
 
   return {
     id: user.id,
     displayName: user.displayName,
-    avatarUrl: user.avatarUrl,
+    avatarUrl: resolveAvatarUrl(user.avatarUrl),
     role: profile?.role || null,
     claimedGrade: profile?.claimedGrade || null,
     primaryStack: profile ? clone(profile.primaryStack) : [],
@@ -679,7 +928,105 @@ function buildUserSummary(userId, viewer) {
     bio: profile?.bio || '',
     githubConnected: Boolean(profile?.githubUrl || profile?.githubData),
     githubImportedAt: profile?.githubData?.fetchedAt || null,
+    githubData: clone(profile?.githubData || null),
+    ...social,
   };
+}
+
+async function toggleFavorite(userId, favoriteUserId) {
+  const user = getUserById(userId);
+  const targetUser = getUserById(favoriteUserId);
+
+  if (!user || !targetUser) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  if (userId === favoriteUserId) {
+    const error = new Error('You cannot favorite yourself.');
+    error.statusCode = 409;
+    error.code = 'CANNOT_FAVORITE_SELF';
+    throw error;
+  }
+
+  const existing = getFavoriteEntry(userId, favoriteUserId);
+  if (existing) {
+    const index = favorites.findIndex((favorite) => favorite.id === existing.id);
+    if (index >= 0) {
+      favorites.splice(index, 1);
+    }
+
+    await deleteFavorite(userId, favoriteUserId);
+  } else {
+    const favorite = {
+      id: `favorite-${randomUUID()}`,
+      userId,
+      favoriteUserId,
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    };
+
+    favorites.push(favorite);
+    await persistFavorite(favorite);
+  }
+
+  return buildUserSummary(favoriteUserId, user);
+}
+
+async function toggleVote(voterId, targetUserId, value) {
+  const voter = getUserById(voterId);
+  const targetUser = getUserById(targetUserId);
+
+  if (!voter || !targetUser) {
+    const error = new Error('User not found.');
+    error.statusCode = 404;
+    error.code = 'USER_NOT_FOUND';
+    throw error;
+  }
+
+  if (voterId === targetUserId) {
+    const error = new Error('You cannot vote for yourself.');
+    error.statusCode = 409;
+    error.code = 'CANNOT_VOTE_FOR_SELF';
+    throw error;
+  }
+
+  if (value !== 1 && value !== -1) {
+    const error = new Error('Invalid vote value.');
+    error.statusCode = 400;
+    error.code = 'INVALID_VOTE_VALUE';
+    throw error;
+  }
+
+  const existing = getVoteEntry(voterId, targetUserId);
+  if (existing && existing.value === value) {
+    const index = votes.findIndex((vote) => vote.id === existing.id);
+    if (index >= 0) {
+      votes.splice(index, 1);
+    }
+
+    await deleteVote(voterId, targetUserId);
+  } else if (existing) {
+    existing.value = value;
+    existing.updatedAt = nowIso();
+    await persistVote(existing);
+  } else {
+    const vote = {
+      id: `vote-${randomUUID()}`,
+      voterId,
+      targetUserId,
+      value,
+      createdAt: nowIso(),
+      updatedAt: nowIso(),
+    };
+
+    votes.push(vote);
+    await persistVote(vote);
+  }
+
+  return buildUserSummary(targetUserId, voter);
 }
 
 function getRatingHistoryByUserId(userId) {
@@ -723,14 +1070,14 @@ function getTeamMembers(teamId) {
       id: member.id,
       userId: member.userId,
       displayName: user.displayName,
-      avatarUrl: user.avatarUrl,
+      avatarUrl: resolveAvatarUrl(user.avatarUrl),
       role: member.role,
       rating: rating ? { score: rating.score } : null,
     };
   });
 }
 
-function listTeams(query = {}) {
+function listTeams(query = {}, viewerId = null) {
   return teams
     .filter((team) => {
       if (query.role && !team.requiredRoles.includes(query.role)) return false;
@@ -743,6 +1090,7 @@ function listTeams(query = {}) {
         if (!stackTokens.every((token) => teamStack.includes(token))) return false;
       }
       if (query.hackathon && team.hackathonName !== query.hackathon) return false;
+      if (team.status === 'closed' && !(query.includeClosed && viewerId && team.authorId === viewerId)) return false;
       return true;
     })
       .map((team) => {
@@ -757,11 +1105,12 @@ function listTeams(query = {}) {
           requiredRoles: clone(team.requiredRoles),
           stack: clone(team.stack),
           slotsOpen: team.slotsOpen,
+          status: team.status,
           author: author
             ? {
                 userId: author.id,
                 displayName: author.displayName,
-                avatarUrl: author.avatarUrl,
+                avatarUrl: resolveAvatarUrl(author.avatarUrl),
                 isPro: Boolean(author.isPro),
               }
             : null,
@@ -770,8 +1119,8 @@ function listTeams(query = {}) {
         };
       })
       .sort((left, right) => {
-        const leftBoost = Number(Boolean(left.author?.isPro)) + Number(Boolean(left.isActive));
-        const rightBoost = Number(Boolean(right.author?.isPro)) + Number(Boolean(right.isActive));
+        const leftBoost = Number(Boolean(left.author?.isPro)) + Number(left.status === 'active' && left.isActive && left.slotsOpen > 0);
+        const rightBoost = Number(Boolean(right.author?.isPro)) + Number(right.status === 'active' && right.isActive && right.slotsOpen > 0);
 
         if (rightBoost !== leftBoost) {
           return rightBoost - leftBoost;
@@ -797,7 +1146,7 @@ function getTeamById(id) {
         ? {
             userId: getUserById(team.authorId).id,
             displayName: getUserById(team.authorId).displayName,
-            avatarUrl: getUserById(team.authorId).avatarUrl,
+            avatarUrl: resolveAvatarUrl(getUserById(team.authorId).avatarUrl),
             isPro: Boolean(getUserById(team.authorId).isPro),
           }
         : null,
@@ -806,6 +1155,7 @@ function getTeamById(id) {
 }
 
 async function createTeam(authorId, payload) {
+  const nextStatus = payload.status || 'active';
   const team = {
     id: `team-${randomUUID()}`,
     authorId,
@@ -813,11 +1163,11 @@ async function createTeam(authorId, payload) {
     description: payload.description,
     hackathonName: payload.hackathonName,
     requiredRoles: payload.requiredRoles,
-    minRating: payload.minRating || null,
+    minRating: payload.minRating ?? null,
     stack: payload.stack,
     slotsOpen: payload.slotsOpen,
-    isActive: payload.isActive ?? true,
-    status: payload.status || 'active',
+    isActive: nextStatus === 'closed' ? false : (payload.isActive ?? true),
+    status: nextStatus === 'closed' ? 'closed' : nextStatus,
     updatedAt: nowIso(),
     deletedAt: null,
     createdAt: nowIso(),
@@ -834,8 +1184,11 @@ async function updateTeam(teamId, payload) {
     return null;
   }
 
+  const nextStatus = payload.status || team.status;
   Object.assign(team, {
     ...payload,
+    status: nextStatus === 'closed' ? 'closed' : nextStatus || team.status,
+    isActive: nextStatus === 'closed' ? false : (payload.isActive ?? team.isActive),
     updatedAt: nowIso(),
   });
 
@@ -856,16 +1209,19 @@ function getApplicationView(application) {
           id: team.id,
           name: team.name,
           hackathonName: team.hackathonName,
+          status: team.status,
+          isActive: team.isActive,
+          slotsOpen: team.slotsOpen,
         }
       : null,
     applicant: applicant
-      ? {
-          id: applicant.id,
-          displayName: applicant.displayName,
-          avatarUrl: applicant.avatarUrl,
-          telegramUsername: application.status === 'accepted' ? profile?.telegramUsername || null : null,
-          rating: rating ? { score: rating.score } : null,
-        }
+          ? {
+              id: applicant.id,
+              displayName: applicant.displayName,
+              avatarUrl: resolveAvatarUrl(applicant.avatarUrl),
+              telegramUsername: application.status === 'accepted' ? profile?.telegramUsername || null : null,
+              rating: rating ? { score: rating.score } : null,
+            }
       : null,
     message: application.message,
     status: application.status,
@@ -897,6 +1253,13 @@ async function createApplication({ applicantId, teamId, message }) {
     throw error;
   }
 
+  if (team.authorId === applicantId) {
+    const error = new Error('Team author cannot apply to own team.');
+    error.statusCode = 409;
+    error.code = 'CANNOT_APPLY_TO_OWN_TEAM';
+    throw error;
+  }
+
   if (!team.isActive || team.status !== 'active') {
     const error = new Error('Team is not accepting applications.');
     error.statusCode = 409;
@@ -904,10 +1267,10 @@ async function createApplication({ applicantId, teamId, message }) {
     throw error;
   }
 
-  if (team.authorId === applicantId) {
-    const error = new Error('Team author cannot apply to own team.');
+  if ((team.slotsOpen || 0) <= 0) {
+    const error = new Error('Team is full.');
     error.statusCode = 409;
-    error.code = 'CANNOT_APPLY_TO_OWN_TEAM';
+    error.code = 'TEAM_FULL';
     throw error;
   }
 
@@ -949,14 +1312,22 @@ async function updateApplicationStatus(applicationId, userId, status) {
     return { error: 'forbidden' };
   }
 
-  application.status = status;
-  application.viewedAt = application.viewedAt || nowIso();
-  application.updatedAt = nowIso();
-
   if (status === 'accepted') {
+    if (!team.isActive || team.status !== 'active') {
+      return { error: 'team_closed' };
+    }
+
     const memberExists = teamMembers.some(
       (member) => member.teamId === application.teamId && member.userId === application.applicantId
     );
+
+    if (!memberExists && (team.slotsOpen || 0) <= 0) {
+      return { error: 'team_full' };
+    }
+
+    application.status = status;
+    application.viewedAt = application.viewedAt || nowIso();
+    application.updatedAt = nowIso();
 
     if (!memberExists) {
       const teamMember = {
@@ -969,11 +1340,48 @@ async function updateApplicationStatus(applicationId, userId, status) {
 
       teamMembers.push(teamMember);
       await persistTeamMember(teamMember);
+      team.slotsOpen = Math.max(0, (team.slotsOpen || 0) - 1);
+      await persistTeam(team);
     }
+  } else {
+    application.status = status;
+    application.viewedAt = application.viewedAt || nowIso();
+    application.updatedAt = nowIso();
   }
 
   await persistApplication(application);
   return getApplicationView(application);
+}
+
+async function removeTeamMember(teamId, userId) {
+  const team = teams.find((item) => item.id === teamId);
+  if (!team) {
+    const error = new Error('Team not found.');
+    error.statusCode = 404;
+    error.code = 'TEAM_NOT_FOUND';
+    throw error;
+  }
+
+  if (team.authorId === userId) {
+    const error = new Error('Team captain cannot be removed from the team.');
+    error.statusCode = 409;
+    error.code = 'CANNOT_REMOVE_TEAM_AUTHOR';
+    throw error;
+  }
+
+  const index = teamMembers.findIndex((member) => member.teamId === teamId && member.userId === userId);
+  if (index === -1) {
+    const error = new Error('Team member not found.');
+    error.statusCode = 404;
+    error.code = 'TEAM_MEMBER_NOT_FOUND';
+    throw error;
+  }
+
+  const [removed] = teamMembers.splice(index, 1);
+  await deleteTeamMember(removed.teamId, removed.userId);
+  team.slotsOpen = Math.max(0, (team.slotsOpen || 0) + 1);
+  await persistTeam(team);
+  return getTeamById(teamId);
 }
 
 function inferRatingInput(profile, githubData) {
@@ -988,7 +1396,12 @@ function inferRatingInput(profile, githubData) {
     : 0;
   const githubSocialBoost = mergedGithubData ? Math.min((mergedGithubData.followers || 0) * 0.15, 8) : 0;
   const githubActivityBoost = mergedGithubData?.activityRecencyDays == null
-    ? 0
+    ? ({
+        fresh: 8,
+        recent: 6,
+        steady: 3,
+        stale: 0,
+      }[mergedGithubData?.activityBucket || ''] || 0)
     : Math.max(0, 8 - Math.min(Math.floor((mergedGithubData.activityRecencyDays || 0) / 30), 8));
   const githubBoost = Math.min(githubRepoBoost + githubQualityBoost + githubSocialBoost + githubActivityBoost, 25);
   const baseScore = 30;
@@ -1193,7 +1606,7 @@ async function upsertOAuthUser({
       telegramId: null,
       email: email || `${username || 'user'}@skillhub.dev`,
       username: username || `user-${normalizedGithubId || 'guest'}`,
-      avatarUrl: avatarUrl || 'https://avatars.githubusercontent.com/u/1?v=4',
+      avatarUrl: resolveAvatarUrl(avatarUrl),
       displayName: displayName || username || 'GitHub User',
       isPro: false,
       proExpiresAt: null,
@@ -1207,7 +1620,7 @@ async function upsertOAuthUser({
     user.githubId = normalizedGithubId ?? user.githubId;
     user.email = email || user.email;
     user.username = username || user.username;
-    user.avatarUrl = avatarUrl || user.avatarUrl;
+    user.avatarUrl = resolveAvatarUrl(avatarUrl || user.avatarUrl);
     user.displayName = displayName || user.displayName;
     user.updatedAt = now;
   }
@@ -1223,16 +1636,21 @@ async function importGithubData(userId, githubData) {
   profile.githubData = githubData;
   profile.updatedAt = nowIso();
 
+  const githubUsername = String(githubData?.username || '').trim();
   const sortedLanguages = Object.entries(githubData?.languages || {})
     .sort((left, right) => right[1] - left[1])
     .map(([language]) => language);
 
   const suggestedPrimaryStack = sortedLanguages.slice(0, 3);
-  const suggestedProjectLinks = (githubData?.topRepos || []).slice(0, 3).map((repo) => ({
-    url: `https://github.com/example/${repo.name}`,
-    title: repo.name,
-    description: repo.description || repo.primaryLanguage || 'GitHub repository',
-  }));
+  const suggestedProjectLinks = (githubData?.topRepos || [])
+    .map((repo) => normalizeImportedGithubRepo(repo, githubUsername))
+    .filter(Boolean)
+    .slice(0, 3)
+    .map((repo) => ({
+      url: repo.url,
+      title: repo.name,
+      description: repo.description || repo.primaryLanguage || 'GitHub repository',
+    }));
 
   await persistProfile(profile);
   return {
@@ -1302,6 +1720,7 @@ module.exports = {
     buildPublicProfile,
     buildOwnProfile,
     buildUserSummary,
+    listFavoriteUsers,
     getRatingHistoryByUserId,
     getScoreJobStatus,
     listUsers,
@@ -1309,9 +1728,12 @@ module.exports = {
     getTeamById,
     createTeam,
     updateTeam,
+    removeTeamMember,
     listApplicationsForUser,
     createApplication,
     updateApplicationStatus,
+    toggleFavorite,
+    toggleVote,
     scoreProfile,
     updateProfile,
     setUserPro,

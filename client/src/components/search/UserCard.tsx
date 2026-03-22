@@ -2,20 +2,30 @@ import { Link } from "react-router-dom";
 import { RatingBadge } from "../profile/RatingBadge";
 import type { UsersListItem } from "../../api/users";
 import { ArrowRightIcon, GithubIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../ui/Icons";
+import { formatProfileHeadline } from "../../utils/profileLabels";
+import { UserSocialActions } from "../users/UserSocialActions";
+import { UserAvatar } from "../ui/UserAvatar";
 
 type UserCardProps = {
   user: UsersListItem;
+  currentUserId?: string | null;
+  onSocialChange?: (next: Pick<
+    UsersListItem,
+    "favoriteCount" | "isFavorite" | "upvotes" | "downvotes" | "voteScore" | "myVote"
+  >) => void;
 };
 
-export function UserCard({ user }: UserCardProps) {
+export function UserCard({ user, currentUserId, onSocialChange }: UserCardProps) {
   const contactLabel = user.contactVisible ? "Контакт открыт" : "Контакт скрыт";
   const relevance = user.searchMatch?.score ?? null;
+  const canInteract = Boolean(currentUserId) && currentUserId !== user.id;
+  const isCurrentUser = currentUserId === user.id;
 
   return (
     <article className="group relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-4 shadow-xl shadow-slate-950/25 backdrop-blur-xl transition duration-300 ease-out hover:border-cyan-300/25 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-slate-950/35 sm:p-5">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-        <img
+        <UserAvatar
           src={user.avatarUrl}
           alt={user.displayName}
           className="h-14 w-14 rounded-2xl border border-white/10 object-cover shadow-lg shadow-black/20 sm:h-16 sm:w-16"
@@ -23,6 +33,11 @@ export function UserCard({ user }: UserCardProps) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-balance text-[1.05rem] font-semibold tracking-tight text-white sm:text-lg">{user.displayName}</h3>
+            {isCurrentUser ? (
+              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-300">
+                Это вы
+              </span>
+            ) : null}
             {user.isPro ? (
               <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/30 bg-emerald-300/15 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-100">
                 <ShieldCheckIcon className="h-3.5 w-3.5" />
@@ -30,9 +45,7 @@ export function UserCard({ user }: UserCardProps) {
               </span>
             ) : null}
           </div>
-          <p className="mt-1 text-sm text-slate-400">
-            {user.role ?? "роль не указана"} · {user.claimedGrade ?? "грейд не указан"}
-          </p>
+          <p className="mt-1 text-sm text-slate-400">{formatProfileHeadline(user.role, user.claimedGrade)}</p>
           <p className="mt-3 text-sm leading-6 text-slate-300">{user.bio || "Описание пока не заполнено."}</p>
         </div>
         {user.rating ? (
@@ -73,6 +86,15 @@ export function UserCard({ user }: UserCardProps) {
             {user.rating.grade}
           </span>
         ) : null}
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/55 p-3">
+        <UserSocialActions
+          userId={user.id}
+          social={user}
+          canInteract={canInteract}
+          onChange={onSocialChange}
+        />
       </div>
 
       {user.searchMatch ? (

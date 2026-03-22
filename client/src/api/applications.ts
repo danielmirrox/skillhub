@@ -8,6 +8,9 @@ export type ApplicationView = {
     id: string;
     name: string;
     hackathonName: string;
+    status: "active" | "paused" | "closed";
+    isActive: boolean;
+    slotsOpen: number;
   } | null;
   applicant: {
     id: string;
@@ -48,6 +51,9 @@ export async function createApplication(teamId: string, message: string) {
       typeof body.message === "string" ? body.message : `Request failed with status ${response.status}`,
     );
     (error as Error & { status?: number }).status = response.status;
+    if (body && typeof body === "object" && typeof body.error === "string") {
+      (error as Error & { code?: string }).code = body.error;
+    }
     throw error;
   }
 
@@ -71,6 +77,9 @@ export async function updateApplicationStatus(applicationId: string, status: Exc
       typeof body.message === "string" ? body.message : `Request failed with status ${response.status}`,
     );
     (error as Error & { status?: number }).status = response.status;
+    if (body && typeof body === "object" && typeof body.error === "string") {
+      (error as Error & { code?: string }).code = body.error;
+    }
     throw error;
   }
 

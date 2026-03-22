@@ -6,6 +6,7 @@ import {
   buildFormValues,
   type ProfileFormValues,
 } from "../components/profile/ProfileForm";
+import { formatGithubActivityLabel } from "../utils/profileLabels";
 
 const GITHUB_IMPORT_SAMPLE = {
   fetchedAt: new Date().toISOString(),
@@ -31,6 +32,7 @@ const GITHUB_IMPORT_SAMPLE = {
   topRepos: [
     {
       name: "team-radar",
+      url: "https://github.com/skillhub-user/team-radar",
       description: "Пример проекта для матчинга участников и команд",
       stars: 31,
       forks: 7,
@@ -39,6 +41,7 @@ const GITHUB_IMPORT_SAMPLE = {
     },
     {
       name: "profile-signal",
+      url: "https://github.com/skillhub-user/profile-signal",
       description: "Пример панели для работы с профилем и рейтингом",
       stars: 22,
       forks: 4,
@@ -121,6 +124,7 @@ export function ProfileEditPage() {
     suggestedProjectLinks: { url: string; title: string; description: string }[];
     importedAt: string | null;
     source: "manual" | "stored" | "github-rest";
+    githubData: Awaited<ReturnType<typeof importGithubProfile>>["githubData"];
   } | null>(null);
   const [profileSnapshot, setProfileSnapshot] = React.useState<Profile | null>(null);
   const [values, setValues] = React.useState<ProfileFormValues | null>(null);
@@ -144,6 +148,7 @@ export function ProfileEditPage() {
       suggestedProjectLinks: result.suggestedProjectLinks,
       importedAt: result.importedAt,
       source: result.source,
+      githubData: result.githubData,
     });
     setProfileSnapshot(result.profile);
     setValues((current) =>
@@ -192,6 +197,14 @@ export function ProfileEditPage() {
   const githubConnected = Boolean(values?.githubUrl?.trim() || profileSnapshot?.githubUrl?.trim());
   const githubImportedAt = profileSnapshot?.githubData?.fetchedAt || importResult?.importedAt || null;
   const githubImportedAtLabel = formatDateTime(githubImportedAt);
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate("/profile");
+  };
 
   const onSubmit = async () => {
     if (!values) return;
@@ -217,7 +230,22 @@ export function ProfileEditPage() {
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[0.86fr_1.14fr]">
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-[1.5rem] border border-white/10 bg-white/5 px-4 py-3 shadow-xl shadow-slate-950/20 backdrop-blur-xl">
+        <div>
+          <p className="text-xs uppercase tracking-[0.24em] text-cyan-300">Редактирование</p>
+          <p className="mt-1 text-sm text-slate-300">Вернуться назад можно без потери текущего контекста.</p>
+        </div>
+        <button
+          type="button"
+          onClick={goBack}
+          className="rounded-full border border-white/10 bg-slate-950/55 px-4 py-2 text-sm font-medium text-slate-100 transition hover:bg-white/10"
+        >
+          Назад
+        </button>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-[0.86fr_1.14fr]">
       <div className="xl:col-span-2 min-h-[2.25rem]">
         {error ? <p className="text-red-300">{error}</p> : null}
       </div>
@@ -306,11 +334,38 @@ export function ProfileEditPage() {
                 <li key={`${project.url}-${index}`}>{project.title}</li>
               ))}
             </ul>
+            {importResult.githubData ? (
+              <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                <div className="rounded-2xl border border-emerald-200/20 bg-slate-950/45 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-100/70">Публичные репозитории</p>
+                  <p className="mt-1 text-lg font-semibold text-white">{importResult.githubData.publicRepos ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-emerald-200/20 bg-slate-950/45 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-100/70">Звезды</p>
+                  <p className="mt-1 text-lg font-semibold text-white">{importResult.githubData.totalStars ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-emerald-200/20 bg-slate-950/45 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-100/70">Подписчики</p>
+                  <p className="mt-1 text-lg font-semibold text-white">{importResult.githubData.followers ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-emerald-200/20 bg-slate-950/45 px-3 py-2">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-100/70">Активность</p>
+                  <p className="mt-1 text-lg font-semibold text-white">
+                    {importResult.githubData.activityBucket
+                      ? formatGithubActivityLabel(importResult.githubData.activityBucket)
+                      : importResult.githubData.lastActivityAt
+                        ? formatDateTime(importResult.githubData.lastActivityAt) ?? "обновлена"
+                        : "нет данных"}
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </section>
       <div className="xl:pt-0">
         <ProfileForm values={values} onChange={setValues} onSubmit={onSubmit} loading={saving} />
+      </div>
       </div>
     </div>
   );

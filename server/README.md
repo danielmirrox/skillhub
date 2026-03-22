@@ -43,10 +43,14 @@ Backend API for the SkillHub hackathon product.
 - `POST /api/v1/profile/import-github`
 - `GET /api/v1/users`
 - `GET /api/v1/users/:id`
+- `GET /api/v1/users/favorites`
+- `POST /api/v1/users/:id/favorite`
+- `POST /api/v1/users/:id/vote`
 - `GET /api/v1/teams`
 - `GET /api/v1/teams/:teamId`
 - `POST /api/v1/teams`
 - `PUT /api/v1/teams/:teamId`
+- `DELETE /api/v1/teams/:teamId/members/:userId`
 - `GET /api/v1/applications`
 - `POST /api/v1/applications`
 - `PATCH /api/v1/applications/:id`
@@ -57,6 +61,12 @@ Backend API for the SkillHub hackathon product.
 - `GET /api/v1/profile/score/status/:jobId`
 
 These support routes are kept for diagnostics and future UI hooks. They are not part of the main product surface today.
+
+## Product notes
+
+- `/api/v1/teams` hides closed teams by default and only includes them for the captain in their own list when the client asks for it.
+- Accepted applications decrement `slotsOpen`; removing a member restores a slot.
+- `POST /api/v1/applications` rejects closed or full teams with 409 so the UI can show a clear message.
 
 ## Environment
 

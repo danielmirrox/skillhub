@@ -1,4 +1,5 @@
 import React from "react";
+import { useAuth } from "../authContext";
 import { getUsers, type UsersQuery, type UsersListItem } from "../api/users";
 import { SearchFilters } from "../components/search/SearchFilters";
 import { UserCard } from "../components/search/UserCard";
@@ -14,39 +15,68 @@ const defaultFilters: UsersQuery = {
   limit: 12,
 };
 
+function sortUsers(items: UsersListItem[], search: string) {
+  return [...items].sort((left, right) => {
+    if (search) {
+      const relevanceDelta = (right.searchMatch?.score || 0) - (left.searchMatch?.score || 0);
+      if (relevanceDelta !== 0) {
+        return relevanceDelta;
+      }
+    }
+
+    const leftScore = (left.rating?.score || 0) + (left.voteScore || 0) * 2 + (left.favoriteCount || 0) * 0.5;
+    const rightScore = (right.rating?.score || 0) + (right.voteScore || 0) * 2 + (right.favoriteCount || 0) * 0.5;
+
+    if (rightScore !== leftScore) {
+      return rightScore - leftScore;
+    }
+
+    return (right.rating?.score || 0) - (left.rating?.score || 0);
+  });
+}
+
 export function SearchPage() {
+  const { user: currentUser } = useAuth();
+  const requestIdRef = React.useRef(0);
   const [filters, setFilters] = React.useState<UsersQuery>(defaultFilters);
   const [appliedFilters, setAppliedFilters] = React.useState<UsersQuery>(defaultFilters);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [items, setItems] = React.useState<UsersListItem[]>([]);
   const [total, setTotal] = React.useState(0);
+  const currentPage = appliedFilters.page ?? 1;
+  const pageSize = appliedFilters.limit ?? defaultFilters.limit ?? 12;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  React.useEffect(() => {
-    let active = true;
+  const loadUsers = React.useCallback(async () => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
 
-    getUsers(appliedFilters)
-      .then((response) => {
-        if (!active) return;
-        setItems(response.items);
-        setTotal(response.total);
-      })
-      .catch(() => {
-        if (!active) return;
-        setError("Не удалось загрузить участников.");
-      })
-      .finally(() => {
-        if (active) {
-          setLoading(false);
-        }
-      });
+    try {
+      const response = await getUsers(appliedFilters);
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
 
-    return () => {
-      active = false;
-    };
+      setItems(sortUsers(response.items, String(appliedFilters.search || "")));
+      setTotal(response.total);
+    } catch {
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
+
+      setError("Не удалось загрузить участников.");
+    } finally {
+      if (requestIdRef.current === requestId) {
+        setLoading(false);
+      }
+    }
   }, [appliedFilters]);
+
+  React.useEffect(() => {
+    void loadUsers();
+  }, [loadUsers]);
 
   const handleSubmit = () => {
     setAppliedFilters({
@@ -59,6 +89,13 @@ export function SearchPage() {
   const handleReset = () => {
     setFilters(defaultFilters);
     setAppliedFilters(defaultFilters);
+  };
+
+  const changePage = (nextPage: number) => {
+    setAppliedFilters((current) => ({
+      ...current,
+      page: Math.min(Math.max(1, nextPage), totalPages),
+    }));
   };
 
   return (
@@ -161,9 +198,46 @@ export function SearchPage() {
         <div className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-2">
             {items.map((user) => (
-              <UserCard key={user.id} user={user} />
+              <UserCard
+                key={user.id}
+                user={user}
+                currentUserId={currentUser?.id ?? null}
+                onSocialChange={(next) => {
+                  setItems((currentItems) =>
+                    sortUsers(
+                      currentItems.map((item) => (item.id === user.id ? { ...item, ...next } : item)),
+                      String(appliedFilters.search || ""),
+                    ),
+                  );
+                }}
+              />
             ))}
           </div>
+          {totalPages > 1 ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-300 backdrop-blur-xl">
+              <p>
+                Страница <span className="text-white">{currentPage}</span> из <span className="text-white">{totalPages}</span>
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => changePage(currentPage - 1)}
+                  disabled={currentPage <= 1}
+                  className="rounded-full border border-white/10 bg-slate-950/55 px-4 py-2 font-medium text-slate-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Назад
+                </button>
+                <button
+                  type="button"
+                  onClick={() => changePage(currentPage + 1)}
+                  disabled={currentPage >= totalPages}
+                  className="rounded-full border border-white/10 bg-slate-950/55 px-4 py-2 font-medium text-slate-100 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Вперёд
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
     </div>

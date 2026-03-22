@@ -327,15 +327,20 @@ function buildGithubSection(githubData) {
     ? githubData.topRepos
         .map(
           (repo) =>
-            `  - name: ${repo.name}\n    primaryLanguage: ${repo.primaryLanguage || 'unknown'}\n    stars: ${repo.stars || 0}\n    description: ${repo.description || ''}`,
+            `  - name: ${repo.name}\n    url: ${repo.url || 'unknown'}\n    primaryLanguage: ${repo.primaryLanguage || 'unknown'}\n    stars: ${repo.stars || 0}\n    description: ${repo.description || ''}`,
         )
         .join('\n')
     : '  - нет';
 
   return [
     `- publicRepos: ${githubData.publicRepos ?? 0}`,
+    `- totalStars: ${githubData.totalStars ?? 0}`,
+    `- totalForks: ${githubData.totalForks ?? 0}`,
     `- followers: ${githubData.followers ?? 0}`,
     `- accountAgeYears: ${githubData.accountAgeYears ?? 0}`,
+    `- lastActivityAt: ${githubData.lastActivityAt || 'unknown'}`,
+    `- activityRecencyDays: ${githubData.activityRecencyDays ?? 'unknown'}`,
+    `- activityBucket: ${githubData.activityBucket || 'unknown'}`,
     `- languages(bytes): ${JSON.stringify(githubData.languages || {})}`,
     '- topRepos:',
     topRepos,

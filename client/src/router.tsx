@@ -27,6 +27,10 @@ export const router = createBrowserRouter([
         element: <routes.SearchRoute />,
       },
       {
+        path: "/favorites",
+        element: <routes.FavoritesRoute />,
+      },
+      {
         path: "/teams",
         element: <routes.TeamsRoute />,
       },

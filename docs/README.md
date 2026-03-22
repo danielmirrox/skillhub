@@ -7,6 +7,7 @@
 ## Source of Truth
 
 - **PRODUCT_SPEC_FULL.md** — полная спецификация продукта
+- **IMPLEMENTATION_NOTES.md** — текущие отличия реализованного поведения от базовой спеки
 - **CHECKLISTS_BY_MEMBER.md** — текущие чеклисты по участникам
 - **DEPLOYMENT.md** — рекомендации по запуску и выбору схемы деплоя
 - **DEPLOYMENT_COMPOSE.md** — памятка по VM и Docker Compose

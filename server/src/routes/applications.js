@@ -67,6 +67,20 @@ applicationsRouter.patch('/:applicationId', requireAuth, async (req, res, next) 
       });
     }
 
+    if (application.error === 'team_closed') {
+      return res.status(409).json({
+        error: 'TEAM_NOT_ACCEPTING_APPLICATIONS',
+        message: 'Team is not accepting applications.',
+      });
+    }
+
+    if (application.error === 'team_full') {
+      return res.status(409).json({
+        error: 'TEAM_FULL',
+        message: 'Team is full.',
+      });
+    }
+
     return res.json({ application });
   } catch (error) {
     return next(error);

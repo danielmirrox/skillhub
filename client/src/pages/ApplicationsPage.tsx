@@ -1,8 +1,22 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { getApplications, updateApplicationStatus, type ApplicationView } from "../api/applications";
+import { UserAvatar } from "../components/ui/UserAvatar";
 
 type TabKey = "incoming" | "outgoing";
+
+function getApplicationStatusLabel(status: ApplicationView["status"]) {
+  switch (status) {
+    case "pending":
+      return "На рассмотрении";
+    case "accepted":
+      return "Принята";
+    case "declined":
+      return "Отклонена";
+    default:
+      return status;
+  }
+}
 
 function ApplicationCard({
   application,
@@ -13,6 +27,18 @@ function ApplicationCard({
   onAccept?: (id: string) => void;
   onDecline?: (id: string) => void;
 }) {
+  const teamIsAccepting = Boolean(application.team?.status === "active" && application.team?.isActive && (application.team?.slotsOpen ?? 0) > 0);
+  const teamAvailabilityLabel =
+    application.team?.status === "closed"
+      ? "Набор закрыт"
+      : application.team?.status === "paused" || !application.team?.isActive
+        ? "Набор на паузе"
+        : application.team && (application.team.slotsOpen ?? 0) <= 0
+          ? "Команда заполнена"
+          : !teamIsAccepting
+          ? "Набор на паузе"
+          : null;
+
   return (
     <article className="relative overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/5 p-5 shadow-xl shadow-slate-950/25 backdrop-blur-xl">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-lime-300/60 to-transparent" />
@@ -20,15 +46,34 @@ function ApplicationCard({
         <div>
           <p className="text-lg font-semibold text-white">{application.team?.name ?? "Команда не указана"}</p>
           <p className="text-sm text-slate-400">{application.team?.hackathonName ?? "Хакатон"}</p>
+          {teamAvailabilityLabel ? (
+            <p
+              className={`mt-2 inline-flex rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
+                teamAvailabilityLabel === "Набор на паузе"
+                  ? "border border-white/10 bg-white/5 text-slate-300"
+                  : "border border-amber-300/20 bg-amber-300/10 text-amber-100"
+              }`}
+            >
+              {teamAvailabilityLabel}
+            </p>
+          ) : null}
         </div>
-        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200">
-          {application.status}
+        <span
+          className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+            application.status === "accepted"
+              ? "border-emerald-300/20 bg-emerald-300/10 text-emerald-100"
+              : application.status === "declined"
+                ? "border-rose-300/20 bg-rose-300/10 text-rose-100"
+                : "border-white/10 bg-white/5 text-slate-200"
+          }`}
+        >
+          {getApplicationStatusLabel(application.status)}
         </span>
       </div>
 
       <div className="mt-4 flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-950/55 p-3">
-        <img
-          src={application.applicant?.avatarUrl ?? "https://avatars.githubusercontent.com/u/1?v=4"}
+        <UserAvatar
+          src={application.applicant?.avatarUrl}
           alt={application.applicant?.displayName ?? "Участник"}
           className="h-11 w-11 rounded-2xl border border-white/10 object-cover"
         />
@@ -51,9 +96,10 @@ function ApplicationCard({
           <button
             type="button"
             onClick={() => onAccept(application.id)}
-            className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20"
+            disabled={!teamIsAccepting}
+            className="rounded-full bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-4 py-2 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 transition disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Принять
+            {teamAvailabilityLabel ?? "Принять"}
           </button>
           <button
             type="button"
@@ -135,8 +181,16 @@ export function ApplicationsPage() {
       setIncoming(response.incoming);
       setOutgoing(response.outgoing);
     } catch (err) {
-      const typed = err as Error;
-      setActionError(typed.message || "Не удалось обновить статус отклика.");
+      const typed = err as Error & { status?: number; code?: string };
+      if ((typed as Error & { status?: number }).status === 409 && status === "accepted") {
+        if (typed.code === "TEAM_FULL") {
+          setActionError("Команда уже заполнена. Принять заявку нельзя.");
+        } else {
+          setActionError("Набор уже закрыт. Принять заявку нельзя.");
+        }
+      } else {
+        setActionError(typed.message || "Не удалось обновить статус отклика.");
+      }
     }
   };
 

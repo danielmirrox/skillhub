@@ -1,4 +1,5 @@
-import { apiGet } from "./client";
+import { API_BASE_URL, apiGet, getApiRequestHeaders } from "./client";
+import type { GithubImportData } from "./profile";
 
 export type UserRole = "frontend" | "backend" | "fullstack" | "design" | "ml" | "mobile" | "other";
 export type ClaimedGrade = "junior" | "middle" | "senior";
@@ -25,6 +26,12 @@ export type UsersListItem = {
   contactVisible: boolean;
   isPro: boolean;
   bio: string;
+  favoriteCount: number;
+  isFavorite: boolean;
+  upvotes: number;
+  downvotes: number;
+  voteScore: number;
+  myVote: 1 | -1 | null;
 };
 
 export type UsersListResponse = {
@@ -48,6 +55,18 @@ export type UserSummary = {
   bio: string;
   githubConnected: boolean;
   githubImportedAt: string | null;
+  githubData?: GithubImportData | null;
+  favoriteCount: number;
+  isFavorite: boolean;
+  upvotes: number;
+  downvotes: number;
+  voteScore: number;
+  myVote: 1 | -1 | null;
+};
+
+export type FavoriteUsersResponse = {
+  items: UsersListItem[];
+  total: number;
 };
 
 export type UsersQuery = {
@@ -77,4 +96,57 @@ export async function getUsers(query: UsersQuery = {}) {
 
 export async function getUserSummary(userId: string) {
   return apiGet<{ user: UserSummary }>(`/api/v1/users/${userId}`);
+}
+
+export async function getFavoriteUsers() {
+  return apiGet<FavoriteUsersResponse>("/api/v1/users/favorites");
+}
+
+export async function toggleFavorite(userId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/${userId}/favorite`, {
+    method: "POST",
+    credentials: "include",
+    headers: getApiRequestHeaders({
+      "Content-Type": "application/json",
+    }),
+  });
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      typeof body.message === "string"
+        ? body.message
+        : `Request failed with status ${response.status}`,
+    );
+    (error as Error & { status?: number }).status = response.status;
+    throw error;
+  }
+
+  return body as { user: UserSummary };
+}
+
+export async function toggleVote(userId: string, value: 1 | -1) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/users/${userId}/vote`, {
+    method: "POST",
+    credentials: "include",
+    headers: getApiRequestHeaders({
+      "Content-Type": "application/json",
+    }),
+    body: JSON.stringify({ value }),
+  });
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(
+      typeof body.message === "string"
+        ? body.message
+        : `Request failed with status ${response.status}`,
+    );
+    (error as Error & { status?: number }).status = response.status;
+    throw error;
+  }
+
+  return body as { user: UserSummary };
 }

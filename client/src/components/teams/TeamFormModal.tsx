@@ -102,6 +102,7 @@ export function TeamFormModal({
   );
   const [localErrors, setLocalErrors] = React.useState<Record<string, string>>({});
   const [submitAttempted, setSubmitAttempted] = React.useState(false);
+  const isClosed = status === "closed";
 
   React.useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -125,6 +126,12 @@ export function TeamFormModal({
     setLocalErrors({});
     setSubmitAttempted(false);
   }, [team]);
+
+  React.useEffect(() => {
+    if (status === "closed") {
+      setIsActive(false);
+    }
+  }, [status]);
 
   if (typeof document === "undefined") {
     return null;
@@ -216,7 +223,7 @@ export function TeamFormModal({
                 minRating: Number.isFinite(normalizedMinRating as number)
                   ? Math.min(100, Math.max(0, normalizedMinRating as number))
                   : null,
-                isActive,
+                isActive: status === "closed" ? false : isActive,
                 status,
               });
             }}
@@ -348,7 +355,12 @@ export function TeamFormModal({
                 Активная команда
                 <span className={optionalBadgeClass}>необязательно</span>
               </span>
-              <input type="checkbox" checked={isActive} onChange={(event) => setIsActive(event.target.checked)} />
+              <input
+                type="checkbox"
+                checked={isActive}
+                onChange={(event) => setIsActive(event.target.checked)}
+                disabled={isClosed}
+              />
             </label>
 
             <label className="flex flex-col gap-2 text-sm text-slate-300">
@@ -358,13 +370,24 @@ export function TeamFormModal({
               </span>
               <select
                 value={status}
-                onChange={(event) => setStatus(event.target.value as "active" | "paused" | "closed")}
+                onChange={(event) => {
+                  const nextStatus = event.target.value as "active" | "paused" | "closed";
+                  setStatus(nextStatus);
+                  if (nextStatus === "closed") {
+                    setIsActive(false);
+                  } else if (isClosed) {
+                    setIsActive(true);
+                  }
+                }}
                 className={inputBaseClass}
               >
                 <option value="active">Активна</option>
                 <option value="paused">На паузе</option>
                 <option value="closed">Закрыта</option>
               </select>
+              <span className="text-xs text-slate-500">
+                Закрытая команда скрывается из поиска и больше не принимает заявки.
+              </span>
             </label>
 
             <div className="md:col-span-2 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:justify-end">

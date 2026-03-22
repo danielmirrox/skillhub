@@ -4,6 +4,7 @@ import { getCurrentUser } from "../api/auth";
 import { createTeam, getTeamById, getTeams, updateTeam, type TeamRole, type TeamSummary, type TeamDetail, type TeamFormPayload } from "../api/teams";
 import { TeamFormModal } from "../components/teams/TeamFormModal";
 import { ArrowRightIcon, ShieldCheckIcon, UsersIcon } from "../components/ui/Icons";
+import { UserAvatar } from "../components/ui/UserAvatar";
 
 const ROLE_OPTIONS: Array<{ value: TeamRole | ""; label: string }> = [
   { value: "", label: "Любая роль" },
@@ -23,6 +24,22 @@ function formatMemberCount(count: number) {
   if (mod10 === 1 && mod100 !== 11) return `${count} участник`;
   if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return `${count} участника`;
   return `${count} участников`;
+}
+
+function getTeamStatusLabel(team: TeamSummary) {
+  if (team.status === "closed") {
+    return "Закрыта";
+  }
+
+  if (!team.isActive || team.status === "paused") {
+    return "Пауза";
+  }
+
+  if (team.slotsOpen <= 0) {
+    return "Мест нет";
+  }
+
+  return "Активна";
 }
 
 function TeamCard({ team }: { team: TeamSummary }) {
@@ -48,9 +65,13 @@ function TeamCard({ team }: { team: TeamSummary }) {
                 PRO-буст
               </span>
             ) : null}
-            {!team.isActive ? (
-              <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] text-slate-300">
-                Пауза
+            {team.status !== "active" || !team.isActive || team.slotsOpen <= 0 ? (
+              <span className={`rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.24em] ${
+                team.status === "closed"
+                  ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
+                  : "border-white/10 bg-white/5 text-slate-300"
+              }`}>
+                {getTeamStatusLabel(team)}
               </span>
             ) : null}
           </div>
@@ -60,7 +81,7 @@ function TeamCard({ team }: { team: TeamSummary }) {
           <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Слоты</p>
           <p className="mt-1 inline-flex items-center gap-2 text-lg font-semibold text-white">
             <UsersIcon className="h-4 w-4 text-cyan-200" />
-            {team.slotsOpen}
+            {team.slotsOpen > 0 ? team.slotsOpen : "Мест нет"}
           </p>
         </div>
       </div>
@@ -84,7 +105,21 @@ function TeamCard({ team }: { team: TeamSummary }) {
       <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-sm text-slate-400">
           <p className="flex items-center gap-2">
-            {team.author ? <Link to={`/users/${team.author.userId}`} className="text-slate-200 transition duration-300 ease-out hover:text-cyan-200">{team.author.displayName}</Link> : "Автор не указан"}
+            {team.author ? (
+              <Link
+                to={`/users/${team.author.userId}`}
+                className="inline-flex items-center gap-2 text-slate-200 transition duration-300 ease-out hover:text-cyan-200"
+              >
+                <UserAvatar
+                  src={team.author.avatarUrl}
+                  alt={team.author.displayName}
+                  className="h-6 w-6 rounded-full object-cover"
+                />
+                {team.author.displayName}
+              </Link>
+            ) : (
+              "Автор не указан"
+            )}
             {team.author?.isPro ? <span className="text-emerald-200">PRO</span> : null}
           </p>
           <p>{formatMemberCount(team.membersCount)}</p>
@@ -139,7 +174,12 @@ export function TeamsPage() {
     setError(null);
 
     try {
-      const response = await getTeams({ role: role || undefined, stack: stack || undefined, hackathon: hackathon || undefined });
+      const response = await getTeams({
+        role: role || undefined,
+        stack: stack || undefined,
+        hackathon: hackathon || undefined,
+        includeClosed: true,
+      });
       setTeams(response.items);
     } catch {
       setError("Не удалось загрузить команды.");

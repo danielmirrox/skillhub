@@ -82,3 +82,22 @@ CREATE TABLE IF NOT EXISTS applications (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE (applicant_id, team_id)
 );
+
+CREATE TABLE IF NOT EXISTS user_favorites (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  favorite_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (user_id, favorite_user_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_votes (
+  id TEXT PRIMARY KEY,
+  voter_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  target_user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  value INT NOT NULL CHECK (value IN (-1, 1)),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE (voter_id, target_user_id)
+);

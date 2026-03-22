@@ -1,6 +1,7 @@
 import { API_BASE_URL, apiGet, getApiRequestHeaders } from "./client";
 
 export type TeamRole = "frontend" | "backend" | "fullstack" | "design" | "ml" | "mobile" | "other";
+export type TeamStatus = "active" | "paused" | "closed";
 
 export type TeamSummary = {
   id: string;
@@ -18,6 +19,7 @@ export type TeamSummary = {
   } | null;
   membersCount: number;
   isActive: boolean;
+  status: TeamStatus;
 };
 
 export type TeamMemberSummary = {
@@ -33,7 +35,6 @@ export type TeamDetail = TeamSummary & {
   authorId: string;
   author: TeamSummary["author"];
   minRating: number | null;
-  status: string;
   updatedAt: string;
   deletedAt: string | null;
   createdAt: string;
@@ -49,7 +50,7 @@ export type TeamFormPayload = {
   slotsOpen: number;
   minRating?: number | null;
   isActive?: boolean;
-  status?: "active" | "paused" | "closed";
+  status?: TeamStatus;
 };
 
 export type ValidationIssue = {
@@ -72,6 +73,7 @@ export type TeamsQuery = Partial<{
   role: TeamRole;
   stack: string;
   hackathon: string;
+  includeClosed: boolean;
 }>;
 
 export async function getTeams(query: TeamsQuery = {}) {
@@ -93,7 +95,7 @@ export async function getTeamById(teamId: string) {
   return apiGet<{ team: TeamDetail }>(`/api/v1/teams/${teamId}`);
 }
 
-async function submitTeam(teamId: string | null, payload: TeamFormPayload, method: "POST" | "PUT") {
+async function submitTeam(teamId: string | null, payload: TeamFormPayload | Partial<TeamFormPayload>, method: "POST" | "PUT") {
   const response = await fetch(`${API_BASE_URL}/api/v1/teams${teamId ? `/${teamId}` : ""}`, {
     method,
     credentials: "include",
@@ -134,4 +136,28 @@ export async function createTeam(payload: TeamFormPayload) {
 
 export async function updateTeam(teamId: string, payload: TeamFormPayload) {
   return submitTeam(teamId, payload, "PUT");
+}
+
+export async function patchTeam(teamId: string, payload: Partial<TeamFormPayload>) {
+  return submitTeam(teamId, payload, "PUT");
+}
+
+export async function removeTeamMember(teamId: string, userId: string) {
+  const response = await fetch(`${API_BASE_URL}/api/v1/teams/${teamId}/members/${userId}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getApiRequestHeaders({
+      "Content-Type": "application/json",
+    }),
+  });
+
+  const body = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    const error = new Error(typeof body.message === "string" ? body.message : `Request failed with status ${response.status}`);
+    (error as Error & { status?: number }).status = response.status;
+    throw error;
+  }
+
+  return body as { team: TeamDetail };
 }

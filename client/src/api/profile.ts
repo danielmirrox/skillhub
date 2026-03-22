@@ -89,6 +89,7 @@ export type GithubImportData = {
   languages?: Record<string, number>;
   topRepos?: Array<{
     name: string;
+    url?: string | null;
     description?: string | null;
     stars?: number;
     forks?: number;

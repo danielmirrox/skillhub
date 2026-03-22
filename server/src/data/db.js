@@ -115,7 +115,12 @@ async function insertSeedRows(client, table, columns, rows) {
 
   const columnList = columns.join(', ');
   const placeholderList = columns.map((_, index) => `$${index + 1}`).join(', ');
-  const conflictTarget = table === 'applications' ? '(applicant_id, team_id)' : '(id)';
+  const conflictTargets = {
+    applications: '(applicant_id, team_id)',
+    user_favorites: '(user_id, favorite_user_id)',
+    user_votes: '(voter_id, target_user_id)',
+  };
+  const conflictTarget = conflictTargets[table] || '(id)';
   const updateAssignments = columns
     .filter((column) => column !== 'id')
     .map((column) => `${column} = EXCLUDED.${column}`)
@@ -210,6 +215,23 @@ async function seedDatabase(client) {
     created_at: item.createdAt,
     updated_at: item.updatedAt,
   })));
+
+  await insertSeedRows(client, 'user_favorites', ['id', 'user_id', 'favorite_user_id', 'created_at', 'updated_at'], (seedData.favorites || []).map((item) => ({
+    id: item.id,
+    user_id: item.userId,
+    favorite_user_id: item.favoriteUserId,
+    created_at: item.createdAt,
+    updated_at: item.updatedAt,
+  })));
+
+  await insertSeedRows(client, 'user_votes', ['id', 'voter_id', 'target_user_id', 'value', 'created_at', 'updated_at'], (seedData.votes || []).map((item) => ({
+    id: item.id,
+    voter_id: item.voterId,
+    target_user_id: item.targetUserId,
+    value: item.value,
+    created_at: item.createdAt,
+    updated_at: item.updatedAt,
+  })));
 }
 
 async function bootstrapDatabase() {
@@ -251,13 +273,15 @@ async function loadSnapshot() {
     return null;
   }
 
-  const [usersResult, profilesResult, ratingsResult, teamsResult, teamMembersResult, applicationsResult] = await Promise.all([
+  const [usersResult, profilesResult, ratingsResult, teamsResult, teamMembersResult, applicationsResult, favoritesResult, votesResult] = await Promise.all([
     query('SELECT * FROM users ORDER BY created_at ASC, id ASC'),
     query('SELECT * FROM profiles ORDER BY created_at ASC, id ASC'),
     query('SELECT * FROM ratings ORDER BY created_at DESC, id DESC'),
     query('SELECT * FROM teams ORDER BY created_at ASC, id ASC'),
     query('SELECT * FROM team_members ORDER BY joined_at ASC, id ASC'),
     query('SELECT * FROM applications ORDER BY created_at ASC, id ASC'),
+    query('SELECT * FROM user_favorites ORDER BY created_at ASC, id ASC'),
+    query('SELECT * FROM user_votes ORDER BY created_at ASC, id ASC'),
   ]);
 
   return {
@@ -336,6 +360,21 @@ async function loadSnapshot() {
       viewedAt: row.viewed_at,
       updatedAt: row.updated_at,
       createdAt: row.created_at,
+    })),
+    favorites: favoritesResult.rows.map((row) => ({
+      id: row.id,
+      userId: row.user_id,
+      favoriteUserId: row.favorite_user_id,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+    })),
+    votes: votesResult.rows.map((row) => ({
+      id: row.id,
+      voterId: row.voter_id,
+      targetUserId: row.target_user_id,
+      value: row.value,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
     })),
   };
 }

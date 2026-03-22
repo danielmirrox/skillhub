@@ -1,8 +1,12 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAuth } from "../authContext";
 import { getUserSummary, type UserSummary } from "../api/users";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { ArrowRightIcon, GithubIcon, LockIcon, SendIcon, ShieldCheckIcon, SparklesIcon, UsersIcon } from "../components/ui/Icons";
+import { UserAvatar } from "../components/ui/UserAvatar";
+import { UserSocialActions } from "../components/users/UserSocialActions";
+import { formatGithubActivityLabel, formatProfileHeadline, formatRatingGradeLabel } from "../utils/profileLabels";
 
 function formatDateTime(value?: string | null) {
   if (!value) {
@@ -20,6 +24,7 @@ function formatDateTime(value?: string | null) {
 
 export function UserDetailPage() {
   const { id } = useParams();
+  const { user: currentUser } = useAuth();
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [user, setUser] = React.useState<UserSummary | null>(null);
@@ -102,13 +107,15 @@ export function UserDetailPage() {
   }
 
   const telegramLink = user.contactVisible && user.telegramUsername ? `https://t.me/${user.telegramUsername.replace(/^@/, "")}` : null;
+  const currentUserId = currentUser?.id ?? null;
+  const canInteract = Boolean(currentUserId && currentUserId !== user.id);
 
   return (
     <section className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
         <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="flex flex-wrap items-start gap-5">
-            <img
+            <UserAvatar
               src={user.avatarUrl}
               alt={user.displayName}
               className="h-24 w-24 rounded-[1.5rem] border border-white/10 object-cover shadow-lg shadow-black/20"
@@ -118,9 +125,7 @@ export function UserDetailPage() {
                 <h2 className="text-3xl font-semibold tracking-tight text-white">{user.displayName}</h2>
                 {user.rating ? <RatingBadge score={user.rating.score} /> : null}
               </div>
-              <p className="mt-2 text-slate-400">
-                {user.role ?? "роль не указана"} · {user.claimedGrade ?? "грейд не указан"}
-              </p>
+              <p className="mt-2 text-slate-400">{formatProfileHeadline(user.role, user.claimedGrade)}</p>
               <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">{user.bio || "О себе пока ничего не добавлено."}</p>
               <div className="mt-5 inline-flex rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
                 {user.contactVisible ? (
@@ -135,6 +140,13 @@ export function UserDetailPage() {
                   </span>
                 )}
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-slate-950/55 p-4">
+            <p className="text-sm text-slate-400">Реакция сообщества</p>
+            <div className="mt-3">
+              <UserSocialActions userId={user.id} social={user} canInteract={canInteract} />
             </div>
           </div>
 
@@ -201,6 +213,32 @@ export function UserDetailPage() {
                 </span>
               ) : null}
             </div>
+            {user.githubData ? (
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Публичные репозитории</p>
+                  <p className="mt-1 text-xl font-semibold text-white">{user.githubData.publicRepos ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Звезды</p>
+                  <p className="mt-1 text-xl font-semibold text-white">{user.githubData.totalStars ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Подписчики</p>
+                  <p className="mt-1 text-xl font-semibold text-white">{user.githubData.followers ?? 0}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Активность</p>
+                  <p className="mt-1 text-xl font-semibold text-white">
+                    {user.githubData.activityBucket
+                      ? formatGithubActivityLabel(user.githubData.activityBucket)
+                      : user.githubData.lastActivityAt
+                        ? formatDateTime(user.githubData.lastActivityAt) ?? "обновлена"
+                        : "нет данных"}
+                  </p>
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="mt-6 flex flex-wrap gap-3">
@@ -249,7 +287,7 @@ export function UserDetailPage() {
                   </div>
                   <RatingBadge score={user.rating.score} />
                 </div>
-                <p className="mt-4 text-sm text-slate-300">{user.rating.grade}</p>
+                <p className="mt-4 text-sm text-slate-300">{formatRatingGradeLabel(user.rating.grade, user.role)}</p>
               </div>
 
               <div className="rounded-[1.5rem] border border-amber-300/15 bg-amber-300/10 p-4 text-sm text-amber-100">

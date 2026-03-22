@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import type { AuthUser } from "../../api/auth";
-import { LogOutIcon, MenuIcon, SearchIcon, ShieldCheckIcon, UserRoundIcon, UsersIcon, XIcon } from "../ui/Icons";
+import { LogOutIcon, MenuIcon, SearchIcon, ShieldCheckIcon, StarIcon, UserRoundIcon, UsersIcon, XIcon } from "../ui/Icons";
 
 const navLinkClassName = ({ isActive }: { isActive: boolean }) =>
   [
@@ -63,6 +63,7 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
   const authenticatedLinks = [
     { to: "/dashboard", label: "Дашборд" },
     { to: "/search", label: "Поиск", icon: SearchIcon },
+    { to: "/favorites", label: "Избранные", icon: StarIcon },
     { to: "/teams", label: "Команды", icon: UsersIcon },
     { to: "/applications", label: "Заявки", icon: ShieldCheckIcon },
   ];
