@@ -38,10 +38,27 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
     };
   }, [mobileMenuOpen]);
 
+  React.useEffect(() => {
+    if (!mobileMenuOpen) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [mobileMenuOpen]);
+
   const handleLogoClick = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
     setMobileMenuOpen(false);
   };
+
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   const authenticatedLinks = [
     { to: "/dashboard", label: "Дашборд" },
@@ -69,6 +86,7 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             onClick={() => setMobileMenuOpen((value) => !value)}
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-slate-100 transition duration-200 ease-out hover:-translate-y-px hover:bg-white/10 md:hidden"
             aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-navigation"
             aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
           >
             {mobileMenuOpen ? <XIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
@@ -117,73 +135,96 @@ export function Layout({ user, loading, onLogout }: LayoutProps) {
             )}
           </nav>
 
+        </div>
+      </header>
+
+      <div
+        className={[
+          "fixed inset-0 z-40 md:hidden",
+          mobileMenuOpen ? "pointer-events-auto" : "pointer-events-none",
+        ].join(" ")}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <button
+          type="button"
+          onClick={closeMobileMenu}
+          tabIndex={mobileMenuOpen ? 0 : -1}
+          className={[
+            "absolute inset-0 bg-slate-950/55 backdrop-blur-sm transition-opacity duration-200 ease-out",
+            mobileMenuOpen ? "opacity-100" : "opacity-0",
+          ].join(" ")}
+          aria-label="Закрыть меню"
+        />
+        <div className="absolute inset-x-4 top-[calc(env(safe-area-inset-top)+4.1rem)]">
           <nav
-            aria-hidden={!mobileMenuOpen}
+            id="mobile-navigation"
+            role="dialog"
+            aria-modal="true"
             className={[
-              "grid w-full gap-2 overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/90 text-sm backdrop-blur-xl transition-[max-height,opacity,transform,padding] duration-300 ease-out md:hidden",
-              mobileMenuOpen
-                ? "max-h-[calc(100dvh-5rem)] overflow-y-auto px-3 py-3 opacity-100 translate-y-0 overscroll-contain"
-                : "max-h-0 pointer-events-none px-3 py-0 opacity-0 -translate-y-2",
+              "ml-auto w-full max-w-sm origin-top-right overflow-hidden rounded-[1.5rem] border border-white/10 bg-slate-950/96 text-sm shadow-2xl shadow-slate-950/50 backdrop-blur-2xl transform-gpu transition-[transform,opacity] duration-300 ease-out",
+              mobileMenuOpen ? "translate-y-0 scale-100 opacity-100" : "-translate-y-3 scale-[0.98] opacity-0",
             ].join(" ")}
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-2">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Меню</p>
-              <button
-                type="button"
-                onClick={() => setMobileMenuOpen(false)}
-                className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-200 transition duration-200 ease-out hover:-translate-y-px hover:bg-white/10"
-                aria-label="Закрыть меню"
-              >
-                <XIcon className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="grid gap-2 pt-1">
-              {user ? (
-                <>
-                  {authenticatedLinks.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <NavLink key={item.to} to={item.to} onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                        <span className="inline-flex items-center gap-2">
-                          {Icon ? <Icon className="h-4 w-4" /> : null}
-                          {item.label}
-                        </span>
-                      </NavLink>
-                    );
-                  })}
-                  <NavLink to="/profile" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
+            <div className="max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain px-3 py-3">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-400">Меню</p>
+                <button
+                  type="button"
+                  onClick={closeMobileMenu}
+                  className="rounded-full border border-white/10 bg-white/5 p-2 text-slate-200 transition duration-200 ease-out hover:-translate-y-px hover:bg-white/10"
+                  aria-label="Закрыть меню"
+                >
+                  <XIcon className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="grid gap-2 pt-3">
+                {user ? (
+                  <>
+                    {authenticatedLinks.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <NavLink key={item.to} to={item.to} onClick={closeMobileMenu} className={navLinkClassName}>
+                          <span className="inline-flex items-center gap-2">
+                            {Icon ? <Icon className="h-4 w-4" /> : null}
+                            {item.label}
+                          </span>
+                        </NavLink>
+                      );
+                    })}
+                    <NavLink to="/profile" onClick={closeMobileMenu} className={navLinkClassName}>
+                      <span className="inline-flex items-center gap-2">
+                        <UserRoundIcon className="h-4 w-4" />
+                        Профиль
+                      </span>
+                    </NavLink>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        closeMobileMenu();
+                        onLogout();
+                      }}
+                      className="rounded-full px-4 py-2 text-left text-sm font-medium text-slate-300 backdrop-blur-xl transition duration-200 ease-out hover:-translate-y-px hover:bg-white/8 hover:text-white"
+                      disabled={loading}
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <LogOutIcon className="h-4 w-4" />
+                        Выход
+                      </span>
+                    </button>
+                  </>
+                ) : (
+                  <NavLink to="/login" onClick={closeMobileMenu} className={navLinkClassName}>
                     <span className="inline-flex items-center gap-2">
                       <UserRoundIcon className="h-4 w-4" />
-                      Профиль
+                      Вход
                     </span>
                   </NavLink>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      onLogout();
-                    }}
-                    className="rounded-full px-4 py-2 text-left text-sm font-medium text-slate-300 backdrop-blur-xl transition duration-200 ease-out hover:-translate-y-px hover:bg-white/8 hover:text-white"
-                    disabled={loading}
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      <LogOutIcon className="h-4 w-4" />
-                      Выход
-                    </span>
-                  </button>
-                </>
-              ) : (
-                <NavLink to="/login" onClick={() => setMobileMenuOpen(false)} className={navLinkClassName}>
-                  <span className="inline-flex items-center gap-2">
-                    <UserRoundIcon className="h-4 w-4" />
-                    Вход
-                  </span>
-                </NavLink>
-              )}
+                )}
+              </div>
             </div>
           </nav>
         </div>
-      </header>
+      </div>
 
       <main className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-10">
         <div key={location.pathname} className="ui-page-enter">
