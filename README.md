@@ -32,7 +32,7 @@ SkillHub — платформа для мэтчинга участников и 
 | `client/` | Frontend-приложение, UI, роутинг и интеграция с API |
 | `server/` | Backend API, авторизация, скоринг и интеграция с данными |
 | `scripts/` | Seed-данные, smoke-тесты и служебные скрипты |
-| `docs/` | Спецификация продукта, планы, заметки по деплою и чеклисты |
+| `docs/` | Текущая документация проекта, API и гайды по разработке |
 
 ## Команда и зоны ответственности
 
@@ -55,6 +55,7 @@ SkillHub — платформа для мэтчинга участников и 
 - YandexGPT подключён к скорингу профиля
 - Для VM предусмотрен `docker compose`-путь с Postgres, backend и фронтендом через nginx
 - Документация и smoke-тесты поддерживаются в `docs/` и `scripts/`
+- Legacy-материалы по планированию и питчам вынесены в `../skillhub_docs_archive`
 
 ## Локальная разработка
 
@@ -106,7 +107,7 @@ VITE_ENABLE_DEMO_AUTH=true
 
 ### Deployment on VM
 
-Для запуска на одной виртуальной машине смотри [docs/DEPLOYMENT_COMPOSE.md](./docs/DEPLOYMENT_COMPOSE.md).
+Для запуска на одной виртуальной машине смотри [docs/DEPLOYMENT_GUIDE.md](./docs/DEPLOYMENT_GUIDE.md).
 Там описан `docker compose`-путь с PostgreSQL, backend и nginx-контейнером для фронтенда.
 
 ## Примечания по API
@@ -122,14 +123,16 @@ VITE_ENABLE_DEMO_AUTH=true
 
 Рекомендуемые точки входа:
 
-- `docs/PRODUCT_SPEC_FULL.md`
-- `docs/IMPLEMENTATION_NOTES.md`
-- `docs/HAKATHON_30H_PLAN_V2.md`
-- `docs/CHECKLISTS_BY_MEMBER.md`
-- `docs/JURY_HANDOFF.md`
-- `docs/DEPLOYMENT_SSH.md`
-- `docs/DEPLOYMENT.md`
-- `docs/DEPLOYMENT_COMPOSE.md`
+- `docs/INDEX.md`
+- `docs/PROJECT_OVERVIEW.md`
+- `docs/ARCHITECTURE.md`
+- `docs/API_REFERENCE.md`
+- `docs/FEATURES.md`
+- `docs/DEPLOYMENT_GUIDE.md`
+- `docs/DEVELOPMENT.md`
+- `docs/QA_CHECKLIST.md`
+
+Legacy-материалы лежат в `../skillhub_docs_archive`.
 
 ## Тестирование
 
