@@ -279,8 +279,7 @@ export function TeamsPage() {
       <article className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Команды</p>
-            <h2 className="text-balance mt-3 text-[clamp(1.7rem,5vw,3rem)] font-semibold tracking-tight text-white">Команды хакатона</h2>
+            <h2 className="text-balance text-[clamp(1.7rem,5vw,3rem)] font-semibold tracking-tight text-white">Команды хакатона</h2>
             <p className="mt-4 max-w-3xl text-pretty text-sm leading-6 text-slate-300 sm:text-base sm:leading-7">
               Здесь видно, кто ищет людей, какие роли нужны и сколько мест осталось.
             </p>
@@ -320,9 +319,10 @@ export function TeamsPage() {
             value={role}
             onChange={(event) => setRole(event.target.value as TeamRole | "")}
             className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-100"
+            style={{ colorScheme: "dark" }}
           >
             {ROLE_OPTIONS.map((option) => (
-              <option key={option.label} value={option.value}>
+              <option key={option.label} value={option.value} className="bg-slate-900 text-slate-100">
                 {option.label}
               </option>
             ))}
