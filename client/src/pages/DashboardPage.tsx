@@ -15,6 +15,20 @@ function pluralizeYears(count: number): string {
   return "лет";
 }
 
+function formatDateTime(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
 export function DashboardPage({ user }: DashboardPageProps) {
   const [profile, setProfile] = React.useState<Profile | undefined>(undefined);
   const [loadingProfile, setLoadingProfile] = React.useState(true);
@@ -87,7 +101,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
           </div>
 
           {!loadingProfile && profile && !isDraftProfile ? (
-            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
                 <p className="text-sm text-slate-400">AI-рейтинг</p>
                 <p className="mt-2 text-2xl font-semibold text-white">
@@ -112,6 +126,19 @@ export function DashboardPage({ user }: DashboardPageProps) {
                     : "Не заполнен"}
                 </p>
               </div>
+              <div className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+                <p className="text-sm text-slate-400">GitHub</p>
+                <p className="mt-2 text-lg font-semibold text-white">
+                  {profile.githubData?.fetchedAt ? "Подключён" : profile.githubUrl ? "Готов к импорту" : "Не подключён"}
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  {profile.githubData?.fetchedAt
+                    ? `Импорт обновлён ${formatDateTime(profile.githubData.fetchedAt)}`
+                    : profile.githubUrl
+                      ? "Открой профиль и нажми импорт"
+                      : "Добавь GitHub URL в профиль"}
+                </p>
+              </div>
             </div>
           ) : !loadingProfile && profile && isDraftProfile ? (
             <div className="mt-6 rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5">
@@ -119,6 +146,9 @@ export function DashboardPage({ user }: DashboardPageProps) {
               <p className="mt-2 text-lg font-semibold text-white">Профиль ещё пустой, это нормально для первого входа</p>
               <p className="mt-2 text-sm leading-7 text-slate-300">
                 Заполни роль, стек и пару проектов. После этого поиск, рейтинг и карточка профиля начнут выглядеть сильнее.
+              </p>
+              <p className="mt-2 text-sm leading-7 text-slate-300">
+                Если у тебя есть GitHub, подключи его: открытые данные помогут точнее собрать стек, проекты и рекомендации.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link

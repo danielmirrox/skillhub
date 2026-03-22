@@ -238,6 +238,10 @@ authRouter.get('/github/callback', async (req, res, next) => {
       email,
     });
 
+    await demoStore.updateProfile(user.id, {
+      githubUrl: githubUser.html_url || `https://github.com/${githubUser.login}`,
+    });
+
     const token = jwt.sign(
       {
         sub: user.id,

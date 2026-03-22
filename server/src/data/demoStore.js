@@ -569,6 +569,7 @@ function buildOwnProfile(userId, viewer) {
           projectLinks: clone(profile.projectLinks),
           telegramUsername: profile.telegramUsername,
           githubUrl: profile.githubUrl,
+          githubData: clone(profile.githubData || null),
           isPublic: profile.isPublic,
           hasRating: Boolean(rating),
           lastRatingScore: rating?.score || null,
@@ -676,6 +677,8 @@ function buildUserSummary(userId, viewer) {
     contactVisible: calculateContactVisible(viewer, rating),
     telegramUsername: calculateContactVisible(viewer, rating) ? profile?.telegramUsername || null : null,
     bio: profile?.bio || '',
+    githubConnected: Boolean(profile?.githubUrl || profile?.githubData),
+    githubImportedAt: profile?.githubData?.fetchedAt || null,
   };
 }
 
@@ -979,7 +982,15 @@ function inferRatingInput(profile, githubData) {
   const projectBoost = (profile.projectLinks || []).length * 4;
   const experienceBoost = Math.min(profile.experienceYears * 6, 24);
   const hackathonBoost = Math.min(profile.hackathonsCount * 5, 15);
-  const githubBoost = mergedGithubData ? Math.min((mergedGithubData.publicRepos || 0) * 1.5, 15) : 0;
+  const githubRepoBoost = mergedGithubData ? Math.min((mergedGithubData.publicRepos || 0) * 1.2, 14) : 0;
+  const githubQualityBoost = mergedGithubData
+    ? Math.min(((mergedGithubData.totalStars || 0) * 0.12) + ((mergedGithubData.totalForks || 0) * 0.08), 12)
+    : 0;
+  const githubSocialBoost = mergedGithubData ? Math.min((mergedGithubData.followers || 0) * 0.15, 8) : 0;
+  const githubActivityBoost = mergedGithubData?.activityRecencyDays == null
+    ? 0
+    : Math.max(0, 8 - Math.min(Math.floor((mergedGithubData.activityRecencyDays || 0) / 30), 8));
+  const githubBoost = Math.min(githubRepoBoost + githubQualityBoost + githubSocialBoost + githubActivityBoost, 25);
   const baseScore = 30;
   const score = Math.max(0, Math.min(100, Math.round(baseScore + stackBoost + projectBoost + experienceBoost + hackathonBoost + githubBoost)));
 
