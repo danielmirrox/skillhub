@@ -38,7 +38,7 @@ SkillHub — платформа для мэтчинга участников и 
 
 | Автор | Зона ответственности |
 |--------|------------------------|
-| Даниэл | Backend, YandexGPT, деплой и стабильность |
+| Даниэл | Backend, YandexGPT, деплой и стабильность, GitHub API |
 | Денис | Frontend, layout, роутинг, поиск, профиль и экраны команд |
 | Дени | Seed data, smoke tests, scripts, documentation support, presentation materials, PostgreSQL, GitHub OAuth |
 
