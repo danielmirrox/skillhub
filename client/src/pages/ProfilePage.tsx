@@ -92,7 +92,7 @@ export function ProfilePage() {
 
   if (!profile) {
     return (
-      <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+      <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
         <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Профиль ещё не создан</h2>
         <p className="mt-3 max-w-2xl text-slate-300">
@@ -125,7 +125,7 @@ export function ProfilePage() {
   return (
     <section className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-slate-950/30 backdrop-blur-xl">
+        <article className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
@@ -289,7 +289,7 @@ export function ProfilePage() {
                 <div className="flex items-center justify-between gap-4">
                   <div>
                     <p className="text-sm text-slate-400">Текущий рейтинг</p>
-                    <p className="mt-2 text-5xl font-semibold tracking-tight text-white">{profile.rating.score}</p>
+                    <p className="mt-2 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{profile.rating.score}</p>
                   </div>
                   <RatingBadge score={profile.rating.score} />
                 </div>

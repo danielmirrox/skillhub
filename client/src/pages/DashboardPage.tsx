@@ -241,7 +241,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">Статус</p>
             <p className="mt-2 text-xl font-semibold text-white">Сценарий готов</p>
-            <p className="mt-2 text-sm text-slate-400">Можно проверять все экраны локально и без OAuth.</p>
+            <p className="mt-2 text-sm text-slate-400">Можно пройти весь сценарий без лишних шагов.</p>
           </article>
           <article className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl">
             <p className="text-sm text-slate-400">AI-скоринг</p>
