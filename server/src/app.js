@@ -61,6 +61,14 @@ function createApp() {
       limit: env.RATE_LIMIT_MAX_REQUESTS,
       standardHeaders: true,
       legacyHeaders: false,
+      skip(req) {
+        return (
+          req.method === 'OPTIONS' ||
+          req.path === '/health' ||
+          req.path.startsWith('/auth') ||
+          req.path.startsWith('/api/v1/auth')
+        );
+      },
     })
   );
 

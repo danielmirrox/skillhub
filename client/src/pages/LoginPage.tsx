@@ -1,3 +1,4 @@
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { getApiUrl } from "../api/client";
 import {
@@ -12,6 +13,7 @@ import { GithubIcon, LogOutIcon, ShieldCheckIcon, SparklesIcon } from "../compon
 export function LoginPage() {
   const navigate = useNavigate();
   const demoAuthEnabled = isDemoAuthEnabled();
+  const [authing, setAuthing] = React.useState(false);
 
   const handleLogin = (isPro = false) => {
     const user = isPro ? DEMO_PRO_AUTH_USER : DEMO_AUTH_USER;
@@ -25,6 +27,8 @@ export function LoginPage() {
   };
 
   const handleGithubLogin = () => {
+    if (authing) return;
+    setAuthing(true);
     window.location.assign(getApiUrl("/api/v1/auth/github"));
   };
 
@@ -68,14 +72,15 @@ export function LoginPage() {
             <button
               type="button"
               onClick={handleGithubLogin}
-              className="inline-flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-100 via-cyan-200 to-sky-300 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
+              disabled={authing}
+              className="inline-flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-slate-100 via-cyan-200 to-sky-300 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-slate-950/10 text-slate-950">
                 <GithubIcon className="h-5 w-5" />
               </span>
               <span className="block">
                 <span className="block text-sm uppercase tracking-[0.2em] text-slate-700/70">GitHub</span>
-                <span className="mt-1 block text-lg">Войти через GitHub</span>
+                <span className="mt-1 block text-lg">{authing ? "Открываем GitHub..." : "Войти через GitHub"}</span>
               </span>
             </button>
 
