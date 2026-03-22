@@ -1,12 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { DEMO_PRO_AUTH_USER, getDemoAuthUser, isDemoAuthEnabled, setDemoAuthUser } from "../api/demoAuth";
 import { getOwnProfile, scoreProfile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { ArrowRightIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../components/ui/Icons";
 
 export function ProfilePage() {
-  const demoAuthEnabled = isDemoAuthEnabled();
   const [loading, setLoading] = React.useState(true);
   const [scoring, setScoring] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -79,7 +77,6 @@ export function ProfilePage() {
     return <p className="text-red-300">{error}</p>;
   }
 
-  const currentDemoUser = demoAuthEnabled ? getDemoAuthUser() : null;
   const profile = profileData?.profile;
   const isDraftProfile =
     Boolean(profile) &&
@@ -151,19 +148,6 @@ export function ProfilePage() {
                   Стать PRO
                 </Link>
               )}
-              {!profileData?.user.isPro && demoAuthEnabled ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setDemoAuthUser(DEMO_PRO_AUTH_USER);
-                    window.location.reload();
-                  }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10 sm:w-auto"
-                >
-                  <SparklesIcon className="h-3.5 w-3.5" />
-                  Включить PRO-демо
-                </button>
-              ) : null}
               <Link
                 to="/profile/edit"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 hover:bg-white/10 sm:w-auto"
@@ -199,13 +183,6 @@ export function ProfilePage() {
                 Здесь можно смелее сосредоточиться на качестве профиля: рейтинг, проекты и ясное описание.
               </p>
             </div>
-          ) : null}
-
-          {currentDemoUser?.id ? (
-            <p className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-sm text-slate-300">
-              <SparklesIcon className="h-4 w-4 text-cyan-200" />
-              Демо-пользователь: {currentDemoUser.displayName ?? currentDemoUser.username}
-            </p>
           ) : null}
 
           {isDraftProfile ? (
@@ -295,7 +272,7 @@ export function ProfilePage() {
                 </div>
                 <p className="mt-4 text-sm text-slate-300">{profile.rating.grade}</p>
                 <p className="mt-2 text-xs uppercase tracking-[0.2em] text-slate-500">
-                  {profileData?.user.isPro ? "Без лимита в PRO" : "1 попытка / 7 дней в демо"}
+                  {profileData?.user.isPro ? "Без лимита в PRO" : "1 попытка / 7 дней в стандартном режиме"}
                 </p>
               </div>
 

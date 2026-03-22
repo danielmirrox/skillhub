@@ -39,32 +39,19 @@ export function LoginPage() {
           SkillHub делает поиск людей и команд быстрым и понятным.
         </h2>
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Основной путь входа подключён к серверу через GitHub OAuth. Для проверки сценариев предусмотрен
-          отдельный режим разработки.
+          Основной путь входа ведёт через GitHub OAuth. После авторизации открываются поиск, команды, заявки и профиль.
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-3 text-sm">
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">Поиск</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">AI-рейтинг</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">Заявки</span>
-          <span className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">Импорт GitHub</span>
-        </div>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Для теста</p>
-            <p className="mt-2 text-2xl font-semibold text-white">1 клик</p>
-            <p className="mt-2 text-sm text-slate-400">Попадаешь в дашборд и сразу видишь весь поток продукта.</p>
+            <p className="text-sm text-slate-400">Вход</p>
+            <p className="mt-2 text-2xl font-semibold text-white">GitHub OAuth</p>
+            <p className="mt-2 text-sm text-slate-400">Один основной сценарий без лишних развилок.</p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Для PRO</p>
-            <p className="mt-2 text-2xl font-semibold text-white">Доступно</p>
-            <p className="mt-2 text-sm text-slate-400">Рекомендации и контактная информация открываются по правилам.</p>
-          </article>
-          <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-            <p className="text-sm text-slate-400">Флоу</p>
-            <p className="mt-2 text-2xl font-semibold text-white">Живой</p>
-            <p className="mt-2 text-sm text-slate-400">Поиск → профиль → заявки → скоринг работает end-to-end.</p>
+            <p className="text-sm text-slate-400">Результат</p>
+            <p className="mt-2 text-2xl font-semibold text-white">Рабочий экран</p>
+            <p className="mt-2 text-sm text-slate-400">После входа открывается полноценный продуктовый интерфейс.</p>
           </article>
         </div>
       </div>
@@ -74,7 +61,7 @@ export function LoginPage() {
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Панель входа</p>
           <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            Нажми кнопку GitHub, чтобы перейти в настоящий флоу авторизации и открыть рабочие разделы продукта.
+            Нажми кнопку GitHub, чтобы перейти в авторизацию и открыть рабочие разделы продукта.
           </p>
 
           <div className="mt-6 grid gap-3">
@@ -136,9 +123,7 @@ export function LoginPage() {
             ) : null}
           </div>
 
-          <p className="mt-5 text-sm text-slate-400">
-            Кнопка GitHub открывает серверный OAuth-флоу. Демо-кнопки доступны только в локальной разработке.
-          </p>
+          <p className="mt-5 text-sm text-slate-400">GitHub-кнопка открывает серверный OAuth-флоу.</p>
         </div>
       </aside>
     </section>

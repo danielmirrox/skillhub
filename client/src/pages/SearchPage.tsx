@@ -2,7 +2,7 @@ import React from "react";
 import { getUsers, type UsersQuery, type UsersListItem } from "../api/users";
 import { SearchFilters } from "../components/search/SearchFilters";
 import { UserCard } from "../components/search/UserCard";
-import { SearchIcon, SparklesIcon, UsersIcon } from "../components/ui/Icons";
+import { SearchIcon, UsersIcon } from "../components/ui/Icons";
 
 const defaultFilters: UsersQuery = {
   search: "",
@@ -73,10 +73,6 @@ export function SearchPage() {
             Живой экран поверх API `/api/v1/users`. Фильтры по роли, грейду, минимальному рейтингу и стеку
             работают, а AI-релевантность и PRO-доступ к контактам подтягиваются из бэка.
           </p>
-          <div className="mt-6 inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-50">
-            <SparklesIcon className="h-4 w-4" />
-            <span className="font-medium">AI-релевантность и рейтинг подсвечены прямо в карточках</span>
-          </div>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
@@ -163,18 +159,6 @@ export function SearchPage() {
 
       {!loading && !error && items.length > 0 ? (
         <div className="space-y-4">
-          {appliedFilters.search ? (
-            <div className="rounded-2xl border border-cyan-300/20 bg-gradient-to-r from-cyan-300/15 via-slate-950 to-violet-400/10 px-4 py-3 backdrop-blur-xl">
-              <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-cyan-200">
-                <SparklesIcon className="h-3.5 w-3.5" />
-                AI-рейтинг
-              </p>
-              <p className="mt-2 text-sm text-cyan-50/95">
-                Поиск работает гибридно: сначала учитываются совпадения по имени, стеку, био, роли и проектам,
-                затем рейтинг.
-              </p>
-            </div>
-          ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
             {items.map((user) => (
               <UserCard key={user.id} user={user} />

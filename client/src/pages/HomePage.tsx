@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { getApiUrl } from "../api/client";
 import { useAuth } from "../authContext";
-import { GithubIcon, ArrowRightIcon, ShieldCheckIcon, SparklesIcon, UsersIcon } from "../components/ui/Icons";
+import { GithubIcon, SparklesIcon } from "../components/ui/Icons";
 
 export function HomePage() {
   const { loading, user } = useAuth();
@@ -28,44 +28,20 @@ export function HomePage() {
             Одна и та же главная страница до входа и после него.
           </h2>
           <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            Здесь видно, что делает платформа: поиск людей, команды, AI-рейтинг, заявки и будущий PRO-доступ.
-            После входа меняются только действия и навигация, а не сама точка входа.
+            Здесь видно основной сценарий продукта: поиск людей, команды, AI-рейтинг и заявки. После входа
+            меняются только действия и навигация.
           </p>
 
-          <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">
-              <SparklesIcon className="h-3.5 w-3.5" />
-              AI-рейтинг
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">
-              <UsersIcon className="h-3.5 w-3.5" />
-              Поиск участников
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">
-              <ShieldCheckIcon className="h-3.5 w-3.5" />
-              Лента команд
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-slate-200">
-              <ArrowRightIcon className="h-3.5 w-3.5" />
-              Заявки
-            </span>
-          </div>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Сценарий</p>
               <p className="mt-2 text-2xl font-semibold text-white">Главный поток</p>
-              <p className="mt-2 text-sm text-slate-400">Можно показать без лишней подготовки и без ручных редиректов.</p>
+              <p className="mt-2 text-sm text-slate-400">Один экран, один сценарий, один переход в рабочие разделы.</p>
             </article>
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Авторизация</p>
               <p className="mt-2 text-2xl font-semibold text-white">{user ? "Уже есть вход" : "GitHub OAuth"}</p>
               <p className="mt-2 text-sm text-slate-400">Хедер меняется под состояние сессии автоматически.</p>
-            </article>
-            <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
-              <p className="text-sm text-slate-400">PAYWALL</p>
-              <p className="mt-2 text-2xl font-semibold text-white">Подготовлен</p>
-              <p className="mt-2 text-sm text-slate-400">Платёжный экран готов к подключению YuMoney.</p>
             </article>
           </div>
         </article>
@@ -75,8 +51,7 @@ export function HomePage() {
             <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Главное действие</p>
             <h3 className="text-balance mt-3 text-xl font-semibold text-white sm:text-2xl">{user ? "Продолжить работу" : "Войти и открыть продукт"}</h3>
             <p className="mt-3 text-sm leading-7 text-slate-300">
-              Главная не пересобирается под авторизацию. После GitHub входа ты остаёшься в той же логике страницы,
-              просто открываются внутренние разделы.
+              После GitHub входа открываются рабочие разделы без лишних переходов и дублирования сценария.
             </p>
 
             <div className="mt-6 grid gap-3">
@@ -121,11 +96,8 @@ export function HomePage() {
             </div>
 
             <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
-              <p className="font-semibold text-white">Проверка на защите</p>
-              <p className="mt-2 leading-7">
-                Для показа важно только, что всё стартует предсказуемо: GitHub вход, Postgres, YandexGPT и
-                проверка основного сценария.
-              </p>
+              <p className="font-semibold text-white">Что важно на показе</p>
+              <p className="mt-2 leading-7">Предсказуемый вход, рабочий поиск, команды и профиль без лишнего шума.</p>
             </div>
           </div>
         </aside>

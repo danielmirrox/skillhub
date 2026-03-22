@@ -34,11 +34,11 @@ export function PaywallPage() {
           PRO paywall
         </div>
         <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.4vw,4.2rem)] font-semibold leading-[1.03] tracking-tight text-white">
-          Экран оплаты уже на месте и готов к подключению YuMoney.
+          Оформление PRO-доступа
         </h2>
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Здесь позже подключится YuMoney. Для защиты достаточно показать сам экран, сценарий переключения
-          и то, что он переводит пользователя в PRO-режим.
+          Этот экран отделяет покупку от профиля и показывает основной сценарий оформления. Подключение платёжного
+          провайдера можно добавить без изменения остального UX.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -56,12 +56,12 @@ export function PaywallPage() {
               <SparklesIcon className="h-5 w-5 text-cyan-200" />
               Готов
             </p>
-            <p className="mt-2 text-sm text-slate-400">Кнопка уже переводит сценарий в PRO до подключения YuMoney.</p>
+            <p className="mt-2 text-sm text-slate-400">Экран уже готов к подключению платёжного провайдера.</p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Флоу</p>
             <p className="mt-2 text-2xl font-semibold text-white">Стабильный</p>
-            <p className="mt-2 text-sm text-slate-400">После оплаты возвращаемся в профиль и обновляем состояние хедера.</p>
+            <p className="mt-2 text-sm text-slate-400">После подтверждения пользователь возвращается в профиль.</p>
           </article>
         </div>
       </article>
@@ -70,12 +70,11 @@ export function PaywallPage() {
         <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-emerald-300/15 via-slate-950 to-cyan-300/10 p-4 sm:p-6">
           <p className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.22em] text-emerald-300 sm:text-sm sm:tracking-[0.24em]">
             <SparklesIcon className="h-4 w-4" />
-            Платёж позже
+            Оформление
           </p>
-          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Оплата PRO</h3>
+          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Подтверждение доступа</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            Эта страница уже отделяет покупку от профиля. Когда подключите платёжку, достаточно заменить кнопку
-            подтверждения на реальный checkout.
+            Здесь остаётся один понятный шаг: подтвердить переход в PRO и вернуться в профиль без лишних экранов.
           </p>
 
           <div className="mt-6 grid gap-3">
@@ -99,10 +98,9 @@ export function PaywallPage() {
           {error ? <p className="mt-4 rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">{error}</p> : null}
 
           <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
-            <p className="font-semibold text-white">Будущая интеграция</p>
+            <p className="font-semibold text-white">Техническая заметка</p>
             <p className="mt-2 leading-7">
-              Здесь можно подключить YuMoney checkout, callback и запись результата оплаты в backend, не трогая
-              остальной UX.
+              Платёжный провайдер можно подключить отдельно, сохранив этот экран и текущую навигацию.
             </p>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import type { AuthUser } from "../api/auth";
 import { getOwnProfile, type Profile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
-import { ArrowRightIcon, GithubIcon, SearchIcon, ShieldCheckIcon, SparklesIcon, UserRoundIcon, UsersIcon } from "../components/ui/Icons";
+import { GithubIcon, SearchIcon, ShieldCheckIcon, SparklesIcon, UserRoundIcon, UsersIcon } from "../components/ui/Icons";
 
 type DashboardPageProps = {
   user: AuthUser;
@@ -174,25 +174,11 @@ export function DashboardPage({ user }: DashboardPageProps) {
             Поиск команд
           </Link>
           <Link
-            to="/applications"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
-          >
-            <ArrowRightIcon className="h-4 w-4" />
-            Заявки
-          </Link>
-          <Link
             to="/profile"
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
           >
             <UserRoundIcon className="h-4 w-4" />
             Мой профиль
-          </Link>
-          <Link
-            to="/profile/edit"
-            className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 font-medium text-slate-100 hover:bg-white/10"
-          >
-            <SparklesIcon className="h-4 w-4" />
-            Редактировать профиль
           </Link>
         </aside>
       </div>
