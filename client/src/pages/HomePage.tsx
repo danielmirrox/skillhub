@@ -29,11 +29,10 @@ export function HomePage() {
             SkillHub
           </div>
           <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-[1.03] tracking-tight text-white">
-            Одна и та же главная страница до входа и после него.
+            Мэтчинг участников и команд без лишних шагов.
           </h2>
           <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            Здесь видно основной сценарий продукта: поиск людей, команды, AI-рейтинг и заявки. После входа
-            меняются только действия и навигация.
+            После входа доступны поиск людей, команды, AI-рейтинг и заявки. Интерфейс сразу ведёт в рабочие разделы.
           </p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -44,7 +43,7 @@ export function HomePage() {
             </article>
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Авторизация</p>
-              <p className="mt-2 text-2xl font-semibold text-white">{user ? "Уже есть вход" : "GitHub OAuth"}</p>
+              <p className="mt-2 text-2xl font-semibold text-white">{user ? "Сессия активна" : "GitHub OAuth"}</p>
               <p className="mt-2 text-sm text-slate-400">Хедер меняется под состояние сессии автоматически.</p>
             </article>
           </div>
@@ -54,9 +53,7 @@ export function HomePage() {
           <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-4 sm:p-6">
             <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Главное действие</p>
             <h3 className="text-balance mt-3 text-xl font-semibold text-white sm:text-2xl">{user ? "Продолжить работу" : "Войти и открыть продукт"}</h3>
-            <p className="mt-3 text-sm leading-7 text-slate-300">
-              После GitHub входа открываются рабочие разделы без лишних переходов и дублирования сценария.
-            </p>
+            <p className="mt-3 text-sm leading-7 text-slate-300">После GitHub входа открываются рабочие разделы без лишних переходов и дублирования сценария.</p>
 
             <div className="mt-6 grid gap-3">
               {user ? (

@@ -66,12 +66,12 @@ export function SearchPage() {
       <section className="grid gap-4 rounded-[2rem] border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-slate-950 to-violet-400/10 p-5 shadow-2xl shadow-slate-950/30 sm:p-7 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Поиск</p>
-          <h2 className="text-balance mt-3 max-w-2xl text-[clamp(2rem,6.6vw,4.4rem)] font-semibold tracking-tight text-white">
+          <h2 className="text-balance mt-3 max-w-2xl text-[clamp(1.7rem,5vw,3.4rem)] font-semibold leading-[1.05] tracking-tight text-white">
             Ищи участников по роли, грейду и стеку
           </h2>
           <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            Живой экран поверх API `/api/v1/users`. Фильтры по роли, грейду, минимальному рейтингу и стеку
-            работают, а AI-релевантность и PRO-доступ к контактам подтягиваются из бэка.
+            Поиск работает в реальном времени: роль, грейд, минимальный рейтинг и стек быстро сужают выдачу.
+            AI-релевантность и PRO-доступ к контактам учитываются автоматически.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export function SearchPage() {
             </p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-3 backdrop-blur-xl sm:p-4">
-            <p className="text-sm text-slate-400">На экране</p>
+            <p className="text-sm text-slate-400">Показано</p>
             <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white sm:text-3xl">
               <SearchIcon className="h-5 w-5 text-cyan-200" />
               {items.length}

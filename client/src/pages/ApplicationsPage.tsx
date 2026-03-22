@@ -71,32 +71,50 @@ function ApplicationCard({
 export function ApplicationsPage() {
   const [tab, setTab] = React.useState<TabKey>("incoming");
   const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [actionError, setActionError] = React.useState<string | null>(null);
   const [incoming, setIncoming] = React.useState<ApplicationView[]>([]);
   const [outgoing, setOutgoing] = React.useState<ApplicationView[]>([]);
 
-  const load = React.useCallback(() => {
+  const load = React.useCallback((options?: { minimumDelayMs?: number }) => {
     let active = true;
+    const startedAt = Date.now();
     setLoading(true);
     setError(null);
 
-    getApplications()
-      .then((response) => {
+    if (options?.minimumDelayMs) {
+      setRefreshing(true);
+    }
+
+    void (async () => {
+      try {
+        const response = await getApplications();
+
+        if (options?.minimumDelayMs) {
+          const elapsed = Date.now() - startedAt;
+          const remaining = options.minimumDelayMs - elapsed;
+
+          if (remaining > 0) {
+            await new Promise((resolve) => window.setTimeout(resolve, remaining));
+          }
+        }
+
         if (!active) return;
+
         setIncoming(response.incoming);
         setOutgoing(response.outgoing);
-      })
-      .catch(() => {
+      } catch {
         if (active) {
           setError("Не удалось загрузить заявки.");
         }
-      })
-      .finally(() => {
+      } finally {
         if (active) {
           setLoading(false);
+          setRefreshing(false);
         }
-      });
+      }
+    })();
 
     return () => {
       active = false;
@@ -131,7 +149,7 @@ export function ApplicationsPage() {
           <p className="text-sm uppercase tracking-[0.24em] text-lime-300">Заявки</p>
           <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl">Заявки и управление откликами</h2>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-            Здесь видны входящие и исходящие заявки, а также можно принять или отклонить отклик без ручного API.
+            Здесь видны входящие и исходящие заявки, а также можно принять или отклонить отклик в пару действий.
           </p>
         </div>
 
@@ -192,7 +210,7 @@ export function ApplicationsPage() {
         <section className="rounded-[1.75rem] border border-white/10 bg-white/5 p-6 text-slate-300 backdrop-blur-xl">
           <p className="text-lg font-semibold text-white">Пока пусто</p>
           <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-400">
-            Здесь появятся заявки после поиска и отправки запроса на вступление. Если ты ждёшь входящие, проверь поиск или открой профиль участника, чтобы отправить первый запрос.
+            Здесь появятся заявки после поиска и отправки запроса на вступление. Если ждёшь входящие, проверь поиск или открой профиль участника, чтобы отправить первый запрос.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <Link
@@ -203,10 +221,20 @@ export function ApplicationsPage() {
             </Link>
             <button
               type="button"
-              onClick={load}
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 font-semibold text-slate-100 hover:bg-white/10"
+              onClick={() => {
+                void load({ minimumDelayMs: 450 });
+              }}
+              disabled={loading || refreshing}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 font-semibold text-slate-100 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Обновить список
+              {refreshing ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-cyan-200 border-t-transparent" />
+                  Обновляем…
+                </>
+              ) : (
+                "Обновить список"
+              )}
             </button>
           </div>
         </section>

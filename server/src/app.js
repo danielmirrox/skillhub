@@ -14,6 +14,7 @@ const { apiRouter } = require('./routes');
 
 function createApp() {
   const app = express();
+  app.set('trust proxy', 1);
   const allowedClientOrigins = new Set(
     [env.CLIENT_URL, ...(env.CLIENT_URLS || [])]
       .filter(Boolean)

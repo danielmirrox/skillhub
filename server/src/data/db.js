@@ -27,9 +27,10 @@ function getPool() {
 
   if (!pool) {
     const databaseUrl = new URL(env.DATABASE_URL);
+    const sslmode = databaseUrl.searchParams.get('sslmode');
     const useSsl =
-      databaseUrl.searchParams.get('sslmode') === 'require' ||
-      !['localhost', '127.0.0.1'].includes(databaseUrl.hostname);
+      sslmode === 'require' ||
+      (sslmode !== 'disable' && !['localhost', '127.0.0.1', 'postgres'].includes(databaseUrl.hostname));
 
     pool = new Pool({
       connectionString: env.DATABASE_URL,

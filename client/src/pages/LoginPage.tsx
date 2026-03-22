@@ -1,30 +1,9 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
 import { getApiUrl } from "../api/client";
-import {
-  clearDemoAuthUser,
-  isDemoAuthEnabled,
-  setDemoAuthUser,
-  DEMO_AUTH_USER,
-  DEMO_PRO_AUTH_USER,
-} from "../api/demoAuth";
-import { GithubIcon, LogOutIcon, ShieldCheckIcon, SparklesIcon } from "../components/ui/Icons";
+import { GithubIcon } from "../components/ui/Icons";
 
 export function LoginPage() {
-  const navigate = useNavigate();
-  const demoAuthEnabled = isDemoAuthEnabled();
   const [authing, setAuthing] = React.useState(false);
-
-  const handleLogin = (isPro = false) => {
-    const user = isPro ? DEMO_PRO_AUTH_USER : DEMO_AUTH_USER;
-    setDemoAuthUser(user);
-    navigate("/dashboard", { replace: true });
-  };
-
-  const handleReset = () => {
-    clearDemoAuthUser();
-    navigate("/login", { replace: true });
-  };
 
   const handleGithubLogin = () => {
     if (authing) return;
@@ -40,10 +19,10 @@ export function LoginPage() {
           GitHub OAuth
         </div>
         <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.5vw,4.5rem)] font-semibold leading-[1.03] tracking-tight text-white">
-          SkillHub делает поиск людей и команд быстрым и понятным.
+          Единый вход в SkillHub и сразу в рабочий интерфейс.
         </h2>
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Основной путь входа ведёт через GitHub OAuth. После авторизации открываются поиск, команды, заявки и профиль.
+          После авторизации откроются поиск, команды, заявки и профиль без лишних переходов и развилок.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -63,9 +42,9 @@ export function LoginPage() {
       <aside className="rounded-[2rem] border border-white/10 bg-slate-950/70 p-4 shadow-2xl shadow-slate-950/35 backdrop-blur-xl sm:p-6">
         <div className="rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-cyan-300/15 via-slate-950 to-violet-400/10 p-4 sm:p-6">
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-300 sm:text-sm sm:tracking-[0.24em]">Панель входа</p>
-          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти</h3>
+          <h3 className="mt-3 text-xl font-semibold text-white sm:text-2xl">Войти через GitHub</h3>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            Нажми кнопку GitHub, чтобы перейти в авторизацию и открыть рабочие разделы продукта.
+            GitHub-кнопка открывает серверный OAuth-флоу и сразу переводит в рабочие разделы продукта.
           </p>
 
           <div className="mt-6 grid gap-3">
@@ -83,49 +62,6 @@ export function LoginPage() {
                 <span className="mt-1 block text-lg">{authing ? "Открываем GitHub..." : "Войти через GitHub"}</span>
               </span>
             </button>
-
-            {demoAuthEnabled ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => handleLogin(false)}
-                  className="inline-flex w-full items-center gap-3 rounded-2xl bg-gradient-to-r from-cyan-300 via-sky-400 to-indigo-400 px-5 py-4 text-left font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:translate-y-[-1px]"
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/30 text-slate-950">
-                    <SparklesIcon className="h-5 w-5" />
-                  </span>
-                  <span className="block">
-                    <span className="block text-sm uppercase tracking-[0.2em] text-slate-800/70">Локально</span>
-                    <span className="mt-1 block text-lg">Войти как демо-пользователь</span>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => handleLogin(true)}
-                  className="inline-flex w-full items-center gap-3 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 px-5 py-4 text-left font-semibold text-emerald-50 shadow-lg shadow-emerald-950/20 transition hover:translate-y-[-1px]"
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-emerald-200/30 bg-emerald-200/15 text-emerald-50">
-                    <ShieldCheckIcon className="h-5 w-5" />
-                  </span>
-                  <span className="block">
-                    <span className="block text-sm uppercase tracking-[0.2em] text-emerald-200/80">PRO</span>
-                    <span className="mt-1 block text-lg">Войти как PRO-демо</span>
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleReset}
-                  className="inline-flex w-full items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left font-medium text-slate-200 transition hover:bg-white/10"
-                >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 bg-white/10 text-slate-200">
-                    <LogOutIcon className="h-5 w-5" />
-                  </span>
-                  Сбросить демо-вход
-                </button>
-              </>
-            ) : null}
           </div>
 
           <p className="mt-5 text-sm text-slate-400">GitHub-кнопка открывает серверный OAuth-флоу.</p>

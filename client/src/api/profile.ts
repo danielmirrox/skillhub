@@ -102,6 +102,10 @@ export type ScoreProfileResponse = {
   nextAllowedAt: string | null;
 };
 
+export type ScoreProfileOptions = {
+  bypassRateLimit?: boolean;
+};
+
 export async function getOwnProfile() {
   return apiGet<OwnProfileResponse>("/api/v1/profile");
 }
@@ -128,7 +132,7 @@ export async function updateOwnProfile(payload: UpdateProfilePayload) {
   return (await response.json()) as { profile: Profile };
 }
 
-export async function scoreProfile(payload: UpdateProfilePayload = {}) {
+export async function scoreProfile(payload: UpdateProfilePayload = {}, options: ScoreProfileOptions = {}) {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/profile/score`,
     {
@@ -137,7 +141,10 @@ export async function scoreProfile(payload: UpdateProfilePayload = {}) {
       headers: getApiRequestHeaders({
         "Content-Type": "application/json",
       }),
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        ...payload,
+        ...(options.bypassRateLimit ? { bypassRateLimit: true } : {}),
+      }),
     },
   );
 

@@ -115,11 +115,10 @@ export function DashboardPage({ user }: DashboardPageProps) {
             </div>
           ) : !loadingProfile && profile && isDraftProfile ? (
             <div className="mt-6 rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5">
-              <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Стартовый сценарий</p>
+              <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль на старте</p>
               <p className="mt-2 text-lg font-semibold text-white">Профиль ещё пустой, это нормально для первого входа</p>
               <p className="mt-2 text-sm leading-7 text-slate-300">
-                Чтобы всё выглядело как законченный продукт, заполни роль, стек и пару проектов. После этого
-                поиск, рейтинг и карточка профиля начнут выглядеть убедительно.
+                Заполни роль, стек и пару проектов. После этого поиск, рейтинг и карточка профиля начнут выглядеть сильнее.
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
@@ -143,7 +142,7 @@ export function DashboardPage({ user }: DashboardPageProps) {
               <p className="text-sm text-amber-100">
                 Профиль ещё не заполнен.{" "}
                 <Link to="/profile/edit" className="underline">
-                  Заполни профиль
+                  Дополните профиль
                 </Link>{" "}
                 чтобы получить AI-рейтинг.
               </p>

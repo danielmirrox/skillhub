@@ -32,12 +32,15 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-2xl shadow-slate-950/30 backdrop-blur-xl sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Filters</p>
+          <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Фильтры</p>
           <h2 className="text-balance mt-2 text-2xl font-semibold">Фильтры поиска участников</h2>
           <p className="mt-2 text-sm text-slate-400">Настрой выдачу под команду, а не под шум.</p>
-          <p className="mt-2 text-xs uppercase tracking-[0.18em] text-slate-500">
-            Активных фильтров: {activeFiltersCount}
-          </p>
+          <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-cyan-300/15 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-cyan-100">
+            Активных фильтров
+            <span className="rounded-full bg-cyan-300 px-2 py-0.5 text-[10px] font-bold tracking-[0.12em] text-slate-950">
+              {activeFiltersCount}
+            </span>
+          </div>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
           <button
@@ -62,7 +65,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
         <label className="flex flex-col gap-2 text-sm xl:col-span-2">
           Поиск
           <input
-            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
             value={value.search ?? ""}
             onChange={(event) => onChange({ ...value, search: event.target.value })}
             placeholder="Имя, описание, био или стек"
@@ -72,7 +75,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
         <label className="flex flex-col gap-2 text-sm">
           Роль
           <select
-            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
             value={value.role ?? ""}
             onChange={(event) => onChange({ ...value, role: event.target.value as UserRole | "" })}
           >
@@ -87,7 +90,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
         <label className="flex flex-col gap-2 text-sm">
           Грейд
           <select
-            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
             value={value.grade ?? ""}
             onChange={(event) => onChange({ ...value, grade: event.target.value as ClaimedGrade | "" })}
           >
@@ -106,7 +109,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
             min={0}
             max={100}
             inputMode="numeric"
-            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
             value={value.minRating ?? ""}
             onChange={(event) => onChange({ ...value, minRating: event.target.value })}
             placeholder="70"
@@ -116,7 +119,7 @@ export function SearchFilters({ value, onChange, onSubmit }: SearchFiltersProps)
         <label className="flex flex-col gap-2 text-sm xl:col-span-3">
           Стек
           <input
-            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+            className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
             value={value.stack ?? ""}
             onChange={(event) => onChange({ ...value, stack: event.target.value })}
             placeholder="React, TypeScript"

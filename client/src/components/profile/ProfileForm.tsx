@@ -5,8 +5,8 @@ type ProfileFormValues = {
   role: ProfileRole;
   claimedGrade: ClaimedGrade;
   primaryStackText: string;
-  experienceYears: number;
-  hackathonsCount: number;
+  experienceYears: string;
+  hackathonsCount: string;
   bio: string;
   telegramUsername: string;
   githubUrl: string;
@@ -26,8 +26,8 @@ export function buildFormValues(profile: Profile | null): ProfileFormValues {
     role: profile?.role ?? "frontend",
     claimedGrade: profile?.claimedGrade ?? "junior",
     primaryStackText: (profile?.primaryStack ?? []).join(", "),
-    experienceYears: profile?.experienceYears ?? 0,
-    hackathonsCount: profile?.hackathonsCount ?? 0,
+    experienceYears: profile?.experienceYears !== undefined ? String(profile.experienceYears) : "",
+    hackathonsCount: profile?.hackathonsCount !== undefined ? String(profile.hackathonsCount) : "",
     bio: profile?.bio ?? "",
     telegramUsername: profile?.telegramUsername ?? "",
     githubUrl: profile?.githubUrl ?? "",
@@ -44,8 +44,8 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
   const onNumber =
     (key: "experienceYears" | "hackathonsCount") =>
     (event: ChangeEvent<HTMLInputElement>) => {
-      const numberValue = Number(event.target.value);
-      setField(key, Number.isFinite(numberValue) ? numberValue : 0);
+      const nextValue = event.target.value;
+      setField(key, nextValue);
     };
 
   const updateProjectLink = (index: number, field: keyof ProjectLink, value: string) => {
@@ -96,7 +96,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             <label className="flex flex-col gap-2 text-sm">
               Специализация
               <select
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.role}
                 onChange={(event) => setField("role", event.target.value as ProfileRole)}
               >
@@ -111,9 +111,9 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             </label>
 
             <label className="flex flex-col gap-2 text-sm">
-              Заявленный грейд
+              Грейд
               <select
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.claimedGrade}
                 onChange={(event) => setField("claimedGrade", event.target.value as ClaimedGrade)}
               >
@@ -130,7 +130,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 min={0}
                 max={50}
                 inputMode="numeric"
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.experienceYears}
                 onChange={onNumber("experienceYears")}
               />
@@ -143,7 +143,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 min={0}
                 max={100}
                 inputMode="numeric"
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.hackathonsCount}
                 onChange={onNumber("hackathonsCount")}
               />
@@ -151,21 +151,21 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
           </div>
 
           <label className="flex flex-col gap-2 text-sm">
-            Основной стек (через запятую)
+            Основной стек
             <input
-              className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+              className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
               value={values.primaryStackText}
               onChange={(event) => setField("primaryStackText", event.target.value)}
               placeholder="React, TypeScript, Tailwind"
             />
-            <span className="text-xs text-slate-500">Пиши через запятую: это проще читать на мобильном и точнее для поиска.</span>
+            <span className="text-xs text-slate-500">Пиши через запятую: так проще читать на мобильном и точнее для поиска.</span>
           </label>
 
           <label className="flex flex-col gap-2 text-sm">
             О себе
             <textarea
               rows={6}
-              className="min-h-32 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 sm:text-sm"
+              className="min-h-32 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
               value={values.bio}
               onChange={(event) => setField("bio", event.target.value)}
               placeholder="Коротко опиши роль, интересы и что ищешь в команде"
@@ -179,7 +179,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             <label className="flex flex-col gap-2 text-sm">
               Telegram
               <input
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.telegramUsername}
                 onChange={(event) => setField("telegramUsername", event.target.value)}
                 placeholder="denisui"
@@ -190,7 +190,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
             <label className="flex flex-col gap-2 text-sm">
               GitHub
               <input
-                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+                className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                 value={values.githubUrl}
                 onChange={(event) => setField("githubUrl", event.target.value)}
                 placeholder="https://github.com/username"
@@ -229,13 +229,13 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                 <div key={`${item.url}-${index}`} className="rounded-2xl border border-white/10 bg-slate-950/70 p-4">
                   <div className="grid gap-3 sm:grid-cols-1 md:grid-cols-2">
                     <input
-                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                       placeholder="Название проекта"
                       value={item.title}
                       onChange={(event) => updateProjectLink(index, "title", event.target.value)}
                     />
                     <input
-                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+                      className="min-h-12 rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                       placeholder="https://github.com/user/project"
                       value={item.url}
                       onChange={(event) => updateProjectLink(index, "url", event.target.value)}
@@ -243,7 +243,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
                   </div>
                   <textarea
                     rows={2}
-                    className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 sm:text-sm"
+                    className="mt-3 min-h-24 w-full rounded-2xl border border-white/10 bg-slate-950/80 px-4 py-3 text-base text-slate-100 placeholder:text-slate-500 shadow-inner shadow-black/20 transition focus:border-cyan-300/30 focus:bg-slate-950 sm:text-sm"
                     placeholder="Короткое описание"
                     value={item.description}
                     onChange={(event) =>
@@ -262,7 +262,7 @@ export function ProfileForm({ values, loading, onChange, onSubmit }: ProfileForm
               ))}
               {values.projectLinks.length === 0 ? (
                 <p className="rounded-2xl border border-dashed border-white/10 bg-slate-950/45 px-4 py-5 text-sm text-slate-400">
-                  Добавь хотя бы 1 проект для более точного скоринга.
+                  Добавь хотя бы один проект для более точного скоринга.
                 </p>
               ) : null}
             </div>

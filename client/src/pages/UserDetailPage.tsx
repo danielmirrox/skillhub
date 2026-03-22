@@ -153,16 +153,16 @@ export function UserDetailPage() {
               ) : (
                 <div className="mt-3 space-y-3">
                   <p className="text-slate-200">Контакт скрыт: нужен PRO и рейтинг 80+</p>
-                  <div className="grid gap-2 text-xs text-slate-300">
+                  <div className="grid select-none gap-2 text-xs text-slate-300">
                     <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                      <span className="blur-[2px]">@username</span>
+                      <span className="pointer-events-none select-none blur-[2px]">@username</span>
                       <span className="inline-flex items-center gap-1 text-slate-500">
                         <LockIcon className="h-3 w-3" />
                         Telegram
                       </span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2">
-                      <span className="blur-[2px]">github.com/hidden</span>
+                      <span className="pointer-events-none select-none blur-[2px]">github.com/hidden</span>
                       <span className="inline-flex items-center gap-1 text-slate-500">
                         <GithubIcon className="h-3 w-3" />
                         GitHub
@@ -225,8 +225,8 @@ export function UserDetailPage() {
 
               <div className="rounded-[1.5rem] border border-amber-300/15 bg-amber-300/10 p-4 text-sm text-amber-100">
                 {user.contactVisible
-                  ? "Этот профиль уже открыт для PRO-режима и выглядит как сильный кандидат для быстрого отклика."
-                  : "Здесь хорошо видно, что именно откроется после PRO: контакты, рекомендации и более тёплый сценарий связи."}
+                  ? "Этот профиль уже открыт для PRO-режима и готов к быстрому отклику."
+                  : "После PRO откроются контакты, рекомендации и более тёплый сценарий связи."}
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">

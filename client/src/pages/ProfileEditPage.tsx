@@ -20,14 +20,14 @@ const GITHUB_IMPORT_SAMPLE = {
   },
   topRepos: [
     {
-      name: "skillhub-matcher",
-      description: "Прототип матчинга хакатона с оценкой профиля",
+      name: "team-radar",
+      description: "Пример проекта для матчинга участников и команд",
       stars: 31,
       primaryLanguage: "TypeScript",
     },
     {
-      name: "team-boards",
-      description: "Панель планирования команды для быстрой совместной работы",
+      name: "profile-signal",
+      description: "Пример панели для работы с профилем и рейтингом",
       stars: 22,
       primaryLanguage: "React",
     },
@@ -35,6 +35,9 @@ const GITHUB_IMPORT_SAMPLE = {
 };
 
 function toPayload(values: ProfileFormValues) {
+  const experienceYears = Number(values.experienceYears || 0);
+  const hackathonsCount = Number(values.hackathonsCount || 0);
+
   return {
     role: values.role,
     claimedGrade: values.claimedGrade,
@@ -42,8 +45,8 @@ function toPayload(values: ProfileFormValues) {
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean),
-    experienceYears: values.experienceYears,
-    hackathonsCount: values.hackathonsCount,
+    experienceYears: Number.isFinite(experienceYears) ? experienceYears : 0,
+    hackathonsCount: Number.isFinite(hackathonsCount) ? hackathonsCount : 0,
     bio: values.bio.trim(),
     projectLinks: values.projectLinks
       .map((item) => ({
@@ -136,14 +139,16 @@ export function ProfileEditPage() {
 
   return (
     <div className="grid gap-6 xl:grid-cols-[0.86fr_1.14fr]">
-      {error ? <p className="mb-4 text-red-300">{error}</p> : null}
+      <div className="xl:col-span-2 min-h-[2.25rem]">
+        {error ? <p className="text-red-300">{error}</p> : null}
+      </div>
       <section id="github-import" className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-2xl shadow-slate-950/30 backdrop-blur-xl xl:sticky xl:top-28 xl:self-start">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm uppercase tracking-[0.24em] text-violet-300">Импорт из GitHub</p>
             <h2 className="mt-2 text-2xl font-semibold text-white">Импорт GitHub</h2>
             <p className="mt-2 text-sm text-slate-400">
-              Проверяем импорт профиля через данные GitHub и сразу подставляем подсказки в форму.
+              Подтягиваем открытые данные GitHub и сразу предлагаем подсказки для формы профиля.
             </p>
           </div>
           <button

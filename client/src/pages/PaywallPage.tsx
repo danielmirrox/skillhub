@@ -34,11 +34,10 @@ export function PaywallPage() {
           PRO paywall
         </div>
         <h2 className="text-balance mt-5 max-w-2xl text-[clamp(2rem,6.4vw,4.2rem)] font-semibold leading-[1.03] tracking-tight text-white">
-          Оформление PRO-доступа
+          PRO-доступ для расширенной видимости
         </h2>
         <p className="mt-4 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-          Этот экран отделяет покупку от профиля и показывает основной сценарий оформления. Подключение платёжного
-          провайдера можно добавить без изменения остального UX.
+          Контакты, рекомендации и более тёплый сценарий связи становятся доступны сразу после включения PRO.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -54,9 +53,9 @@ export function PaywallPage() {
             <p className="text-sm text-slate-400">Платёж</p>
             <p className="mt-2 inline-flex items-center gap-2 text-2xl font-semibold text-white">
               <SparklesIcon className="h-5 w-5 text-cyan-200" />
-              Готов
+              Оформление
             </p>
-            <p className="mt-2 text-sm text-slate-400">Экран уже готов к подключению платёжного провайдера.</p>
+            <p className="mt-2 text-sm text-slate-400">Осталось только подтвердить доступ и вернуться в профиль.</p>
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Флоу</p>
@@ -97,12 +96,6 @@ export function PaywallPage() {
 
           {error ? <p className="mt-4 rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">{error}</p> : null}
 
-          <div className="mt-5 rounded-2xl border border-white/10 bg-slate-950/55 p-4 text-sm text-slate-300">
-            <p className="font-semibold text-white">Техническая заметка</p>
-            <p className="mt-2 leading-7">
-              Платёжный провайдер можно подключить отдельно, сохранив этот экран и текущую навигацию.
-            </p>
-          </div>
         </div>
       </aside>
     </section>

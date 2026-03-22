@@ -19,11 +19,11 @@ export function ProfilePage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const onScore = async () => {
+  const onScore = async (options?: { bypassRateLimit?: boolean }) => {
     setScoring(true);
     setError(null);
     try {
-      await scoreProfile();
+      await scoreProfile({}, options);
       const fresh = await getOwnProfile();
       setProfileData(fresh);
     } catch (err) {
@@ -93,7 +93,7 @@ export function ProfilePage() {
         <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Профиль</p>
         <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">Профиль ещё не создан</h2>
         <p className="mt-3 max-w-2xl text-slate-300">
-          Сначала заполни базовые данные, чтобы поиск, AI-рейтинг и рекомендации выглядели как полноценный продукт, а не как пустая карточка.
+          Сначала заполни базовые данные, чтобы поиск, AI-рейтинг и рекомендации работали на твою видимость в продукте.
         </p>
         <div className="mt-6 grid gap-3 md:grid-cols-3">
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
@@ -128,8 +128,7 @@ export function ProfilePage() {
               <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Мой профиль</p>
               <h2 className="text-balance mt-3 text-[clamp(2rem,6.2vw,3.5rem)] font-semibold tracking-tight text-white">{profileData?.user.displayName ?? profileData?.user.username}</h2>
               <p className="mt-3 max-w-2xl text-pretty text-base leading-7 text-slate-300 sm:text-lg sm:leading-8">
-                Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и посмотреть,
-                как тебя видят другие участники.
+                Профиль, рейтинг и рекомендации уже доступны. Отсюда удобно обновить данные и понять, как тебя видят другие участники.
               </p>
             </div>
 
@@ -189,10 +188,9 @@ export function ProfilePage() {
             <div className="mt-6 rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5">
               <p className="text-sm uppercase tracking-[0.24em] text-cyan-300">Стартовый профиль</p>
               <p className="mt-2 text-lg font-semibold text-white">Собери профиль за 3 шага</p>
-              <p className="mt-2 text-sm leading-7 text-slate-300">
-                Сейчас профиль ещё пустой, но это нормальный первый экран после входа. Дальше достаточно заполнить
-                роль, стек и пару проектов, чтобы он выглядел как живой продуктовый профиль.
-              </p>
+                  <p className="mt-2 text-sm leading-7 text-slate-300">
+                    Заполни роль, стек и пару проектов, чтобы профиль выглядел завершённым и сразу читался другими участниками.
+                  </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 <Link
                   to="/profile/edit"
@@ -307,11 +305,19 @@ export function ProfilePage() {
             </div>
           )}
 
-          {error ? <p className="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">{error}</p> : null}
+          <div className="min-h-[4.5rem]">
+            {error ? (
+              <p className="rounded-2xl border border-rose-300/20 bg-rose-300/10 px-4 py-3 text-sm text-rose-100">
+                {error}
+              </p>
+            ) : null}
+          </div>
 
           <button
             type="button"
-            onClick={onScore}
+            onClick={() => {
+              void onScore();
+            }}
             disabled={scoring}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-lime-300 via-emerald-300 to-cyan-300 px-5 py-4 font-semibold text-slate-950 shadow-lg shadow-emerald-500/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -320,6 +326,19 @@ export function ProfilePage() {
             </svg>
             {scoring ? "Считаем рейтинг..." : "Получить рейтинг"}
           </button>
+
+          {import.meta.env.DEV ? (
+            <button
+              type="button"
+              onClick={() => {
+                void onScore({ bypassRateLimit: true });
+              }}
+              disabled={scoring}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-300/20 bg-amber-300/10 px-5 py-3 text-sm font-semibold text-amber-100 transition duration-300 ease-out hover:bg-amber-300/15 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Обойти лимит (временно)
+            </button>
+          ) : null}
         </aside>
       </div>
     </section>

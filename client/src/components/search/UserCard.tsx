@@ -85,7 +85,7 @@ export function UserCard({ user }: UserCardProps) {
           </div>
           <p className="mt-2 text-xs leading-6 text-slate-300">
             {user.searchMatch.reasons.length > 0
-              ? `Почему найден: ${user.searchMatch.reasons.join(' · ')}`
+              ? `Причина совпадения: ${user.searchMatch.reasons.join(' · ')}`
               : 'Результат ранжирован по совпадению с запросом и рейтингом.'}
           </p>
           {user.searchMatch.matchedTerms.length > 0 ? (
@@ -111,7 +111,7 @@ export function UserCard({ user }: UserCardProps) {
           ) : (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-300/20 bg-amber-300/10 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-100">
               <LockIcon className="h-3 w-3" />
-              Только предпросмотр
+              Контакты скрыты
             </span>
           )}
         </div>
@@ -119,19 +119,19 @@ export function UserCard({ user }: UserCardProps) {
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-slate-200">
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Telegram открыт</span>
             <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">GitHub открыт</span>
-            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Прямой контакт открыт</span>
+            <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">Контакт доступен</span>
           </div>
         ) : (
-          <div className="mt-3 grid gap-2 text-xs text-slate-300">
+          <div className="mt-3 grid select-none gap-2 text-xs text-slate-300">
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition duration-300 ease-out group-hover:border-amber-300/20 group-hover:bg-amber-300/10">
-              <span className="blur-[2px]">@username</span>
+              <span className="pointer-events-none select-none blur-[2px]">@username</span>
               <span className="inline-flex items-center gap-1 text-slate-500">
                 <LockIcon className="h-3 w-3" />
                 Telegram
               </span>
             </div>
             <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-2 transition duration-300 ease-out group-hover:border-amber-300/20 group-hover:bg-amber-300/10">
-              <span className="blur-[2px]">github.com/hidden</span>
+              <span className="pointer-events-none select-none blur-[2px]">github.com/hidden</span>
               <span className="inline-flex items-center gap-1 text-slate-500">
                 <GithubIcon className="h-3 w-3" />
                 GitHub
