@@ -46,6 +46,8 @@ export type UserSummary = {
   contactVisible: boolean;
   telegramUsername: string | null;
   bio: string;
+  githubConnected: boolean;
+  githubImportedAt: string | null;
 };
 
 export type UsersQuery = {

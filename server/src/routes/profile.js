@@ -30,11 +30,27 @@ const profileUpdateSchema = z.object({
     return value;
   }, z.string().min(1).max(64).optional().nullable()),
   githubUrl: z.preprocess((value) => {
-    if (typeof value === 'string' && value.trim() === '') {
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    const trimmed = value.trim();
+
+    if (!trimmed) {
       return null;
     }
 
-    return value;
+    if (trimmed.startsWith('@')) {
+      return `https://github.com/${trimmed.slice(1).replace(/^\/+/, '')}`;
+    }
+
+    if (/^(?:https?:\/\/)?(?:www\.)?github\.com\//i.test(trimmed)) {
+      return trimmed.startsWith('http://') || trimmed.startsWith('https://')
+        ? trimmed
+        : `https://${trimmed}`;
+    }
+
+    return `https://github.com/${trimmed.replace(/^\/+/, '')}`;
   }, z.string().url().optional().nullable()),
   isPublic: z.boolean().optional(),
 });
@@ -47,9 +63,19 @@ const githubImportSchema = z.object({
   githubData: z
     .object({
       fetchedAt: z.string().optional(),
+      username: z.string().optional(),
+      displayName: z.string().optional().nullable(),
+      avatarUrl: z.string().url().optional().nullable(),
+      bio: z.string().optional().nullable(),
+      githubUrl: z.string().url().optional().nullable(),
       publicRepos: z.number().int().min(0).optional(),
       followers: z.number().int().min(0).optional(),
+      totalStars: z.number().int().min(0).optional(),
+      totalForks: z.number().int().min(0).optional(),
       accountAgeYears: z.number().int().min(0).optional(),
+      lastActivityAt: z.string().optional().nullable(),
+      activityRecencyDays: z.number().int().min(0).optional().nullable(),
+      activityBucket: z.enum(['fresh', 'recent', 'steady', 'stale']).optional().nullable(),
       languages: z.record(z.number().min(0)).optional(),
       topRepos: z
         .array(
@@ -57,7 +83,9 @@ const githubImportSchema = z.object({
             name: z.string().min(1),
             description: z.string().optional().nullable(),
             stars: z.number().int().min(0).optional(),
+            forks: z.number().int().min(0).optional(),
             primaryLanguage: z.string().optional().nullable(),
+            updatedAt: z.string().optional().nullable(),
           })
         )
         .optional(),
@@ -124,6 +152,26 @@ async function fetchGitHubJson(url) {
   return response.json();
 }
 
+function getActivityBucket(activityRecencyDays) {
+  if (activityRecencyDays == null) {
+    return null;
+  }
+
+  if (activityRecencyDays <= 14) {
+    return 'fresh';
+  }
+
+  if (activityRecencyDays <= 60) {
+    return 'recent';
+  }
+
+  if (activityRecencyDays <= 180) {
+    return 'steady';
+  }
+
+  return 'stale';
+}
+
 async function buildGithubDataFromGitHub(userId) {
   const profile = demoStore.getProfileByUserId(userId);
   const githubUsername = extractGithubUsername(profile?.githubUrl);
@@ -135,25 +183,57 @@ async function buildGithubDataFromGitHub(userId) {
     throw error;
   }
 
-  const [githubUser, githubRepos] = await Promise.all([
-    fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}`),
-    fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated`),
-  ]);
+  let githubUser = null;
+  let githubRepos = [];
+
+  try {
+    githubUser = await fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}`);
+  } catch (error) {
+    if (error.statusCode === 502) {
+      const notFoundError = new Error(`GitHub profile ${githubUsername} was not found or is unavailable.`);
+      notFoundError.statusCode = 404;
+      notFoundError.code = 'GITHUB_PROFILE_NOT_FOUND';
+      throw notFoundError;
+    }
+
+    throw error;
+  }
+
+  try {
+    githubRepos = await fetchGitHubJson(`https://api.github.com/users/${encodeURIComponent(githubUsername)}/repos?per_page=100&sort=updated`);
+  } catch {
+    githubRepos = [];
+  }
+
+  const normalizedRepos = Array.isArray(githubRepos) ? githubRepos : [];
 
   const languages = {};
-  for (const repo of githubRepos) {
+  for (const repo of normalizedRepos) {
     if (!repo.language) continue;
     languages[repo.language] = (languages[repo.language] || 0) + 1;
   }
 
-  const topRepos = [...githubRepos]
+  const totalStars = normalizedRepos.reduce((sum, repo) => sum + (repo.stargazers_count || 0), 0);
+  const totalForks = normalizedRepos.reduce((sum, repo) => sum + (repo.forks_count || 0), 0);
+  const lastActivityAt = normalizedRepos
+    .map((repo) => repo.pushed_at || repo.updated_at || repo.created_at || null)
+    .filter(Boolean)
+    .sort()
+    .at(-1) || null;
+  const activityRecencyDays = lastActivityAt
+    ? Math.max(0, Math.floor((Date.now() - new Date(lastActivityAt).getTime()) / (24 * 60 * 60 * 1000)))
+    : null;
+
+  const topRepos = [...normalizedRepos]
     .sort((left, right) => (right.stargazers_count || 0) - (left.stargazers_count || 0))
     .slice(0, 3)
     .map((repo) => ({
       name: repo.name,
       description: repo.description,
       stars: repo.stargazers_count || 0,
+      forks: repo.forks_count || 0,
       primaryLanguage: repo.language,
+      updatedAt: repo.updated_at || null,
     }));
 
   const accountAgeYears = githubUser?.created_at
@@ -162,9 +242,19 @@ async function buildGithubDataFromGitHub(userId) {
 
   return {
     fetchedAt: new Date().toISOString(),
+    username: githubUser?.login || githubUsername,
+    displayName: githubUser?.name || githubUser?.login || githubUsername,
+    avatarUrl: githubUser?.avatar_url || null,
+    bio: githubUser?.bio || null,
+    githubUrl: githubUser?.html_url || `https://github.com/${githubUsername}`,
     publicRepos: githubUser?.public_repos || 0,
     followers: githubUser?.followers || 0,
+    totalStars,
+    totalForks,
     accountAgeYears,
+    lastActivityAt,
+    activityRecencyDays,
+    activityBucket: getActivityBucket(activityRecencyDays),
     languages,
     topRepos,
   };
@@ -337,7 +427,25 @@ profileRouter.post('/import-github', requireAuth, (req, res) => {
   (async () => {
     const payload = githubImportSchema.parse(req.body || {});
     const currentProfile = demoStore.getProfileByUserId(req.user.id);
-    const githubData = payload.githubData || currentProfile?.githubData || (await buildGithubDataFromGitHub(req.user.id));
+    let githubData = payload.githubData || null;
+    let source = payload.githubData ? 'manual' : 'stored';
+
+    if (!githubData) {
+      if (currentProfile?.githubUrl) {
+        githubData = await buildGithubDataFromGitHub(req.user.id);
+        source = 'github-rest';
+      } else if (currentProfile?.githubData) {
+        githubData = currentProfile.githubData;
+        source = 'stored';
+      }
+    }
+
+    if (!githubData) {
+      const error = new Error('Provide githubData or set githubUrl before importing.');
+      error.statusCode = 400;
+      error.code = 'GITHUB_DATA_REQUIRED';
+      throw error;
+    }
 
     const result = await demoStore.importGithubData(req.user.id, githubData);
 
@@ -345,6 +453,9 @@ profileRouter.post('/import-github', requireAuth, (req, res) => {
       suggestedPrimaryStack: result.suggestedPrimaryStack,
       suggestedProjectLinks: result.suggestedProjectLinks,
       profile: result.profile,
+      githubData: result.githubData,
+      importedAt: githubData.fetchedAt || null,
+      source,
     });
   })().catch((error) => {
     if (isValidationError(error)) {

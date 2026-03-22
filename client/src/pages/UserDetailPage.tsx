@@ -4,6 +4,20 @@ import { getUserSummary, type UserSummary } from "../api/users";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { ArrowRightIcon, GithubIcon, LockIcon, SendIcon, ShieldCheckIcon, SparklesIcon, UsersIcon } from "../components/ui/Icons";
 
+function formatDateTime(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
 export function UserDetailPage() {
   const { id } = useParams();
   const [loading, setLoading] = React.useState(true);
@@ -171,6 +185,21 @@ export function UserDetailPage() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+            <p className="text-sm text-slate-400">GitHub</p>
+            <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-slate-200">
+              <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 ${user.githubConnected ? "border-emerald-300/20 bg-emerald-300/15 text-emerald-100" : "border-white/10 bg-white/5 text-slate-300"}`}>
+                <GithubIcon className="h-3.5 w-3.5" />
+                {user.githubConnected ? "GitHub подключён" : "GitHub не подключён"}
+              </span>
+              {user.githubImportedAt ? (
+                <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-cyan-100">
+                  Импорт обновлён {formatDateTime(user.githubImportedAt)}
+                </span>
+              ) : null}
             </div>
           </div>
 

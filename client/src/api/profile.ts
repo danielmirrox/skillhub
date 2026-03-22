@@ -28,6 +28,7 @@ export type Profile = {
   projectLinks: ProjectLink[];
   telegramUsername: string | null;
   githubUrl: string | null;
+  githubData?: GithubImportData | null;
   isPublic: boolean;
   hasRating: boolean;
   lastRatingScore: number | null;
@@ -72,15 +73,27 @@ export type UpgradeProResponse = {
 
 export type GithubImportData = {
   fetchedAt?: string;
+  username?: string;
+  displayName?: string | null;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  githubUrl?: string | null;
   publicRepos?: number;
   followers?: number;
+  totalStars?: number;
+  totalForks?: number;
   accountAgeYears?: number;
+  lastActivityAt?: string | null;
+  activityRecencyDays?: number | null;
+  activityBucket?: "fresh" | "recent" | "steady" | "stale" | null;
   languages?: Record<string, number>;
   topRepos?: Array<{
     name: string;
     description?: string | null;
     stars?: number;
+    forks?: number;
     primaryLanguage?: string | null;
+    updatedAt?: string | null;
   }>;
 };
 
@@ -88,6 +101,9 @@ export type GithubImportResponse = {
   suggestedPrimaryStack: string[];
   suggestedProjectLinks: ProjectLink[];
   profile: Profile;
+  githubData: GithubImportData | null;
+  importedAt: string | null;
+  source: "manual" | "stored" | "github-rest";
 };
 
 export type ScoreProfileResponse = {
@@ -166,7 +182,7 @@ export async function scoreProfile(payload: UpdateProfilePayload = {}, options: 
   return body as ScoreProfileResponse;
 }
 
-export async function importGithubProfile(githubData: GithubImportData) {
+export async function importGithubProfile(payload: { githubData?: GithubImportData } = {}) {
   const response = await fetch(
     `${API_BASE_URL}/api/v1/profile/import-github`,
     {
@@ -175,7 +191,7 @@ export async function importGithubProfile(githubData: GithubImportData) {
       headers: getApiRequestHeaders({
         "Content-Type": "application/json",
       }),
-      body: JSON.stringify({ githubData }),
+      body: JSON.stringify(payload),
     },
   );
 

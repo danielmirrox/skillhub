@@ -4,6 +4,20 @@ import { getOwnProfile, scoreProfile } from "../api/profile";
 import { RatingBadge } from "../components/profile/RatingBadge";
 import { ArrowRightIcon, LockIcon, ShieldCheckIcon, SparklesIcon } from "../components/ui/Icons";
 
+function formatDateTime(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
 export function ProfilePage() {
   const [loading, setLoading] = React.useState(true);
   const [scoring, setScoring] = React.useState(false);
@@ -106,7 +120,7 @@ export function ProfilePage() {
           </article>
           <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
             <p className="text-sm text-slate-400">Шаг 3</p>
-            <p className="mt-2 text-lg font-semibold text-white">Запусти AI-скоринг</p>
+            <p className="mt-2 text-lg font-semibold text-white">Подключи GitHub для точнее рекомендаций</p>
           </article>
         </div>
         <Link
@@ -210,7 +224,7 @@ export function ProfilePage() {
             </div>
           ) : null}
 
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-4 md:grid-cols-4">
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Роль</p>
               <p className="mt-2 text-lg font-semibold text-white">{profile.role}</p>
@@ -222,6 +236,19 @@ export function ProfilePage() {
             <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
               <p className="text-sm text-slate-400">Стек</p>
               <p className="mt-2 text-lg font-semibold text-white">{profile.primaryStack.join(", ") || "не указан"}</p>
+            </article>
+            <article className="rounded-2xl border border-white/10 bg-slate-950/55 p-4">
+              <p className="text-sm text-slate-400">GitHub</p>
+              <p className="mt-2 text-lg font-semibold text-white">
+                {profile.githubData?.fetchedAt ? "Подключён" : profile.githubUrl ? "Готов к импорту" : "Не подключён"}
+              </p>
+              <p className="mt-1 text-xs text-slate-400">
+                {profile.githubData?.fetchedAt
+                  ? `Импорт обновлён ${formatDateTime(profile.githubData.fetchedAt)}`
+                  : profile.githubUrl
+                    ? "Нажми импорт на странице редактирования"
+                    : "Добавь GitHub URL в профиль"}
+              </p>
             </article>
           </div>
 
